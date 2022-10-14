@@ -1,0 +1,65 @@
+﻿@model IEnumerable<Chemodarts.Models.Player>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.groupId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.dartname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.contactData)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.interpret)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.song)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.groupId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.dartname)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.contactData)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.interpret)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.song)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.playerId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.playerId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.playerId">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
