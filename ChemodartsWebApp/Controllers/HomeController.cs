@@ -24,6 +24,7 @@ namespace ChemodartsWebApp.Controllers
         // GET: Tournaments
         public async Task<IActionResult> Index()
         {
+            //return View(await _context.Tournaments.Include(t => t.Rounds).ToListAsync());
             return View(await _context.Tournaments.ToListAsync());
         }
 

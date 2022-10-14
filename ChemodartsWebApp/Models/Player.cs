@@ -12,5 +12,11 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Kontakt")][Column("contactData")] public string? PlayerContactData { get; set; }
         [Display(Name = "Interpret")][Column("interpret")] public string? PlayerInterpret { get; set; }
         [Display(Name = "Einlaufsong")][Column("song")] public string? PlayerSong { get; set; }
+
+        //Navigation
+        public virtual ICollection<MapGroupPlayer> MappedGroups { get; set; }
+        public virtual ICollection<Match> MatchesHome { get; set; }
+        public virtual ICollection<Match> MatchesAway { get; set; }
+        [NotMapped] public ICollection<Match> Matches { get { return MatchesHome.Concat(MatchesAway).OrderByDescending(m => m.Status).ThenBy(m => m.TimeStarted).ToList(); } }    
     }
 }

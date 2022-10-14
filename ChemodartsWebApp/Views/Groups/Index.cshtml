@@ -1,0 +1,36 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.MapGroupPlayer>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Default Round</h1>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.GPM_Seed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Player.PlayerDartname)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GPM_Seed)
+            </td>
+            <td>
+                <a asp-controller="Players" asp-action="Details" asp-route-id="@item.Player.PlayerId">
+                    @Html.DisplayFor(modelItem => item.Player.PlayerDartname)
+                </a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

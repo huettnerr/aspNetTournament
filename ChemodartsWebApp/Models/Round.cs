@@ -15,8 +15,14 @@ namespace ChemodartsWebApp.Models
         }
 
         [Key][Display(Name = "ID")][Column("roundId")] public int RoundId { get; set; }
-        [Display(Name = "Turnier")][Column("tournamentId")] public int TournamentId { get; set; }
         [Display(Name = "Name")][Column("name")] public string? RoundName { get; set; }
-        [Display(Name = "Typ")][Column("type")] public RoundType Type { get; set; }
+        [Display(Name = "Typ")][Column("type")] public RoundType? Type { get; set; }
+
+        //Navigation
+        [Display(Name = "Turnier")][Column("tournamentId")] public int? TournamentId { get; set; }
+        public virtual Tournament Tournament { get; set; }
+        public virtual ICollection<Group> Groups { get; set; }
+        public virtual ICollection<MapRoundVenue> MappedVenues { get; set; }
+
     }
 }

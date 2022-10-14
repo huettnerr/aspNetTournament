@@ -9,5 +9,9 @@ namespace ChemodartsWebApp.Models
         [Key][Display(Name = "ID")][Column("venueId")] public int VenueId { get; set; }
         [Display(Name = "Name")][Column("name")] public string? VenueName { get; set; }
         [Display(Name = "Match")][Column("matchId")] public int MatchId { get; set; }
+
+        //Navigation
+        public virtual Match Match { get; set; }
+        public virtual ICollection<MapRoundVenue> MappedRounds { get; set; }
     }
 }

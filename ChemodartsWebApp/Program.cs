@@ -7,8 +7,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
-builder.Services.AddDbContext<ChemodartsContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("ChemodartsContext") ?? throw new InvalidOperationException("Connection string 'ChemodarfsEFContext' not found.")));
+string connectionString = builder.Configuration.GetConnectionString("ChemodartsContext") ?? throw new InvalidOperationException("Connection string 'ChemodarfsEFContext' not found.");
+builder.Services.AddDbContext<ChemodartsContext>(
+    options => options.UseLazyLoadingProxies().UseMySQL(connectionString), 
+    ServiceLifetime.Scoped
+);
 
 var app = builder.Build();
 

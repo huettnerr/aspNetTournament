@@ -1,0 +1,36 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.Group>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Round Robin Round</h1>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.GroupId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GroupName)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.GroupId)
+            </td>
+            <td>
+                <a asp-controller="Groups" asp-action="Index" asp-route-id="@item.GroupId">
+                    @Html.DisplayFor(modelItem => item.GroupName)
+                </a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
