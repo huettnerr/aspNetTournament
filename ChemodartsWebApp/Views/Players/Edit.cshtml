@@ -1,4 +1,4 @@
-﻿@model Chemodarts.Models.Player
+﻿@model ChemodartsWebApp.Models.Player
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,36 +12,31 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="playerId" />
+            <input type="hidden" asp-for="PlayerId" />
             <div class="form-group">
-                <label asp-for="groupId" class="control-label"></label>
-                <input asp-for="groupId" class="form-control" />
-                <span asp-validation-for="groupId" class="text-danger"></span>
+                <label asp-for="PlayerName" class="control-label"></label>
+                <input asp-for="PlayerName" class="form-control" />
+                <span asp-validation-for="PlayerName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="name" class="control-label"></label>
-                <input asp-for="name" class="form-control" />
-                <span asp-validation-for="name" class="text-danger"></span>
+                <label asp-for="PlayerDartname" class="control-label"></label>
+                <input asp-for="PlayerDartname" class="form-control" />
+                <span asp-validation-for="PlayerDartname" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="dartname" class="control-label"></label>
-                <input asp-for="dartname" class="form-control" />
-                <span asp-validation-for="dartname" class="text-danger"></span>
+                <label asp-for="PlayerContactData" class="control-label"></label>
+                <input asp-for="PlayerContactData" class="form-control" />
+                <span asp-validation-for="PlayerContactData" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="contactData" class="control-label"></label>
-                <input asp-for="contactData" class="form-control" />
-                <span asp-validation-for="contactData" class="text-danger"></span>
+                <label asp-for="PlayerInterpret" class="control-label"></label>
+                <input asp-for="PlayerInterpret" class="form-control" />
+                <span asp-validation-for="PlayerInterpret" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="interpret" class="control-label"></label>
-                <input asp-for="interpret" class="form-control" />
-                <span asp-validation-for="interpret" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="song" class="control-label"></label>
-                <input asp-for="song" class="form-control" />
-                <span asp-validation-for="song" class="text-danger"></span>
+                <label asp-for="PlayerSong" class="control-label"></label>
+                <input asp-for="PlayerSong" class="form-control" />
+                <span asp-validation-for="PlayerSong" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />

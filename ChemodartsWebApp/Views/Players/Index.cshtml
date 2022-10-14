@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Chemodarts.Models.Player>
+﻿@model IEnumerable<ChemodartsWebApp.Models.Player>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,22 +13,19 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.groupId)
+                @Html.DisplayNameFor(model => model.PlayerName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.name)
+                @Html.DisplayNameFor(model => model.PlayerDartname)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.dartname)
+                @Html.DisplayNameFor(model => model.PlayerContactData)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.contactData)
+                @Html.DisplayNameFor(model => model.PlayerInterpret)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.interpret)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.song)
+                @Html.DisplayNameFor(model => model.PlayerSong)
             </th>
             <th></th>
         </tr>
@@ -37,27 +34,24 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.groupId)
+                @Html.DisplayFor(modelItem => item.PlayerName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.name)
+                @Html.DisplayFor(modelItem => item.PlayerDartname)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.dartname)
+                @Html.DisplayFor(modelItem => item.PlayerContactData)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.contactData)
+                @Html.DisplayFor(modelItem => item.PlayerInterpret)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.interpret)
+                @Html.DisplayFor(modelItem => item.PlayerSong)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.song)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.playerId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.playerId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.playerId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.PlayerId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.PlayerId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.PlayerId">Delete</a>
             </td>
         </tr>
 }

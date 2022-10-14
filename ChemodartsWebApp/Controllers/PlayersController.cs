@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Chemodarts.Data;
-using Chemodarts.Models;
+using ChemodartsWebApp.Data;
+using ChemodartsWebApp.Models;
 
-namespace Chemodarts.Controllers
+namespace ChemodartsWebApp.Controllers
 {
     public class PlayersController : Controller
     {
@@ -22,19 +22,19 @@ namespace Chemodarts.Controllers
         // GET: Players
         public async Task<IActionResult> Index()
         {
-              return View(await _context.Player.ToListAsync());
+              return View(await _context.Players.ToListAsync());
         }
 
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Player == null)
+            if (id == null || _context.Players == null)
             {
                 return NotFound();
             }
 
-            var player = await _context.Player
-                .FirstOrDefaultAsync(m => m.playerId == id);
+            var player = await _context.Players
+                .FirstOrDefaultAsync(m => m.PlayerId == id);
             if (player == null)
             {
                 return NotFound();
@@ -54,7 +54,7 @@ namespace Chemodarts.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("playerId,groupId,name,dartname,contactData,interpret,song")] Player player)
+        public async Task<IActionResult> Create([Bind("playerId,name,dartname,contactData,interpret,song")] Player player)
         {
             if (ModelState.IsValid)
             {
@@ -68,12 +68,12 @@ namespace Chemodarts.Controllers
         // GET: Players/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Player == null)
+            if (id == null || _context.Players == null)
             {
                 return NotFound();
             }
 
-            var player = await _context.Player.FindAsync(id);
+            var player = await _context.Players.FindAsync(id);
             if (player == null)
             {
                 return NotFound();
@@ -86,9 +86,9 @@ namespace Chemodarts.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("playerId,groupId,name,dartname,contactData,interpret,song")] Player player)
+        public async Task<IActionResult> Edit(int id, [Bind("playerId,name,dartname,contactData,interpret,song")] Player player)
         {
-            if (id != player.playerId)
+            if (id != player.PlayerId)
             {
                 return NotFound();
             }
@@ -102,7 +102,7 @@ namespace Chemodarts.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!PlayerExists(player.playerId))
+                    if (!PlayerExists(player.PlayerId))
                     {
                         return NotFound();
                     }
@@ -119,13 +119,13 @@ namespace Chemodarts.Controllers
         // GET: Players/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Player == null)
+            if (id == null || _context.Players == null)
             {
                 return NotFound();
             }
 
-            var player = await _context.Player
-                .FirstOrDefaultAsync(m => m.playerId == id);
+            var player = await _context.Players
+                .FirstOrDefaultAsync(m => m.PlayerId == id);
             if (player == null)
             {
                 return NotFound();
@@ -139,14 +139,14 @@ namespace Chemodarts.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Player == null)
+            if (_context.Players == null)
             {
-                return Problem("Entity set 'ChemodarfsEFContext.Player'  is null.");
+                return Problem("Entity set 'ChemodartsContext.Player'  is null.");
             }
-            var player = await _context.Player.FindAsync(id);
+            var player = await _context.Players.FindAsync(id);
             if (player != null)
             {
-                _context.Player.Remove(player);
+                _context.Players.Remove(player);
             }
             
             await _context.SaveChangesAsync();
@@ -155,7 +155,7 @@ namespace Chemodarts.Controllers
 
         private bool PlayerExists(int id)
         {
-          return _context.Player.Any(e => e.playerId == id);
+          return _context.Players.Any(e => e.PlayerId == id);
         }
     }
 }

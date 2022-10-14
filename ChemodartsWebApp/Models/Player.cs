@@ -1,13 +1,16 @@
-﻿namespace Chemodarts.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace ChemodartsWebApp.Models
 {
+    [Table("players")]
     public class Player
     {
-        public int playerId { get; set; }
-        public int groupId { get; set; }
-        public string? name { get; set; }
-        public string? dartname { get; set; }
-        public string? contactData { get; set; }
-        public string? interpret { get; set; }
-        public string? song { get; set; }
+        [Key][Display(Name = "ID")][Column("playerId")] public int PlayerId { get; set; }
+        [Display(Name = "Name")][Column("name")] public string? PlayerName { get; set; }
+        [Display(Name = "Dartname")][Column("dartname")] public string? PlayerDartname { get; set; }
+        [Display(Name = "Kontakt")][Column("contactData")] public string? PlayerContactData { get; set; }
+        [Display(Name = "Interpret")][Column("interpret")] public string? PlayerInterpret { get; set; }
+        [Display(Name = "Einlaufsong")][Column("song")] public string? PlayerSong { get; set; }
     }
 }

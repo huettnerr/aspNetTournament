@@ -1,25 +1,27 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ChemodartsMySql.Models
+namespace ChemodartsWebApp.Models
 {
+    [Table("matches")]
     public class Match
     {
         public enum MatchStatus
         {
-            Created,
-            Active,
-            Finished
+            [Display(Name = "Erstellt")] Created,
+            [Display(Name = "Läuft")] Active,
+            [Display(Name = "Beendet")] Finished
         }
 
-        public int MatchId { get; set; }
-        public int Player1Id { get; set; }
-        public int Player2Id { get; set; }
-        public MatchStatus Status {get; set; }
+        [Key][Display(Name = "ID")][Column("matchId")] public int MatchId { get; set; }
+        [Display(Name = "Heim")][Column("player1Id")] public int Player1Id { get; set; }
+        [Display(Name = "Gast")][Column("player2Id")] public int Player2Id { get; set; }
+        [Display(Name = "Status")][Column("status")] public MatchStatus Status {get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "Startzeit")][Column("time_started")][DataType(DataType.DateTime)]
         public DateTime? TimeStarted { get; set; }
 
-        [DataType(DataType.Date)]
+        [Display(Name = "Endzeit")][Column("time_finished")][DataType(DataType.DateTime)]
         public DateTime? TimeFinished { get; set; }
     }
 }

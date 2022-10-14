@@ -1,4 +1,4 @@
-﻿@model Chemodarts.Models.Player
+﻿@model ChemodartsWebApp.Models.Player
 
 @{
     ViewData["Title"] = "Delete";
@@ -12,45 +12,39 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.groupId)
+            @Html.DisplayNameFor(model => model.PlayerName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.groupId)
+            @Html.DisplayFor(model => model.PlayerName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.name)
+            @Html.DisplayNameFor(model => model.PlayerDartname)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.name)
+            @Html.DisplayFor(model => model.PlayerDartname)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.dartname)
+            @Html.DisplayNameFor(model => model.PlayerContactData)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.dartname)
+            @Html.DisplayFor(model => model.PlayerContactData)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.contactData)
+            @Html.DisplayNameFor(model => model.PlayerInterpret)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.contactData)
+            @Html.DisplayFor(model => model.PlayerInterpret)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.interpret)
+            @Html.DisplayNameFor(model => model.PlayerSong)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.interpret)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.song)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.song)
+            @Html.DisplayFor(model => model.PlayerSong)
         </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="playerId" />
+        <input type="hidden" asp-for="PlayerId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>

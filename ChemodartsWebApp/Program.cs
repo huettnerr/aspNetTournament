@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Chemodarts.Data;
+using ChemodartsWebApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<ChemodartsContext>(options =>
-    options.UseMySQL(builder.Configuration.GetConnectionString("ChemodarfsEFContext") ?? throw new InvalidOperationException("Connection string 'ChemodarfsEFContext' not found.")));
+    options.UseMySQL(builder.Configuration.GetConnectionString("ChemodartsContext") ?? throw new InvalidOperationException("Connection string 'ChemodarfsEFContext' not found.")));
 
 var app = builder.Build();
 
