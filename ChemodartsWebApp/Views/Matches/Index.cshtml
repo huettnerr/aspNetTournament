@@ -54,10 +54,14 @@
                     </a>
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Score.Sets)
+                    @{
+                        if(item.Group.Round.Scoring != Round.ScoreType.LegsOnly) @Html.DisplayFor(modelItem => item.Score.Sets)
+                    }
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Score.Legs)
+                    @{
+                        if(item.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => item.Score.Legs)
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Status)

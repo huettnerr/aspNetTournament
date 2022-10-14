@@ -16,6 +16,7 @@ namespace ChemodartsWebApp.Data
         public DbSet<Round> Rounds { get; set; } = default!;
         public DbSet<Group> Groups { get; set; } = default!;
         public DbSet<Match> Matches { get; set; } = default!;
+        //public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<MapRoundVenue> MapperRV { get; set; } = default!;
         public DbSet<MapGroupPlayer> MapperGP { get; set; } = default!;
 
@@ -51,7 +52,8 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);
 
             //Converter for enums
-            modelBuilder.Entity<Round>().Property(e => e.Type).HasConversion(createValueConverter<Round.RoundType>());  
+            modelBuilder.Entity<Round>().Property(e => e.Modus).HasConversion(createValueConverter<Round.RoundModus>());  
+            modelBuilder.Entity<Round>().Property(e => e.Scoring).HasConversion(createValueConverter<Round.ScoreType>());  
             modelBuilder.Entity<Match>().Property(e => e.Status).HasConversion(createValueConverter<Match.MatchStatus>());  
         }
 

@@ -23,12 +23,12 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            switch (round.Type)
+            switch (round.Modus)
             {
-                case Models.Round.RoundType.RoundRobin:
+                case Models.Round.RoundModus.RoundRobin:
                     return View("IndexRR", round.Groups);
-                case Models.Round.RoundType.SingleKo:
-                case Models.Round.RoundType.DoubleKo:
+                case Models.Round.RoundModus.SingleKo:
+                case Models.Round.RoundModus.DoubleKo:
                     return View("IndexKO", round.Groups);
                 default:
                     return View(round.Groups);
