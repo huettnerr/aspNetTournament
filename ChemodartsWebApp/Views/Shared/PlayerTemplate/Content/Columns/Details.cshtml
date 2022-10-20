@@ -1,0 +1,18 @@
+﻿@*PlayerTemplate -> Content -> Column -> Details *@
+
+@model Player
+
+<td>
+    @Html.DisplayFor(modelItem => Model.PlayerContactData)
+</td>
+<td>
+    @Html.DisplayFor(modelItem => Model.PlayerInterpret)
+</td>
+<td>
+    @Html.DisplayFor(modelItem => Model.PlayerSong)
+</td>
+<td>
+    <a asp-action="Edit" asp-route-id="@Model.PlayerId">Edit</a> |
+    <a asp-action="Details" asp-route-id="@Model.PlayerId">Details</a> |
+    <a asp-action="Delete" asp-route-id="@Model.PlayerId">Delete</a>
+</td>

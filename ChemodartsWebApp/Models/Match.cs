@@ -15,8 +15,8 @@ namespace ChemodartsWebApp.Models
         }
 
         [Key][Display(Name = "ID")][Column("matchId")] public int MatchId { get; set; }
-        [Display(Name = "Heim")][Column("player1Id")] public int Player1Id { get; set; }
-        [Display(Name = "Gast")][Column("player2Id")] public int Player2Id { get; set; }
+        [Column("player1Id")] public int Player1Id { get; set; }
+        [Column("player2Id")] public int Player2Id { get; set; }
         [Display(Name = "Status")][Column("status")] public MatchStatus? Status {get; set; }
 
         [Display(Name = "Startzeit")][Column("time_started")][DataType(DataType.DateTime)]
@@ -29,8 +29,8 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "GroupId")][Column("groupId")] public int GroupId { get; set; }
         public virtual Venue Venue { get; set; }
         public virtual Group Group { get; set; }
-        public virtual Player Player1 { get; set; }
-        public virtual Player Player2 { get; set; }
+        [Display(Name = "Heim")] public virtual Player Player1 { get; set; }
+        [Display(Name = "Gast")] public virtual Player Player2 { get; set; }
         public virtual Score Score { get; set; }
     }
 }

@@ -1,0 +1,9 @@
+﻿@*PlayerTemplate -> Content -> Column -> Name *@
+
+@model Player
+
+<td>
+    <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId">
+        @Html.DisplayFor(model => Model.CombinedName)
+    </a>
+</td>

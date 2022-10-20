@@ -11,49 +11,9 @@
 </p>
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PlayerName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PlayerDartname)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PlayerContactData)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PlayerInterpret)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PlayerSong)
-            </th>
-            <th></th>
-        </tr>
+        <partial name="PlayerTemplate/Head/Table" model="@Model"/>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlayerName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlayerDartname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlayerContactData)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlayerInterpret)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PlayerSong)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.PlayerId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.PlayerId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.PlayerId">Delete</a>
-            </td>
-        </tr>
-}
+        <partial name="PlayerTemplate/Content/Table" model="@Model"/>
     </tbody>
 </table>

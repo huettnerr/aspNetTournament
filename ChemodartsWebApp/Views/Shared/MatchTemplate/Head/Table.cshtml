@@ -1,0 +1,10 @@
+﻿@* MatchTemplate -> Head -> Table*@
+
+@model IEnumerable<ChemodartsWebApp.Models.Match>
+
+<tr>
+    <partial name="MatchTemplate/Head/Columns/Players" model="@Model.FirstOrDefault()"/>
+    <partial name="MatchTemplate/Head/Columns/Score" model="@Model.FirstOrDefault()"/>
+    <partial name="MatchTemplate/Head/Columns/Venue" model="@Model.FirstOrDefault()"/>
+    <partial name="MatchTemplate/Head/Columns/Time" model="@Model.FirstOrDefault()"/>
+</tr>

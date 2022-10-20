@@ -1,0 +1,14 @@
+﻿@* MatchTemplate -> Content -> Column -> Score *@
+
+@model Match
+
+<td>
+    @{
+        if(Model.Group.Round.Scoring != Round.ScoreType.LegsOnly) @Html.DisplayFor(modelItem => Model.Score.Sets)
+    }
+</td>
+<td>
+    @{
+        if(Model.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => Model.Score.Legs)
+    }
+</td>

@@ -47,57 +47,5 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-<div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    Match ID
-                    @*@Html.DisplayNameFor(model => model.Matches)*@
-                </th>
-                <th>
-                    Heim
-                    @*@Html.DisplayNameFor(model => model.Matches)*@
-                </th>
-                <th>
-                    Gast
-                    @*@Html.DisplayNameFor(model => model.Matches)*@
-                </th>
-                <th>
-                    Status
-                    @*@Html.DisplayNameFor(model => model.Matches)*@
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-    @foreach (var item in Model.Matches) {
-            <tr>
-                <td>
-                    <a asp-controller="Matches" asp-action="Index" asp-route-id="@item.MatchId">
-                    @Html.DisplayFor(modelItem => item.MatchId)
-                    </a>
-                </td>
-                <td>
-                    <a asp-controller="Players" asp-action="Details" asp-route-id="@item.Player1.PlayerId">
-                            @{
-                                var p1Name = item.Player1.PlayerName + " \"" + item.Player1.PlayerDartname + "\"";
-                                @Html.DisplayFor(modelItem => p1Name)
-                            }
-                    </a>
-                </td>
-                <td>
-                    <a asp-controller="Players" asp-action="Details" asp-route-id="@item.Player2.PlayerId">
-                            @{
-                                var p2Name = item.Player2.PlayerName +  " \"" + item.Player2.PlayerDartname + "\"";
-                                @Html.DisplayFor(modelItem => p2Name)
-                            }
-                    </a>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
-</div>
+
+<partial name="Matches/MatchesTable" model="@Model.Matches"/>

@@ -1,0 +1,10 @@
+﻿@*PlayerTemplate -> Content -> Table*@
+
+@model IEnumerable<ChemodartsWebApp.Models.Player>
+
+@foreach (var item in Model) {
+    <tr>
+        <partial name="PlayerTemplate/Content/Columns/Name" model="@item"/>
+        <partial name="PlayerTemplate/Content/Columns/Details" model="@item"/>
+    </tr>
+}

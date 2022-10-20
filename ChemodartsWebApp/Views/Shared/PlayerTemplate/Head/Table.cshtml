@@ -1,0 +1,8 @@
+﻿@*PlayerTemplate -> Head -> Table*@
+
+@model IEnumerable<ChemodartsWebApp.Models.Player>
+
+<tr>
+    <partial name="PlayerTemplate/Head/Columns/Name" model="@Model.FirstOrDefault()"/>
+    <partial name="PlayerTemplate/Head/Columns/Details" model="@Model.FirstOrDefault()"/>
+</tr>

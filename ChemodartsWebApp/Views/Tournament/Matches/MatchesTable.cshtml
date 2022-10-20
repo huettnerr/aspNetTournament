@@ -1,66 +1,10 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Match>
 
 <table class="table">
-        <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.MatchId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Player1)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Player2)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Score.Sets)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Score.Legs)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-        </tr>
+    <thead>
+        <partial name="MatchTemplate/Head/Table" model="@Model"/>
     </thead>
-        <tbody>
-    @foreach (var item in Model) {
-            <tr>
-                <td>
-                    <a asp-controller="Matches" asp-action="Index" asp-route-id="@item.MatchId">
-                    @Html.DisplayFor(modelItem => item.MatchId)
-                    </a>
-                </td>
-                <td>
-                    <a asp-controller="Players" asp-action="Details" asp-route-id="@item.Player1.PlayerId">
-                            @{
-                                var p1Name = item.Player1.PlayerName + " \"" + item.Player1.PlayerDartname + "\"";
-                                @Html.DisplayFor(modelItem => p1Name)
-                            }
-                    </a>
-                </td>
-                <td>
-                    <a asp-controller="Players" asp-action="Details" asp-route-id="@item.Player2.PlayerId">
-                            @{
-                                var p2Name = item.Player2.PlayerName +  " \"" + item.Player2.PlayerDartname + "\"";
-                                @Html.DisplayFor(modelItem => p2Name)
-                            }
-                    </a>
-                </td>
-                <td>
-                    @{
-                        if(item.Group.Round.Scoring != Round.ScoreType.LegsOnly) @Html.DisplayFor(modelItem => item.Score.Sets)
-                    }
-                </td>
-                <td>
-                    @{
-                        if(item.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => item.Score.Legs)
-                    }
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-            </tr>
-    }
-        </tbody>
-    </table>
+    <tbody>
+        <partial name="MatchTemplate/Content/Table" model="@Model"/>
+    </tbody>
+</table>
