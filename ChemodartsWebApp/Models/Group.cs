@@ -12,8 +12,9 @@ namespace ChemodartsWebApp.Models
         //Navigation
         [Display(Name = "RoundID")][Column("roundId")] public int RoundId { get; set; }
         public virtual Round Round { get; set; }
-        public virtual ICollection<MapGroupPlayer> MappedPlayers { get; set; }
+        //public virtual ICollection<MapGroupPlayer> MappedPlayers { get; set; }
         public virtual ICollection<Match> Matches { get; set; }
+        public virtual ICollection<Seed> Seeds { get; set; }
     }
 
 }

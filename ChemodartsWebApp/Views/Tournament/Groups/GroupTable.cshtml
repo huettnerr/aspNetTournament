@@ -1,0 +1,20 @@
+﻿@model Group
+@{var SeedDummy = Model.Seeds.FirstOrDefault(); }
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => SeedDummy.SeedNr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => SeedDummy.Player.PlayerDartname)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model.Seeds) {
+        @Html.DisplayFor(model => item, "Seed")
+    }
+    </tbody>
+</table>

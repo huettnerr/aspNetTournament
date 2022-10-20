@@ -9,7 +9,7 @@ namespace ChemodartsWebApp.Models
     {
         public enum RoundModus
         {
-            [Display(Name = "Gruppen")] RoundRobin,
+            [Display(Name = "Gruppenphase")] RoundRobin,
             [Display(Name = "Einfach KO")] SingleKo,
             [Display(Name = "Doppel KO")] DoubleKo
         }

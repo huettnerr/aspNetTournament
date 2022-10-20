@@ -1,0 +1,19 @@
+﻿@model Seed
+
+<tr>
+    <td>
+        @Model.SeedNr
+    </td>
+    @if (Model.Player is object) {
+        <td>
+            <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.Player?.PlayerId">
+                @Model.Player.PlayerDartname
+            </a>
+        </td>
+    }
+    else {
+        <td>
+            @Html.DisplayFor(model => model.Player)
+        </td>
+    }
+</tr>

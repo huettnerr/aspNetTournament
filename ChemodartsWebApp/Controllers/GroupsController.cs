@@ -11,17 +11,5 @@ namespace ChemodartsWebApp.Controllers
         {
             _context = context;
         }
-
-        // GET: TournamentController
-        public async Task<IActionResult> Index(int? id)
-        {
-            var group = await _context.Groups.FindAsync(id);
-            if (group == null)
-            {
-                return NotFound();
-            }
-
-            return View(group.MappedPlayers);
-        }
     }
 }

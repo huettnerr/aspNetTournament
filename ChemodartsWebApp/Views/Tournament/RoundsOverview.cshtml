@@ -1,0 +1,13 @@
+﻿@*@model IEnumerable<ChemodartsWebApp.Models.Group>*@
+@model Round
+@{var GroupDummy = Model.Groups.FirstOrDefault(); }
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4"><b>@Model.RoundName</b> - @Html.DisplayFor(model => model.Modus)</h1>
+</div>
+
+<partial name="Rounds/Round_@Model.Modus.ToString()" model="@Model"/>

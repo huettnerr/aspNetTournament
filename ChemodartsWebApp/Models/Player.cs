@@ -14,7 +14,7 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Einlaufsong")][Column("song")] public string? PlayerSong { get; set; }
 
         //Navigation
-        public virtual ICollection<MapGroupPlayer> MappedGroups { get; set; }
+        public virtual ICollection<MapTournamentPlayer> MappedTournaments { get; set; }
         public virtual ICollection<Match> MatchesHome { get; set; }
         public virtual ICollection<Match> MatchesAway { get; set; }
         [NotMapped] public ICollection<Match> Matches { get { return MatchesHome.Concat(MatchesAway).OrderByDescending(m => m.Status).ThenBy(m => m.TimeStarted).ToList(); } }    

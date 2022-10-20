@@ -1,0 +1,9 @@
+﻿@model Group
+
+<div class="text-center">
+    <h1 class="display-4">Gruppe <b>@Model.GroupName</b></h1>
+</div>
+
+<partial name="Groups/GroupTable" model="@Model"/>
+
+<partial name="Matches/MatchesTable" model="@Model.Matches"/>

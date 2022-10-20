@@ -1,0 +1,10 @@
+﻿@model Round
+
+@foreach (var group in Model.Groups) {
+    <h2 class="display-4">
+        <a asp-controller="Tournament" asp-action="Group" asp-route-id="@group.GroupId">
+        Gruppe <b>@group.GroupName</b>
+        </a>
+    </h2>
+    <partial name="Groups/GroupTable" model="@group"/>
+}

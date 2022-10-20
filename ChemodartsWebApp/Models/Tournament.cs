@@ -12,5 +12,6 @@ namespace ChemodartsWebApp.Models
 
         //Navigation
         public virtual ICollection<Round> Rounds { get; set; }
+        public virtual ICollection<MapTournamentPlayer> MappedPlayers { get; set; }
     }
 }

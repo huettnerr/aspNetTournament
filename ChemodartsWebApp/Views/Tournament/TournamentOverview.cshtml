@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Tournament>
+﻿@model IEnumerable<ChemodartsWebApp.Models.Round>
 
 @{
     ViewData["Title"] = "Home Page";
@@ -13,13 +13,13 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.TournamentId)
+                @Html.DisplayNameFor(model => model.RoundId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TournamentName)
+                @Html.DisplayNameFor(model => model.RoundName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TournamentStart)
+                @Html.DisplayNameFor(model => model.Modus)
             </th>
         </tr>
     </thead>
@@ -27,15 +27,15 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.TournamentId)
+                @Html.DisplayFor(modelItem => item.RoundId)
             </td>
             <td>
-                <a asp-controller="Tournament" asp-action="Index" asp-route-id="@item.TournamentId">
-                    @Html.DisplayFor(modelItem => item.TournamentName)
+                <a asp-controller="Tournament" asp-action="Round" asp-route-id="@item.RoundId">
+                    @Html.DisplayFor(modelItem => item.RoundName)
                 </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TournamentStart)
+                @Html.DisplayFor(modelItem => item.Modus)
             </td>
         </tr>
 }

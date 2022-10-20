@@ -1,0 +1,8 @@
+﻿@model Round
+@{
+    var group = Model.Groups.FirstOrDefault();
+}
+
+<a asp-controller="Tournament" asp-action="Group" asp-route-id="@group.GroupId">
+    @group.GroupName
+</a>
