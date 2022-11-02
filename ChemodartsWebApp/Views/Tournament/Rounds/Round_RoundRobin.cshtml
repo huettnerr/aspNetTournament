@@ -6,5 +6,6 @@
         Gruppe <b>@group.GroupName</b>
         </a>
     </h2>
-    <partial name="Groups/GroupTable" model="@group"/>
+
+    @Html.DisplayFor(m => group.OrderedSeeds, "Seed/SeedList")
 }

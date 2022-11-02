@@ -1,0 +1,23 @@
+﻿@model Match
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.TimeStarted)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.TimeFinished)
+        </th>*@
+        break;
+    case "Content":
+        <td>
+            @Html.DisplayFor(model => Model.TimeStarted)
+        </td>
+        @*<td>
+            @Html.DisplayFor(model => Model.TimeFinished)
+        </td>*@
+        break;
+    default:
+        break;
+}

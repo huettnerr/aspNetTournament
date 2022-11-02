@@ -1,0 +1,19 @@
+﻿@model Match
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.Player1)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Player2)
+        </th>
+        break;
+    case "Content":
+        @Html.DisplayFor(m => Model.Player1, "Player/Columns/PlayerName", new { RenderType = "Content"})
+        @Html.DisplayFor(m => Model.Player2, "Player/Columns/PlayerName", new { RenderType = "Content"})
+        break;
+    default:
+        break;
+}

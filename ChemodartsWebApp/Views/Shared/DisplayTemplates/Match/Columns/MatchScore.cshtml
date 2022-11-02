@@ -1,0 +1,27 @@
+﻿@model Match
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.Score.Sets)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Score.Legs)
+        </th>
+        break;
+    case "Content":
+        <td>
+            @{
+                if(Model.Group.Round.Scoring != Round.ScoreType.LegsOnly) @Html.DisplayFor(modelItem => Model.Score.Sets)
+            }
+        </td>
+        <td>
+            @{
+                if(Model.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => Model.Score.Legs)
+            }
+        </td>
+        break;
+    default:
+        break;
+}

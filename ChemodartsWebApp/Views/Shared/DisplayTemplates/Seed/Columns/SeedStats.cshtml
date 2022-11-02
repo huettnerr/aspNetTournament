@@ -1,0 +1,35 @@
+﻿@model Seed
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.Statistics.MatchesWon)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Statistics.MatchesLost)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Statistics.PointsDiff)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Statistics.Points)
+        </th>
+        break;
+    case "Content":
+        <td>
+            @Html.DisplayFor(model => model.Statistics.MatchesWon)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.Statistics.MatchesLost)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.Statistics.PointsDiff)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.Statistics.Points)
+        </td>
+        break;
+    default:
+        break;
+}

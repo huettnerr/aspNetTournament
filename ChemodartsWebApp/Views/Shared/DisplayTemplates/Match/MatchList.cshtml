@@ -1,0 +1,25 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.Match>
+@{
+    var dummyMatch = Model.FirstOrDefault();
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
+            @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchScore", new { RenderType = "Header"})
+            @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchVenue", new { RenderType = "Header"})
+            @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchTime", new { RenderType = "Header"})
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
+            @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
+            @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})
+            @Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})
+        </tr>
+    }
+    </tbody>
+</table>

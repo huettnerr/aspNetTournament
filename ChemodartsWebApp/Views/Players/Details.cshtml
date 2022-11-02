@@ -47,5 +47,4 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-
-<partial name="../Tournament/Matches/MatchesTable" model="@Model.Matches"/>
+@Html.DisplayFor(m => Model.Matches, "Match/MatchList")

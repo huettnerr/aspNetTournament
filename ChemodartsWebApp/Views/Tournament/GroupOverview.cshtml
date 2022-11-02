@@ -4,6 +4,6 @@
     <h1 class="display-4">Gruppe <b>@Model.GroupName</b></h1>
 </div>
 
-<partial name="Groups/GroupTable" model="@Model"/>
+@Html.DisplayFor(m => Model.OrderedSeeds, "Seed/SeedList")
 
-<partial name="Matches/MatchesTable" model="@Model.Matches"/>
+@Html.DisplayFor(m => Model.Matches, "Match/MatchList")

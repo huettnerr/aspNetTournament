@@ -1,0 +1,29 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.Seed>
+@{
+    var dummySeed = Model.FirstOrDefault();
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Rank
+            </th>
+            @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedPlayer", new { RenderType = "Header"})
+            @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
+        </tr>
+    </thead>
+    <tbody>
+    @{int rank = 0;}
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @{++rank;}
+                @rank
+            </td>
+            @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
+            @Html.DisplayFor(m => item, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+        </tr>
+    }
+    </tbody>
+</table>

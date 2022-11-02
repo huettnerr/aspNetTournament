@@ -1,0 +1,21 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.Player>
+@{
+    var dummyPlayer = Model.FirstOrDefault();
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            @Html.DisplayFor(m => dummyPlayer, "Player/Columns/PlayerName", new { RenderType = "Header"})
+            @Html.DisplayFor(m => dummyPlayer, "Player/Columns/PlayerDetails", new { RenderType = "Header"})
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            @Html.DisplayFor(m => item, "Player/Columns/PlayerName", new { RenderType = "Content"})
+            @Html.DisplayFor(m => item, "Player/Columns/PlayerDetails", new { RenderType = "Content"})
+        </tr>
+    }
+    </tbody>
+</table>

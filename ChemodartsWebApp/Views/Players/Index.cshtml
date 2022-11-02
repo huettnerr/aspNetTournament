@@ -9,11 +9,5 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<table class="table">
-    <thead>
-        <partial name="PlayerTemplate/Head/Table" model="@Model"/>
-    </thead>
-    <tbody>
-        <partial name="PlayerTemplate/Content/Table" model="@Model"/>
-    </tbody>
-</table>
+
+@Html.DisplayFor(m => Model, "Player/PlayerList")

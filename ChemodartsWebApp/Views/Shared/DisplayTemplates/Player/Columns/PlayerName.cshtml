@@ -1,0 +1,23 @@
+﻿@model Player
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => Model.CombinedName)
+        </th>
+        break;
+    case "Content":
+        <td>
+        @if (Model is object) {
+            <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId">
+                @Html.DisplayFor(model => Model.CombinedName)
+            </a>
+        }else{
+            @Html.DisplayFor(model => Model.CombinedName)
+        }
+        </td>
+        break;
+    default:
+        break;
+}
