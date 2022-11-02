@@ -76,8 +76,9 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            IEnumerable<Match> matches = t.Rounds.SelectMany(r => r.Groups).Distinct().SelectMany(g => g.Matches).Distinct();
-            //IEnumerable<Match> matches = await _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync();
+            //List<Match> matches = t.Rounds.SelectMany(r => r.Groups).Distinct().SelectMany(g => g.Matches).Distinct().ToList();
+            //var matches = t.Rounds.FirstOrDefault().Groups.FirstOrDefault().Matches.ToList();
+            IEnumerable<Match> matches = await _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync();
 
             return View("TournamentMatches", matches);
         }

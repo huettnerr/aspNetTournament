@@ -1,0 +1,17 @@
+﻿@model Match
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.Group.GroupName)
+        </th>
+        break;
+    case "Content":
+        <td>
+            @Html.DisplayFor(model => Model.Group.GroupName)
+        </td>
+        break;
+    default:
+        break;
+}

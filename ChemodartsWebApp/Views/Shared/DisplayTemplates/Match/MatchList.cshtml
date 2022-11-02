@@ -1,11 +1,22 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Match>
 @{
     var dummyMatch = Model.FirstOrDefault();
+
+    bool showGroup;
+    try
+    {
+        showGroup = Convert.ToBoolean(ViewData["ShowGroup"]);
+    }
+    catch (Exception e)
+    {
+        showGroup = false;
+    }
 }
 
 <table class="table">
     <thead>
         <tr>
+            @if(showGroup) @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchGroup", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchScore", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchVenue", new { RenderType = "Header"})
@@ -15,6 +26,7 @@
     <tbody>
     @foreach (var item in Model) {
         <tr>
+            @if(showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})

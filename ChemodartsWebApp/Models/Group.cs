@@ -7,7 +7,7 @@ namespace ChemodartsWebApp.Models
     public class Group
     {
         [Key][Display(Name = "ID")][Column("groupId")] public int GroupId { get; set; }
-        [Required][Display(Name = "Name")][Column("name")] public string? GroupName { get; set; }
+        [Required][Display(Name = "Gruppe")][Column("name")] public string? GroupName { get; set; }
 
         //Navigation
         [Display(Name = "RoundID")][Column("roundId")] public int RoundId { get; set; }
