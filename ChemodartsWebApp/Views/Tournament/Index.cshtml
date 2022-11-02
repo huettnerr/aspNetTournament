@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
 <div class="text-center">
@@ -30,7 +31,7 @@
                 @Html.DisplayFor(modelItem => item.TournamentId)
             </td>
             <td>
-                <a asp-controller="Tournament" asp-action="Detail" asp-route-id="@item.TournamentId">
+                <a asp-route-tournamentId="@item.TournamentId" asp-action="Index">
                     @Html.DisplayFor(modelItem => item.TournamentName)
                 </a>
             </td>

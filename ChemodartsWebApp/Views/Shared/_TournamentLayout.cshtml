@@ -7,12 +7,15 @@
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Detail">Übersicht</a>
+                    @*@Html.ActionLink("Übersicht", "Index")*@
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Index">Übersicht</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Player">Teilnehmer</a>
+                    @*@Html.ActionLink("Teilnehmer", "Players")*@
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Players">Teilnehmer</a>
                 </li>
                 <li class="nav-item">
+                    @*@Html.ActionLink("Matches", "Matches")*@
                     <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Matches">Matches</a>
                 </li>
             </ul>

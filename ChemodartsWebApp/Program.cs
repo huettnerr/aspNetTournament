@@ -33,6 +33,11 @@ app.UseAuthorization();
 app.MapRazorPages();
 
 app.MapControllerRoute(
+    name: "Tournament",
+    pattern: "Tournament/{tournamentId?}/{action}/{id?}",
+    defaults: new { controller = "Tournament", action = "Index"});
+
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Tournament}/{action=Index}/{id?}");
 
