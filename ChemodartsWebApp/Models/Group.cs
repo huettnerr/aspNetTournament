@@ -14,7 +14,9 @@ namespace ChemodartsWebApp.Models
         public virtual Round Round { get; set; }
         //public virtual ICollection<MapGroupPlayer> MappedPlayers { get; set; }
         public virtual ICollection<Match> Matches { get; set; }
-        public virtual ICollection<Seed> Seeds { get; set; }
+        public virtual ICollection<Seed> Seeds { get ; set; }
+
+        [NotMapped] public virtual ICollection<Seed> OrderedSeeds { get => Seeds.OrderByDescending(s => s.Statistics.MatchesWon).ThenByDescending(s => s.Statistics.PointsDiff).ToList(); }
     }
 
 }

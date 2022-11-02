@@ -1,0 +1,9 @@
+﻿@model Player
+
+@if (Model is object) {
+    <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId">
+        @Html.DisplayFor(model => Model.CombinedName)
+    </a>
+}else{
+    @Html.DisplayFor(model => Model.CombinedName)
+}

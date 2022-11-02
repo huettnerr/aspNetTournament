@@ -32,5 +32,81 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Heim")] public virtual Player Player1 { get; set; }
         [Display(Name = "Gast")] public virtual Player Player2 { get; set; }
         public virtual Score Score { get; set; }
+
+        public bool UpdateSeedStat(Seed s, SeedStatistics stat)
+        {
+            if (this.Status != MatchStatus.Finished) return false;
+            if (this.Score == null) return false;
+
+            //Update Set/Leg Stat
+            if (this.Player1.Equals(s.Player))
+            {
+                //Won
+                stat.SetsWon += this.Score.P1Sets;
+                stat.LegsWon += this.Score.P1Legs;
+
+                //Lost
+                stat.SetsWon += this.Score.P2Sets;
+                stat.LegsWon += this.Score.P2Legs;
+            } 
+            else if (this.Player2.Equals(s.Player))
+            {
+                //Won
+                stat.SetsWon += this.Score.P2Sets;
+                stat.LegsWon += this.Score.P2Legs;
+
+                //Lost
+                stat.SetsWon += this.Score.P1Sets;
+                stat.LegsWon += this.Score.P1Legs;
+            } 
+            else return false;
+
+            //Update Winning Stat
+            if(HasPlayerWon(s.Player))
+            {
+                stat.MatchesWon++;
+            }
+            else
+            {
+                stat.MatchesLost++;
+            }
+            return true;
+        }
+
+        public bool HasPlayerWon(Player p)
+        {
+            if (this.Status != MatchStatus.Finished) return false;
+
+            if(this.Score == null) return false;
+
+            if(this.Group.Round.Scoring == Round.ScoreType.LegsOnly)
+            {
+                //Check for Legs
+                if (this.Score.P1Legs > this.Score.P2Legs)
+                {
+                    //Player 1 won
+                    return p.Equals(this.Player1) ? true : false;
+                }
+                else
+                {
+                    //Player 2 won
+                    return p.Equals(this.Player2) ? true : false;
+                }
+            }
+            else
+            {
+                //Check for Sets
+                if (this.Score.P1Sets > this.Score.P2Sets)
+                {
+                    //Player 1 won
+                    return p.Equals(this.Player1) ? true : false;
+                }
+                else
+                {
+                    //Player 2 won
+                    return p.Equals(this.Player2) ? true : false;
+                }
+            }
+        }
     }
 }

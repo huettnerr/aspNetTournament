@@ -1,0 +1,12 @@
+﻿@*SeedTemplate -> Content -> Column -> Player *@
+
+@model Seed
+
+<td>
+    @Html.DisplayFor(model => model.SeedNr)
+</td>
+@*<td>
+    @Html.DisplayFor(model => model.SeedName)
+</td>*@
+
+ <partial name="PlayerTemplate/Content/Columns/Name" model="@Model.Player"/>

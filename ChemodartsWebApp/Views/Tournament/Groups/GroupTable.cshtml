@@ -3,16 +3,9 @@
 
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => SeedDummy.SeedNr)
-            </th>
-            <partial name="PlayerTemplate/Head/Columns/Name" model="@SeedDummy.Player"/>
-        </tr>
+        <partial name="SeedTemplate/Head/Table" model="@Model.Seeds"/>
     </thead>
     <tbody>
-    @foreach (var item in Model.Seeds) {
-        @Html.DisplayFor(model => item, "Seed")
-    }
+        <partial name="SeedTemplate/Content/Table" model="@Model.OrderedSeeds"/>
     </tbody>
 </table>

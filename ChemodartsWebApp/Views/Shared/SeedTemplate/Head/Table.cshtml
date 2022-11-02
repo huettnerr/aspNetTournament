@@ -1,0 +1,11 @@
+﻿@*SeedTemplate -> Head -> Table*@
+
+@model IEnumerable<ChemodartsWebApp.Models.Seed>
+
+<tr>
+    <th>
+        Rank
+    </th>
+    <partial name="SeedTemplate/Head/Columns/Player" model="@Model.FirstOrDefault()"/>
+    <partial name="SeedTemplate/Head/Columns/Stats" model="@Model.FirstOrDefault()"/>
+</tr>
