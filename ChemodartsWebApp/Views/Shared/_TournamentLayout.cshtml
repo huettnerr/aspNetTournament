@@ -1,0 +1,27 @@
+﻿@{
+    ViewBag.Title = "TT";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+}
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <div class="container-fluid">
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Detail">Übersicht</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Player">Teilnehmer</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Matches">Matches</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+@*<a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Detail">Übersicht</a>
+<a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Player">Teilnehmer</a>
+<a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Match">Matches</a>*@
+<br /><br />
+@RenderBody()
