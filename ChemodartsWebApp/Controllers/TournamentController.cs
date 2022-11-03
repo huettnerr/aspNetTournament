@@ -51,18 +51,18 @@ namespace ChemodartsWebApp.Controllers
 
             if (id is null)
             {
-                return View("TournamentPlayers", t.MappedPlayers.Select(mp => mp.Player));
+                return View("TournamentSeeds", t.Seeds);
             }
 
-            MapTournamentPlayer? p = t.MappedPlayers.Where(mp => mp.TPM_PlayerId == id).FirstOrDefault();
+            Seed? s = t.Seeds.Where(s => s.SeedId == id).FirstOrDefault();
 
-            if (p is null)
+            if (s is null)
             {
                 return NotFound();
             }
             else
             {
-                return View("TournamentPlayerDetail", p);
+                return View("TournamentSeedDetail", s);
             }
         }
 

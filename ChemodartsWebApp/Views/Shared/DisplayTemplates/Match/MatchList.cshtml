@@ -2,15 +2,8 @@
 @{
     var dummyMatch = Model.FirstOrDefault();
 
-    bool showGroup;
-    try
-    {
-        showGroup = Convert.ToBoolean(ViewData["ShowGroup"]);
-    }
-    catch (Exception e)
-    {
-        showGroup = false;
-    }
+    bool showGroup = false; ;
+    if(ViewData["ShowGroup"]?.Equals("true") ?? false) showGroup = true;
 }
 
 <table class="table">

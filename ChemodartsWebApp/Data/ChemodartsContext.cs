@@ -19,7 +19,7 @@ namespace ChemodartsWebApp.Data
         public DbSet<Match> Matches { get; set; } = default!;
         //public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<MapRoundVenue> MapperRV { get; set; } = default!;
-        public DbSet<MapTournamentPlayer> MapperTP { get; set; } = default!;
+        public DbSet<MapTournamentSeedPlayer> MapperTP { get; set; } = default!;
 
         public ChemodartsContext (DbContextOptions<ChemodartsContext> options)
             : base(options)
@@ -47,9 +47,10 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<Match>().HasOne<Venue>(v => v.Venue).WithOne(m => m.Match).HasForeignKey<Match>(v => v.VenueId);
 
             //Navigation Entries of mapped tables
-            modelBuilder.Entity<MapTournamentPlayer>().HasOne<Tournament>(map => map.Tournament).WithMany(p => p.MappedPlayers).HasForeignKey(map => map.TPM_TournamentId);
-            modelBuilder.Entity<MapTournamentPlayer>().HasOne<Player>(map => map.Player).WithMany(p => p.MappedTournaments).HasForeignKey(map => map.TPM_PlayerId);
-            modelBuilder.Entity<MapTournamentPlayer>().HasOne<Seed>(map => map.Seed).WithOne(s => s.MappedTournamentPlayer).HasForeignKey<MapTournamentPlayer>(map => map.TPM_SeedId);
+
+            modelBuilder.Entity<MapTournamentSeedPlayer>().HasOne<Tournament>(map => map.Tournament).WithMany(p => p.MappedSeedsPlayers).HasForeignKey(map => map.TSP_TournamentId);
+            modelBuilder.Entity<MapTournamentSeedPlayer>().HasOne<Player>(map => map.Player).WithMany(p => p.MappedTournaments).HasForeignKey(map => map.TSP_PlayerId);
+            modelBuilder.Entity<MapTournamentSeedPlayer>().HasOne<Seed>(map => map.Seed).WithOne(s => s.MappedTournamentPlayer).HasForeignKey<MapTournamentSeedPlayer>(map => map.TSP_SeedId);
 
             modelBuilder.Entity<MapRoundVenue>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedVenues).HasForeignKey(map => map.RVM_RoundId);
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);

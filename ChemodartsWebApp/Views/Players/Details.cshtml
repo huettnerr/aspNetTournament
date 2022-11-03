@@ -2,6 +2,12 @@
 
 @{
     ViewData["Title"] = "Details";
+
+    bool showSeeds = true; ;
+    if(ViewData["ShowSeeds"]?.Equals("false") ?? false) showSeeds = false;
+
+    bool showMatches = true; ;
+    if(ViewData["ShowMatches"]?.Equals("false") ?? false) showMatches = false;
 }
 
 <h1>Details</h1>
@@ -47,4 +53,19 @@
     <a asp-action="Index">Back to List</a>
 </div>
 
-@Html.DisplayFor(m => Model.Matches, "Match/MatchList")
+@if(showSeeds) {
+    <h2>Gespielte Turniere</h2>
+    @foreach (var seed in Model.Seeds)
+    {
+        //@Html.DisplayFor(m => seed, "Tournament/SeedResult")
+        <a asp-controller="Tournament" asp-route-tournamentId=@seed.Tournament.TournamentId asp-action="Players" asp-route-id=@seed.SeedId>
+            @seed.Tournament.TournamentName
+        </a>
+    }
+}
+
+@if (showMatches)
+{
+    <h2>Alle Matches</h2>
+    @Html.DisplayFor(m => Model.Matches, "Match/MatchList")
+}

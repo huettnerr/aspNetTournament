@@ -16,7 +16,7 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<Match> Matches { get; set; }
         public virtual ICollection<Seed> Seeds { get ; set; }
 
-        [NotMapped] public virtual ICollection<Seed> OrderedSeeds { get => Seeds.OrderByDescending(s => s.Statistics.MatchesWon).ThenByDescending(s => s.Statistics.PointsDiff).ToList(); }
+        [NotMapped] public virtual ICollection<Seed> RankedSeeds { get => Seeds.OrderByDescending(s => s.Statistics.MatchesWon).ThenByDescending(s => s.Statistics.PointsDiff).ToList(); }
     }
 
 }

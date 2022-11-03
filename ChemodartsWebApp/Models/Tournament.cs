@@ -12,6 +12,7 @@ namespace ChemodartsWebApp.Models
 
         //Navigation
         public virtual ICollection<Round> Rounds { get; set; }
-        public virtual ICollection<MapTournamentPlayer> MappedPlayers { get; set; }
+        public virtual ICollection<MapTournamentSeedPlayer> MappedSeedsPlayers { get; set; }
+        [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedSeedsPlayers.Select(msp => msp.Seed).ToList(); }
     }
 }

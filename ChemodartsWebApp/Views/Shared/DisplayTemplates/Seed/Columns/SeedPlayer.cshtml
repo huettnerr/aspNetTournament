@@ -14,7 +14,9 @@
         break;
     case "Content":
         <td>
-            #@Model.SeedNr
+            <a asp-action="Players" asp-route-id="@Model.SeedId">
+                #@Model.SeedNr
+            </a>
         </td>
         @*<td>
             @Html.DisplayFor(model => model.SeedName)
@@ -23,5 +25,5 @@
         <partial name="DisplayTemplates/Seed/Columns/SeedPlayerName" model="@Model"/>
         break;
     default:
-        break;
+        goto case "Content";
 }

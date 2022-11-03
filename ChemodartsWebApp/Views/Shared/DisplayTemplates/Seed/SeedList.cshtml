@@ -1,28 +1,35 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Seed>
 @{
     var dummySeed = Model.FirstOrDefault();
+
+    bool showStats = false; ;
+    if(ViewData["ShowStats"]?.Equals("true") ?? false) showStats = true;
 }
 
 <table class="table">
     <thead>
         <tr>
+        @if (showStats) {
             <th>
                 Rank
             </th>
+        }
             @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedPlayer", new { RenderType = "Header"})
-            @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
+            @if(showStats)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
         </tr>
     </thead>
     <tbody>
     @{int rank = 0;}
     @foreach (var item in Model) {
         <tr>
+        @if (showStats) {
             <td>
                 @{++rank;}
                 @rank
             </td>
+        }
             @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
-            @Html.DisplayFor(m => item, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+            @if(showStats)@Html.DisplayFor(m => item, "Seed/Columns/SeedStats", new { RenderType = "Content" })
         </tr>
     }
     </tbody>
