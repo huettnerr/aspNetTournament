@@ -16,8 +16,7 @@ namespace ChemodartsWebApp.Models
 
         //Navigation
         public virtual ICollection<MapTournamentPlayer> MappedTournaments { get; set; }
-        public virtual ICollection<Match> MatchesHome { get; set; }
-        public virtual ICollection<Match> MatchesAway { get; set; }
-        [NotMapped] public ICollection<Match> Matches { get { return MatchesHome.Concat(MatchesAway).OrderByDescending(m => m.Status).ThenBy(m => m.TimeStarted).ToList(); } }    
+        [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedTournaments.Select(mtp => mtp.Seed).ToList(); }
+        [NotMapped] public virtual ICollection<Match> Matches { get => Seeds.SelectMany(s => s.Matches).Distinct().ToList(); } 
     }
 }

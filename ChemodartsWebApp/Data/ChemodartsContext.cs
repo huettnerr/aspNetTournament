@@ -41,10 +41,10 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<Round>().HasMany<Group>(r => r.Groups).WithOne(g => g.Round).HasForeignKey(g => g.RoundId);
             modelBuilder.Entity<Group>().HasMany<Match>(g => g.Matches).WithOne(m => m.Group).HasForeignKey(m => m.GroupId);
             modelBuilder.Entity<Group>().HasMany<Seed>(g => g.Seeds).WithOne(s => s.Group).HasForeignKey(s => s.GroupId);
-            modelBuilder.Entity<Match>().HasOne<Player>(m => m.Player1).WithMany(p => p.MatchesHome).HasForeignKey(m => m.Player1Id);
-            modelBuilder.Entity<Match>().HasOne<Player>(m => m.Player2).WithMany(p => p.MatchesAway).HasForeignKey(m => m.Player2Id);
+            modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed1).WithMany(p => p.MatchesAsS1).HasForeignKey(m => m.Seed1Id);
+            modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed2).WithMany(p => p.MatchesAsS2).HasForeignKey(m => m.Seed2Id);
             modelBuilder.Entity<Match>().HasOne<Score>(m => m.Score).WithOne(s => s.Match).HasForeignKey<Score>(s => s.MatchId);
-            modelBuilder.Entity<Venue>().HasOne<Match>(v => v.Match).WithOne(m => m.Venue).HasForeignKey<Venue>(v => v.MatchId);
+            modelBuilder.Entity<Match>().HasOne<Venue>(v => v.Venue).WithOne(m => m.Match).HasForeignKey<Match>(v => v.VenueId);
 
             //Navigation Entries of mapped tables
             modelBuilder.Entity<MapTournamentPlayer>().HasOne<Tournament>(map => map.Tournament).WithMany(p => p.MappedPlayers).HasForeignKey(map => map.TPM_TournamentId);

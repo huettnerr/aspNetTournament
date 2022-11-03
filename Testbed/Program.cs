@@ -1,19 +1,16 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-Console.WriteLine("Hello, World!");
+using Testbed;
 
-Console.WriteLine(RoundType.RoundRobin);
-Console.WriteLine(RoundType.SingleKo);
-Console.WriteLine(RoundType.DoubleKo);
-RoundType val = (RoundType)Enum.Parse(typeof(RoundType), "RoundRobin");
-Console.WriteLine(val); 
-
-public enum RoundType
+var rounds = BracketGenerator.Generate(BracketGenerator.PlayerNumber.p64);
+foreach (var round in rounds)
 {
-    RoundRobin,
-    SingleKo,
-    DoubleKo
+    foreach (var match in round.Matches)
+    {
+        Console.WriteLine("{0} vs {1}", match.Seed1, match.Seed2);
+    }
+    Console.WriteLine();
 }
+Console.ReadKey();

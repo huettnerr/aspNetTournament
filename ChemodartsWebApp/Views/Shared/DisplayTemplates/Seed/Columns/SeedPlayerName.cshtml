@@ -1,0 +1,12 @@
+﻿@model Seed
+
+@if (Model.Player is object)
+{
+    @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Content"})
+}
+else
+{
+    <td>
+        Seed #@Model.SeedNr
+    </td>
+}

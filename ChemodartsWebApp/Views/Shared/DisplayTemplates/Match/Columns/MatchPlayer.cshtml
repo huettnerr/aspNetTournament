@@ -4,15 +4,15 @@
 {
     case "Header":
         <th>
-            @Html.DisplayNameFor(model => model.Player1)
+            @Html.DisplayNameFor(model => model.Seed1)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Player2)
+            @Html.DisplayNameFor(model => model.Seed2)
         </th>
         break;
     case "Content":
-        @Html.DisplayFor(m => Model.Player1, "Player/Columns/PlayerName", new { RenderType = "Content"})
-        @Html.DisplayFor(m => Model.Player2, "Player/Columns/PlayerName", new { RenderType = "Content"})
+        @Html.DisplayFor(m => Model.Seed1, "Seed/Columns/SeedPlayerName")
+        @Html.DisplayFor(m => Model.Seed2, "Seed/Columns/SeedPlayerName")
         break;
     default:
         break;

@@ -4,7 +4,7 @@
 {
     case "Header":
         <th>
-            @Html.DisplayNameFor(model => model.SeedNr)
+            @Html.DisplayNameFor(model => Model.SeedNr)
         </th>
         @*<th>
             @Html.DisplayNameFor(model => model.SeedName)
@@ -14,13 +14,13 @@
         break;
     case "Content":
         <td>
-            @Html.DisplayFor(model => model.SeedNr)
+            #@Model.SeedNr
         </td>
         @*<td>
             @Html.DisplayFor(model => model.SeedName)
         </td>*@
 
-        @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Content"})
+        <partial name="DisplayTemplates/Seed/Columns/SeedPlayerName" model="@Model"/>
         break;
     default:
         break;
