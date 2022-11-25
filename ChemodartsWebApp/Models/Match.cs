@@ -15,6 +15,7 @@ namespace ChemodartsWebApp.Models
         }
 
         [Key][Display(Name = "ID")][Column("matchId")] public int MatchId { get; set; }
+        [Column("matchOrderValue")] public int MatchOrderValue { get; set; }
         [Display(Name = "GroupId")][Column("groupId")] public int GroupId { get; set; }
         [Column("seed1Id")] public int Seed1Id { get; set; }
         [Column("seed2Id")] public int Seed2Id { get; set; }

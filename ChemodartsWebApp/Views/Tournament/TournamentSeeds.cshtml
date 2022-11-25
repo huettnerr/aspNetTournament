@@ -1,3 +1,5 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Seed>
 
-@Html.DisplayFor(m => Model, "Seed/SeedList", new { ShowStats = "false" } )
+<a asp-action="AddPlayers">Add Players</a>
+
+@Html.DisplayFor(m => Model, "Seed/SeedList", new { ShowStats = "false", ShowTournamentStatus = "true" } )

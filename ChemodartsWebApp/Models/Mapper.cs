@@ -10,7 +10,8 @@ namespace ChemodartsWebApp.Models
         [Column("tournamentId")] public int TSP_TournamentId { get; set; }
         [Display(Name = "Seed")][Column("seedId")] public int TSP_SeedId { get; set; }
         [Column("playerId")] public int? TSP_PlayerId { get; set; }
-        [Display(Name = "Fixed")][Column("playerFixed")] public int TSP_PlayerFixed { get; set; }
+        [Display(Name = "Fixed?")][Column("playerFixed")] public bool TSP_PlayerFixed { get; set; }
+        [Display(Name = "Checked In?")][Column("playerCheckedIn")] public bool TSP_PlayerCheckedIn { get; set; }
 
         //Navigation
         //public virtual ICollection<Player> Players { get; set; }

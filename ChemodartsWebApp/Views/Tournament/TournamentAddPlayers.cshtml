@@ -1,0 +1,36 @@
+﻿@model List<string>
+@{
+    ViewBag.Title = "MultiSelect Player";
+}
+
+@*https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions/working-with-the-dropdownlist-box-and-jquery/using-the-dropdownlist-helper-with-aspnet-mvc*@
+
+@if (ViewBag.YouSelected is object) {
+    <div> You Selected:  @ViewBag.YouSelected</div>
+}
+
+@if (ViewBag.Message is object) {
+    <h3>@ViewBag.Message</h3>
+}
+
+@using (Html.BeginForm()) {
+
+    <fieldset>
+
+        <legend>Multi-Select Demo</legend>
+
+        <div class="editor-field">
+
+            @Html.ListBox("Players", ViewBag.Playerslist as MultiSelectList)
+
+        </div>
+
+        <p>
+
+            <input type="submit" value="Save" />
+
+        </p>
+
+    </fieldset>
+
+}

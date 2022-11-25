@@ -4,6 +4,9 @@
 
     bool showStats = false; ;
     if(ViewData["ShowStats"]?.Equals("true") ?? false) showStats = true;
+
+    bool showTournamentStatus = false; ;
+    if(ViewData["ShowTournamentStatus"]?.Equals("true") ?? false) showTournamentStatus = true;
 }
 
 <table class="table">
@@ -16,6 +19,7 @@
         }
             @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedPlayer", new { RenderType = "Header"})
             @if(showStats)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
+            @if(showTournamentStatus)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedTournamentStatus", new { RenderType = "Header" })
         </tr>
     </thead>
     <tbody>

@@ -24,6 +24,7 @@ namespace ChemodartsWebApp.Data
         public ChemodartsContext (DbContextOptions<ChemodartsContext> options)
             : base(options)
         {
+            createDebugTournament();
         }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -67,6 +68,35 @@ namespace ChemodartsWebApp.Data
                     from => from.ToString(),
                     to => (T)Enum.Parse(typeof(T), to)
                 );
+        }
+
+        public Tournament DebugTournament = null;
+        private void createDebugTournament()
+        {
+            DebugPlayers = new List<Player>();
+            DebugTournament = new Tournament() { TournamentId = 1, TournamentName = "Test Turnier"};
+            DebugTournament.MappedSeedsPlayers = new List<MapTournamentSeedPlayer>() { 
+                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(1) },
+                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(2) },
+                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(3) },
+                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(4) }
+            };
+        }
+
+        private int playerId = 0;
+        public List<Player> DebugPlayers;
+        private Player createRandomPlayer()
+        {
+            Random random = new Random();
+            Player p = new Player() { PlayerId = ++playerId, PlayerName = $"Player {random.Next(100)}" };
+            DebugPlayers.Add(p);
+            return p;
+        }
+
+        private int seedId = 0;
+        private Seed createSeed(int number)
+        {
+            return new Seed() { SeedId = seedId, SeedNr = number };
         }
     }
 }

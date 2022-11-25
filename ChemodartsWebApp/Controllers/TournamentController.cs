@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -64,6 +65,83 @@ namespace ChemodartsWebApp.Controllers
             {
                 return View("TournamentSeedDetail", s);
             }
+        }
+
+        private async Task<MultiSelectList> getPlayersMultiSelectList(Tournament? t)
+        {
+            List<Player> Players = await _context.Players.ToListAsync();
+
+            //Remove already subscribed Players
+            List<Player>? SubscribedPlayers = t?.MappedSeedsPlayers.Where(msp => msp.Seed.Player is object).Select(msp => msp.Seed.Player).ToList();
+            SubscribedPlayers?.ForEach(p => Players.Remove(p));
+
+            return new MultiSelectList(Players, "PlayerId", "CombinedName", null);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> AddPlayers(int? tournamentId, int? id)
+        {
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            //Tournament t = _context.DebugTournament;
+            if (t is null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Playerslist = getPlayersMultiSelectList(t).Result;
+
+            return View("TournamentAddPlayers");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddPlayers(int? tournamentId, int? id, IFormCollection form)
+        {
+            ViewBag.YouSelected = form["Players"];
+            string selectedValues = form["Players"];
+
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            //Tournament t = _context.DebugTournament;
+
+            if (t is null)
+            {
+                return NotFound();
+            }
+
+            if (!selectedValues?.Equals(String.Empty) ?? false)
+            {
+                System.Text.StringBuilder sb = new System.Text.StringBuilder();
+                List<MapTournamentSeedPlayer> availableMappedSeeds = t.MappedSeedsPlayers.Where(msp => msp.Seed.Player is null).ToList();
+
+                List<int> playerIds = selectedValues.Split(",").Select(sV => Convert.ToInt32(sV)).ToList();
+
+                //Update Seeds
+                foreach (int playerId in playerIds)
+                {
+                    if (availableMappedSeeds.Count == 0) {
+                        sb.Append("Keine freien Seeds (mehr) gefunden\n");
+                        break;
+                    }
+
+                    try
+                    {
+                        MapTournamentSeedPlayer msp = availableMappedSeeds.First();
+                        msp.TSP_PlayerId = playerId;
+                        _context.Update(msp);
+                        await _context.SaveChangesAsync();
+
+                        availableMappedSeeds.Remove(msp);
+                        sb.Append($"Spieler '{_context.Players.Single(p => p.PlayerId == playerId).CombinedName}' hat Seed #{msp.Seed.SeedNr}");
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        break;
+                    }
+                }
+
+                ViewBag.Message = sb.ToString();
+            }
+
+            return AddPlayers(tournamentId, id).Result;
         }
 
         // GET Vollständige Matchliste
