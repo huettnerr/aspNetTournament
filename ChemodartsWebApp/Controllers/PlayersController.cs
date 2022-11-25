@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -44,6 +45,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         // GET: Players/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             return View();
@@ -66,6 +68,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         // GET: Players/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Players == null)
@@ -86,6 +89,7 @@ namespace ChemodartsWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int id, [Bind("playerId,name,dartname,contactData,interpret,song")] Player player)
         {
             if (id != player.PlayerId)
@@ -117,6 +121,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         // GET: Players/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Players == null)
@@ -137,6 +142,7 @@ namespace ChemodartsWebApp.Controllers
         // POST: Players/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             if (_context.Players == null)
