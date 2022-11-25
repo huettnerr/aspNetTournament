@@ -54,7 +54,7 @@ namespace ChemodartsWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("playerId,name,dartname,contactData,interpret,song")] Player player)
+        public async Task<IActionResult> Create([Bind("PlayerName,PlayerDartname,PlayerContactData,PlayerInterpret,PlayerSong")] Player player)
         {
             if (ModelState.IsValid)
             {

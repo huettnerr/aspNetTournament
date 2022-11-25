@@ -3,19 +3,33 @@
 @switch(ViewData["RenderType"])
 {
     case "Header":
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
-        </th>
+        </th>*@
         <th>
             @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
         </th>
+        <th>
+            Aktion
+        </th>
         break;
     case "Content":
-        <td>
+        @*<td>
             @Html.DisplayFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
+            </td>*@
+        <td>
+            @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+            {
+                <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId">CheckIn</a>
+            }else{
+                <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId"> @Html.Raw("&#10004;")</a>
+            }
         </td>
         <td>
-            @Html.DisplayFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+            @if (Model.MappedTournamentPlayer.Player is object)
+            {
+                <a asp-action="PlayerRemove" asp-route-id="@Model.SeedId">Entfernen</a>
+            }
         </td>
         break;
     default:

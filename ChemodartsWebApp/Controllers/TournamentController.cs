@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -41,31 +42,22 @@ namespace ChemodartsWebApp.Controllers
         }
 
         // GET Spielerübersicht
-        public async Task<IActionResult> Players(int? tournamentId, int? id)
+        public IActionResult Players(int? tournamentId, int? id)
         {
-             //search for spezific tournament
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
-            if (t is null)
-            {
-                return NotFound();
-            }
+            //search for spezific tournament
+            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            if (t is null) return NotFound();
 
-            if (id is null)
-            {
-                return View("TournamentSeeds", t.Seeds);
-            }
+            if (id is null) return View("TournamentSeeds", t.Seeds.OrderBy(s => s.SeedNr));
 
             Seed? s = t.Seeds.Where(s => s.SeedId == id).FirstOrDefault();
 
-            if (s is null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return View("TournamentSeedDetail", s);
-            }
+            if (s is null) return NotFound();
+
+            return View("TournamentSeedDetail", s);
         }
+
+        #region Add Player
 
         private async Task<MultiSelectList> getPlayersMultiSelectList(Tournament? t)
         {
@@ -122,17 +114,14 @@ namespace ChemodartsWebApp.Controllers
                         break;
                     }
 
-                    try
-                    {
-                        MapTournamentSeedPlayer msp = availableMappedSeeds.First();
-                        msp.TSP_PlayerId = playerId;
-                        _context.Update(msp);
-                        await _context.SaveChangesAsync();
+                    MapTournamentSeedPlayer? msp = availableMappedSeeds.FirstOrDefault();
 
+                    if (changeSeedPlayer(msp, playerId).Result)
+                    {
                         availableMappedSeeds.Remove(msp);
                         sb.Append($"Spieler '{_context.Players.Single(p => p.PlayerId == playerId).CombinedName}' hat Seed #{msp.Seed.SeedNr}");
                     }
-                    catch (DbUpdateConcurrencyException)
+                    else
                     {
                         break;
                     }
@@ -143,6 +132,51 @@ namespace ChemodartsWebApp.Controllers
 
             return AddPlayers(tournamentId, id).Result;
         }
+
+        #endregion
+
+        #region CheckIn/Remove Player
+
+        public IActionResult PlayerRemove(int? tournamentId, int? id)
+        {
+            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            if (t is null || id is null) return NotFound();
+
+            MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == id).FirstOrDefault();
+
+            if(changeSeedPlayer(msp, null).Result)
+            {
+                return Players(tournamentId, null);
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+
+        [Authorize(Policy = "RequireAdministratorRole")]
+        public async Task<IActionResult> PlayerCheckIn(int? tournamentId, int? id)
+        {
+            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            if (t is null || id is null) return NotFound();
+
+            MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == id).FirstOrDefault();
+            if(msp is null) return NotFound();
+
+            try
+            {
+                msp.TSP_PlayerCheckedIn = !msp.TSP_PlayerCheckedIn;
+                _context.Update(msp);
+                await _context.SaveChangesAsync();
+                return Players(tournamentId, null);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+        }
+
+        #endregion
 
         // GET Vollständige Matchliste
         public async Task<IActionResult> Matches(int? tournamentId)
@@ -203,6 +237,23 @@ namespace ChemodartsWebApp.Controllers
         //        return View("Matches/MatchesTable", m);
         //    }
         //}
+
+        private async Task<bool> changeSeedPlayer(MapTournamentSeedPlayer? msp, int? playerId)
+        {
+            if (msp is null) return false;
+
+            try
+            {
+                msp.TSP_PlayerId = playerId;
+                _context.Update(msp);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return false;
+            }
+        }
 
         private ValueTask<T?> queryId<T>(int? id, DbSet<T> set) where T : class
         {

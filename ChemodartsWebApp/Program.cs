@@ -41,4 +41,6 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Tournament}/{action=Index}/{id?}");
 
+app.UseAuthentication();
+
 app.Run();
