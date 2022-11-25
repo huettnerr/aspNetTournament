@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using ChemodartsWebApp.Data;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Configuration;
+using ChemodartsWebApp.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +15,14 @@ builder.Services.AddDbContext<ChemodartsContext>(
     options => options.UseLazyLoadingProxies().UseMySQL(connectionString), 
     ServiceLifetime.Scoped
 );
+
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Admin/Login";
+    });
+
+builder.Services.Configure<User>(builder.Configuration.GetSection("Admin"));
 
 var app = builder.Build();
 
@@ -28,6 +39,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
@@ -40,7 +52,5 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Tournament}/{action=Index}/{id?}");
-
-app.UseAuthentication();
 
 app.Run();

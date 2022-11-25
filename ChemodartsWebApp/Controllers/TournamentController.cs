@@ -71,6 +71,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddPlayers(int? tournamentId, int? id)
         {
             Tournament? t = await queryId(tournamentId, _context.Tournaments);
@@ -85,7 +86,9 @@ namespace ChemodartsWebApp.Controllers
             return View("TournamentAddPlayers");
         }
 
+
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddPlayers(int? tournamentId, int? id, IFormCollection form)
         {
             ViewBag.YouSelected = form["Players"];
@@ -137,6 +140,7 @@ namespace ChemodartsWebApp.Controllers
 
         #region CheckIn/Remove Player
 
+        [Authorize(Roles = "Administrator")]
         public IActionResult PlayerRemove(int? tournamentId, int? id)
         {
             Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
@@ -154,7 +158,7 @@ namespace ChemodartsWebApp.Controllers
             }
         }
 
-        [Authorize(Policy = "RequireAdministratorRole")]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PlayerCheckIn(int? tournamentId, int? id)
         {
             Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
