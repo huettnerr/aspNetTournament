@@ -1,0 +1,17 @@
+﻿@model Venue
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => Model.VenueName)
+        </th>
+        break;
+    case "Content":
+        <td>
+            @Html.DisplayFor(model => Model.VenueName)
+        </td>
+        break;
+    default:
+        goto case "Content";
+}

@@ -1,14 +1,17 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Seed>
 
-<a asp-action="AddPlayers">Add Players</a>
-<hr />
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-action="AddPlayers">Add Players</a>
+    <hr />
 
-<div>
-    <form asp-action="ShufflePlayerSeeds">
-        <button type="submit">Seeds Mischen</button>
-    </form>
-</div>
-<hr />
+    <div>
+        <form asp-action="ShufflePlayerSeeds">
+            <button type="submit">Seeds Mischen</button>
+        </form>
+    </div>
+    <hr />
+}
 
 @*@Html.DisplayFor(m => Model, "Seed/SeedPlayersList", new { ShowStats = "false", ShowTournamentStatus = "true" } )*@
 @Html.DisplayFor(m => Model, "Seed/SeedPlayersList")

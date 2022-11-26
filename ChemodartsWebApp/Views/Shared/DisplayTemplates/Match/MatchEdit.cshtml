@@ -1,0 +1,28 @@
+﻿@model ChemodartsWebApp.Models.Match
+
+<table class="table">
+    <thead>
+        <tr>
+            @Html.DisplayFor(m => Model, "Match/Columns/MatchGroup", new { RenderType = "Header"})
+            @Html.DisplayFor(m => Model, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
+            @Html.DisplayFor(m => Model, "Match/Columns/MatchScore", new { RenderType = "Header"})
+            @Html.DisplayFor(m => Model, "Match/Columns/MatchVenue", new { RenderType = "Header"})
+            <th>
+                Aktion
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <form asp-action="MatchEditScore">
+                @Html.DisplayFor(m => Model, "Match/Columns/MatchGroup", new { RenderType = "Content"})
+                @Html.DisplayFor(m => Model, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
+                @Html.DisplayFor(m => Model, "Match/Columns/MatchScore", new { RenderType = "Content", Edit = "true" })
+                @Html.DisplayFor(m => Model, "Match/Columns/MatchVenue", new { RenderType = "Content", Edit = "true" })
+                <td>
+                    <button type="submit">Speichern</button>
+                </td>
+            </form>
+        </tr>
+    </tbody>
+</table>

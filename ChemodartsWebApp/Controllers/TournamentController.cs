@@ -133,6 +133,24 @@ namespace ChemodartsWebApp.Controllers
 
         #endregion
 
+        #region Venues
+
+        // GET Spielerübersicht
+        public IActionResult Venues(int? tournamentId)
+        {
+            //search for spezific tournament
+            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            if (t is null) return NotFound();
+
+            IEnumerable<Venue>? venues = t.Rounds.FirstOrDefault().MappedVenues.Select(x => x.Venue);
+            List<Venue> v = _context.Venues.Where(v => v.VenueId > 0).ToList();
+            if (venues is null) return NotFound();
+
+            return View("TournamentVenues", venues);
+        }
+
+        #endregion
+
         #region Players
 
         // GET Spielerübersicht
@@ -335,19 +353,25 @@ namespace ChemodartsWebApp.Controllers
             return View("TournamentMatches", matches);
         }
 
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> MatchStart(int? tournamentId, int? id)
         {
             Match? m = await queryId(id, _context.Matches);
             if (m is null) return NotFound();
 
             m.Status = Match.MatchStatus.Active;
-            Score score = ScoreFactory.CreateScore(m);
-            _context.Scores.Add(score); 
+            if (m.Score is null)
+            {
+                Score score = ScoreFactory.CreateScore(m);
+                _context.Scores.Add(score);
+            }
+
             await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId });
         }
 
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> MatchAssignBoard(int? tournamentId, int? id)
         {
             Match? m = await queryId(id, _context.Matches);
@@ -369,10 +393,41 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId });
         }
 
+        [Authorize(Roles = "Administrator")]
+        [HttpGet]
         public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id)
         {
-            //TODO
-            return NotFound();
+            Match? m = await queryId(id, _context.Matches);
+            //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
+            if (m is null) return NotFound();
+
+            return View("DisplayTemplates/Match/MatchEdit", m);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newStatus, int? newVenueId)
+        {
+            Match? m = await queryId(id, _context.Matches);
+            //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
+            if (m is null) return NotFound();
+
+            if (m.Score is object && seed1Legs is object && seed2Legs is object)
+            {
+                m.Score.P1Legs = seed1Legs ?? 0;
+                m.Score.P2Legs = seed2Legs ?? 0;
+
+                if (newStatus is null) { m.Status = Match.MatchStatus.Finished; } 
+                else { m.Status = newStatus; }
+                //else { m.Status = (Match.MatchStatus)Enum.Parse(typeof(Match.MatchStatus), newStatus); }
+
+                if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
+                else { m.Venue = await queryId(newVenueId, _context.Venues); }
+
+                await _context.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId, showAll = "true" });
         }
 
         #endregion

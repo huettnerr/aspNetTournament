@@ -84,8 +84,7 @@ namespace ChemodartsWebApp.Data
 
             DebugTournament.Rounds = new List<Round>()
             {
-                new Round() { RoundName = "Peter", RoundId=1 },
-                new Round() { RoundName = "Julian", RoundId=2 },
+                createRount("Peter"),
             };
         }
 
@@ -94,7 +93,7 @@ namespace ChemodartsWebApp.Data
         private Player createRandomPlayer()
         {
             Random random = new Random();
-            Player p = new Player() { PlayerId = ++playerId, PlayerName = $"Player {random.Next(100)}" };
+            Player p = new Player() { PlayerId = playerId++, PlayerName = $"Player {random.Next(100)}" };
             DebugPlayers.Add(p);
             return p;
         }
@@ -102,7 +101,36 @@ namespace ChemodartsWebApp.Data
         private int seedId = 0;
         private Seed createSeed(int number)
         {
-            return new Seed() { SeedId = seedId, SeedNr = number };
+            return new Seed() { SeedId = seedId++, SeedNr = number };
+        }
+
+        private int roundId = 0;
+        private Round createRount(string name)
+        {
+            Round r = new Round() { RoundId = roundId++, RoundName = name, Modus = Round.RoundModus.RoundRobin };
+            r.Groups = new List<Group>();
+            r.Groups.Add(createGroup("A"));
+
+            r.Groups.ElementAt(0).Matches = MatchFactory.CreateMatches(r);
+            int id = 0;
+            foreach(Match m in MatchFactory.CreateMatches(r))
+            {
+                m.MatchId = id++;
+                m.GroupId = r.Groups.ElementAt(0).GroupId;
+                r.Groups.ElementAt(0).Matches.Add(m);
+            }
+            return r;
+        }
+
+        private int groupId = 0;
+        private Group createGroup(string name)
+        {
+            Group g = new Group() { GroupId = groupId++, GroupName = name };
+            g.Seeds = new List<Seed>();
+            g.Seeds.Add(createSeed(11));
+            g.Seeds.Add(createSeed(12));
+            g.Seeds.Add(createSeed(13));
+            return g;
         }
     }
 }

@@ -105,6 +105,7 @@ namespace ChemodartsWebApp.Models
                     //Seed 2 won
                     return s.Equals(this.Seed2) ? true : false;
                 }
+                return false;
             }
             else
             {
@@ -119,6 +120,7 @@ namespace ChemodartsWebApp.Models
                     //Player 2 won
                     return s.Equals(this.Seed2) ? true : false;
                 }
+                return false;
             }
         }
     }

@@ -1,5 +1,12 @@
 ﻿@model Match
 
+@{
+    bool edit = false;
+    if(ViewData["Edit"]?.Equals("true") ?? false) edit = true;
+    int? newVenueId = null;
+    Match.MatchStatus? newStatus = null;
+}
+
 @switch(ViewData["RenderType"])
 {
     case "Header":
@@ -12,10 +19,24 @@
         break;
     case "Content":
         <td>
-            @Html.DisplayFor(model => Model.Venue.VenueName)
+            @if (edit)
+            {
+                @Html.DropDownListFor(m => newVenueId, new SelectList(Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null), "VenueId", "VenueName"), Model.Venue is object ? "No Venue" : "Select Venue")
+            }
+            else
+            {
+                @Html.DisplayFor(model => Model.Venue.VenueName)
+            }
         </td>
         <td>
-            @Html.DisplayFor(model => Model.Status)
+            @if (edit)
+            {
+                @Html.DropDownListFor(m => newStatus, new SelectList(Enum.GetValues(typeof(Match.MatchStatus))), "Select Status")
+            }
+            else
+            {
+                @Html.DisplayFor(model => Model.Status)
+            }
         </td>
         break;
     default:

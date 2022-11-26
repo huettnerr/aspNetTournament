@@ -1,0 +1,9 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.Venue>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-action="AddVenues">Add Venues</a>
+    <hr />
+}
+
+@Html.DisplayFor(m => Model, "Venue/VenueList")

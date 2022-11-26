@@ -1,5 +1,13 @@
 ﻿@model Match
 
+@{
+    bool edit = false;
+    if(ViewData["Edit"]?.Equals("true") ?? false) edit = true;
+    int scoreSeed1 = 0;
+    int scoreSeed2 = 0;
+}
+
+
 @switch(ViewData["RenderType"])
 {
     case "Header":
@@ -17,8 +25,16 @@
             }
         </td>*@
         <td>
-            @{
-                if(Model.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => Model.Score.Legs)
+            @if(edit && Model.Score is object)
+            {
+                //@Html.DropDownListFor(m => scoreSeed1, new SelectList(Model.Score.P1Legs, "RoundId", "RoundName"), "Select Round")
+                <input type="number" name="seed1Legs" value="@Model.Score?.P1Legs"/>
+                <span> | </span>
+                <input type="number" name="seed2Legs" value="@Model.Score?.P2Legs"/>
+            }
+            else
+            {
+                @if(Model.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => Model.Score.Legs)
             }
         </td>
         break;
