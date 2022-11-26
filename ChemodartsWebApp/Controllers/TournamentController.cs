@@ -385,6 +385,20 @@ namespace ChemodartsWebApp.Controllers
             return View("TournamentCreate", groupFactory);
         }
 
+        public async Task<IActionResult> GroupDeleteSeed(int? tournamentId, int? id, int? seedId)
+        {
+            Group? g = await queryId(id, _context.Groups);
+            if (g is null) return NotFound();
+
+            Seed? s = g.Seeds.Where(s => s.SeedId == seedId).FirstOrDefault();
+            if(s is null) return NotFound();
+
+            g.Seeds.Remove(s);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Round), new { id = g.RoundId });
+        }
+
         #endregion
 
         //// GET: Matchansicht

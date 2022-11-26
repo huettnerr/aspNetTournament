@@ -1,0 +1,17 @@
+﻿@model Seed
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            Seed Aktion
+        </th>
+        break;
+    case "Content":
+        <td>
+            <a asp-action="GroupDeleteSeed" asp-route-id="@Model.Group.GroupId" asp-route-seedId="@Model.SeedId"> Delete Seed </a>
+        </td>
+        break;
+    default:
+        goto case "Content";
+}
