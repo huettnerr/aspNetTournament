@@ -15,7 +15,7 @@ namespace ChemodartsWebApp.Models
         }
 
         [Key][Display(Name = "ID")][Column("matchId")] public int MatchId { get; set; }
-        [Column("matchOrderValue")] public int MatchOrderValue { get; set; }
+        [Column("matchOrderValue")] public int? MatchOrderValue { get; set; }
         [Display(Name = "GroupId")][Column("groupId")] public int GroupId { get; set; }
         [Column("seed1Id")] public int Seed1Id { get; set; }
         [Column("seed2Id")] public int Seed2Id { get; set; }
@@ -40,6 +40,12 @@ namespace ChemodartsWebApp.Models
 
         //[NotMapped][Display(Name = "Heim")] public virtual Player? Player1 { get => Seed1.Player; }
         //[NotMapped][Display(Name = "Gast")] public virtual Player? Player2 { get => Seed2.Player; }
+
+        public static IEnumerable<Match> OrderMatches(IEnumerable<Match> matches)
+        {
+            matches.OrderBy(m => m.MatchOrderValue).ToList();
+            return matches;
+        }
 
         public bool UpdateSeedStat(Seed s, SeedStatistics stat)
         {
@@ -115,6 +121,106 @@ namespace ChemodartsWebApp.Models
                     return s.Equals(this.Seed2) ? true : false;
                 }
             }
+        }
+    }
+
+    public class MatchFactory
+    {
+        public static List<Match> CreateMatches(Round r)
+        {
+            List<Match> matches = new List<Match>();
+
+            foreach (Group g in r.Groups)
+            {
+                //List<Match> tmpList = scheduleRoundRobin(g.Seeds.ToList());
+                List<Match> tmpList = scheduleRoundRobinManual(g.Seeds.ToList());
+
+                tmpList.ForEach(m => {
+                    m.GroupId = g.GroupId; 
+                    m.Status = Match.MatchStatus.Created;
+                });  
+                matches.AddRange(tmpList);
+            }
+
+            return matches;
+        }
+
+        private static List<Match> scheduleRoundRobinManual(List<Seed> seeds)
+        {
+            List<Match> matches = new List<Match>();
+            if (seeds.Count == 3)
+            {
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(0).SeedId, Seed2Id = seeds.ElementAt(1).SeedId, MatchOrderValue = 0 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(1).SeedId, Seed2Id = seeds.ElementAt(2).SeedId, MatchOrderValue = 1 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(0).SeedId, Seed2Id = seeds.ElementAt(2).SeedId, MatchOrderValue = 2 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(2).SeedId, Seed2Id = seeds.ElementAt(1).SeedId, MatchOrderValue = 3 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(2).SeedId, Seed2Id = seeds.ElementAt(0).SeedId, MatchOrderValue = 4 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(1).SeedId, Seed2Id = seeds.ElementAt(0).SeedId, MatchOrderValue = 5 });
+            }
+            else if (seeds.Count == 4)
+            {
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(0).SeedId, Seed2Id = seeds.ElementAt(1).SeedId, MatchOrderValue = 0 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(2).SeedId, Seed2Id = seeds.ElementAt(3).SeedId, MatchOrderValue = 0 });
+
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(0).SeedId, Seed2Id = seeds.ElementAt(2).SeedId, MatchOrderValue = 2 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(1).SeedId, Seed2Id = seeds.ElementAt(3).SeedId, MatchOrderValue = 2 });
+
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(0).SeedId, Seed2Id = seeds.ElementAt(3).SeedId, MatchOrderValue = 4 });
+                matches.Add(new Match() { Seed1Id = seeds.ElementAt(1).SeedId, Seed2Id = seeds.ElementAt(2).SeedId, MatchOrderValue = 4 });
+
+            }
+            return matches;
+        }
+
+        private static List<Match> scheduleRoundRobin(List<Seed> seeds)
+        {
+            List<Match> matches = new List<Match>();
+
+            foreach(Tuple<int, int> pair in CreatePairs(seeds.Count))
+            {
+                matches.Add(new Match()
+                {
+                    Seed1Id = seeds.ElementAt(pair.Item1 - 1).SeedId,
+                    Seed2Id = seeds.ElementAt(pair.Item2 - 1).SeedId,
+                    MatchOrderValue = 0,
+                });
+            }
+
+            return matches;
+        }
+
+        private static List<Tuple<int, int>> CreatePairs(int n)
+        {
+            List<Tuple<int, int>> pairs = new List<Tuple<int, int>>();
+
+            int[] orig = new int[n];
+            for (int i = 0; i < n; i++)
+            {
+                orig[i] = i + 1;
+            }
+            IEnumerable<int> rev = orig.Reverse();
+
+            int len = orig.Length;
+            for (int j = 0; j < len - 1; j++)
+            {
+                List<int> tmp = new List<int>();
+                tmp.Add(orig[0]);
+                tmp.AddRange(rev.Take(j).Reverse());
+                if (j < len && len > 1 + j) tmp.AddRange(orig.Skip(1).Take(len - 1 - j));
+                pairs.AddRange(makeMatches(tmp, j + 1));
+            }
+
+            return pairs;
+        }
+
+        private static List<Tuple<int, int>> makeMatches(IEnumerable<int> arr, int round)
+        {
+            int halfSize = arr.Count() / 2;
+
+            IEnumerable<int> A = arr.Take(halfSize);
+            IEnumerable<int> B = arr.Skip(halfSize).Take(halfSize).Reverse();
+
+            return A.Zip(B, (x, y) => new Tuple<int, int>(x,y)).ToList();
         }
     }
 }

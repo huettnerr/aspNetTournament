@@ -13,6 +13,8 @@
     <div style="color:red;">@ViewBag.UpdateSeedsMessage</div>
 </div>
 
+<br /><br />
+
 <div>
     <form asp-action="SettingsRecreateMatches">
         @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select Round")

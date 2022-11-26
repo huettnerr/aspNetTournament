@@ -8,11 +8,26 @@ namespace Testbed
 {
     public class Round
     {
-        public List<Match> Matches { get; set; }
+        public List<Group> Groups { get; set; }
         public Round() { }
-        public Round(List<Match> matches)
+        public Round(List<Group> groups)
         {
-            Matches = matches;  
+            Groups = groups;  
+        }
+    }
+    public class Group
+    {
+        public List<Match> Matches { get; set; }
+        public List<int> Seeds { get; set; }
+        public Group(int numSeeds) 
+        {
+            Seeds = new List<int>();
+            for (int i = 0; i < numSeeds; i++) Seeds.Add(i);
+            Matches = new List<Match>();
+        }
+        public Group(List<Match> matches, int numSeeds) : this(numSeeds)
+        {
+            Matches = matches;
         }
     }
 
@@ -22,6 +37,7 @@ namespace Testbed
         public int Seed1 { get; set; }
         public int Seed2 { get; set; }
 
+        public Match() { }
         public Match(int s1, int s2)
         {
             Seed1 = s1;
@@ -40,17 +56,17 @@ namespace Testbed
             p64 = 64
         }
 
-        public static List<Round> Generate(PlayerNumber playersNumber)
+        public static List<Group> Generate(PlayerNumber playersNumber)
         {
             // only works for power of 2 number of players   
             var roundsNumber = (int)Math.Log((int)playersNumber, 2);
-            var rounds = new List<Round>(roundsNumber);
+            var rounds = new List<Group>(roundsNumber);
 
             for (int round = 0; round < roundsNumber; round++)
             {
                 List<Match> matches = new List<Match>();    
                 branch(1, 1, roundsNumber - round + 1, ref matches);
-                rounds.Add(new Round(matches));
+                rounds.Add(new Group(matches, 2));
             }
 
             return rounds;

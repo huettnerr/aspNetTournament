@@ -107,6 +107,30 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Round), new { id = r.RoundId });
         }
 
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> SettingsRecreateMatches(int? tournamentId, int selectedRoundId)
+        {
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+            if (r is null)
+            {
+                ViewBag.UpdateSeedsMessage = "RoundId ungültig";
+                return View("TournamentSettings", t);
+            }
+
+            //Delete all old matches
+            IEnumerable<Match> oldMatches = await _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync();
+            _context.Matches.RemoveRange(oldMatches);
+
+            List<Match> newMatches = MatchFactory.CreateMatches(r);
+            _context.Matches.AddRange(newMatches);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Matches), new { id = tournamentId });
+        }
+
 
         #endregion
 
@@ -305,8 +329,9 @@ namespace ChemodartsWebApp.Controllers
             //List<Match> matches = t.Rounds.SelectMany(r => r.Groups).Distinct().SelectMany(g => g.Matches).Distinct().ToList();
             //var matches = t.Rounds.FirstOrDefault().Groups.FirstOrDefault().Matches.ToList();
             IEnumerable<Match> matches = await _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync();
+            IEnumerable<Match> orderedMatches = Match.OrderMatches(matches);
 
-            return View("TournamentMatches", matches);
+            return View("TournamentMatches", orderedMatches);
         }
 
         #endregion
