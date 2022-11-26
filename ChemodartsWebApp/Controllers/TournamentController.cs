@@ -135,9 +135,9 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> SettingsUpdateKoFirstRound(int? tournamentId, int selectedRoundId, int selectedRound2Id)
         {
             //KoFactory.UpdateFirstRoundSeeds(
-            //    _context, 
-            //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } }, 
-            //    new Group() { Matches = new List<Match>() { new Match(), new Match(), new Match(), new Match() } });
+            //    _context,
+            //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } },
+            //    new Group() { Matches = new List<Match>() { new Match(), new Match() } });
 
             Tournament? t = await queryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
@@ -395,6 +395,8 @@ namespace ChemodartsWebApp.Controllers
             var relevantRounds = t.Rounds.Where(r => r.Modus == Models.Round.RoundModus.RoundRobin).ToList();
             List<Match> matches = new List<Match>();
             relevantRounds.ForEach(r => matches.AddRange(getAllRoundMatches(r.RoundId)));
+
+            matches = Match.OrderMatches(matches).ToList();
 
             if (matches.Count == 0) return NotFound();
 
@@ -695,9 +697,7 @@ namespace ChemodartsWebApp.Controllers
         {
             if (roundId is null) return Enumerable.Empty<Match>();
 
-            IEnumerable<Match> matches = _context.Matches.Where(m => m.Group.RoundId == roundId).ToListAsync().Result;
-            IEnumerable<Match> orderedMatches = Match.OrderMatches(matches);
-            return orderedMatches;
+            return _context.Matches.Where(m => m.Group.RoundId == roundId).ToListAsync().Result;
         }
     }
 }

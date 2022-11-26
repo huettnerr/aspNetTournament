@@ -17,6 +17,7 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<Seed> Seeds { get ; set; }
 
         [NotMapped] public virtual ICollection<Seed> RankedSeeds { get => Seeds.OrderByDescending(s => s.Statistics.MatchesWon).ThenByDescending(s => s.Statistics.PointsDiff).ToList(); }
+        [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Match.OrderMatches(this.Matches).ToList(); }
     }
 
     public class GroupFactory
@@ -94,6 +95,7 @@ namespace ChemodartsWebApp.Models
         public bool CreateSystem(Data.ChemodartsContext context)
         {
             if (ThisRoundId is null) return false;
+            NumberOfRounds--; // Fühlt sich natürlicher an das Finale mitzuzählen
 
             List<Group> groups = new List<Group>();
             for(int roundNr = 0; roundNr <= NumberOfRounds; roundNr++)
@@ -162,25 +164,25 @@ namespace ChemodartsWebApp.Models
             int matchNr = 0;
             foreach (Match m in firstKoRoundGroup.Matches)
             {
-                if (numberOfMatches == (2 * previousRound.Groups.Count))
+                if ((2 * numberOfMatches) == previousRound.Groups.Count)
                 {
                     Seed sforS1 = previousRound.Groups.ElementAt(2 * matchNr).RankedSeeds.ElementAt(0);
                     m.Seed1Id = sforS1.SeedId;
-                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname;
+                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname ?? sforS1.SeedName;
 
                     Seed sforS2 = previousRound.Groups.ElementAt(2 * matchNr + 1).RankedSeeds.ElementAt(0);
                     m.Seed2Id = sforS2.SeedId;
-                    m.Seed1.SeedName = sforS2.Player?.PlayerDartname;
+                    m.Seed2.SeedName = sforS2.Player?.PlayerDartname ?? sforS2.SeedName;
                 }
                 else if (numberOfMatches == previousRound.Groups.Count)
                 {
                     Seed sforS1 = previousRound.Groups.ElementAt(matchNr).RankedSeeds.ElementAt(0);
                     m.Seed1Id = sforS1.SeedId;
-                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname;
+                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname ?? sforS1.SeedName;
 
                     Seed sforS2 = previousRound.Groups.ElementAt(numberOfMatches - 1 - matchNr).RankedSeeds.ElementAt(1);
                     m.Seed2Id = sforS2.SeedId;
-                    m.Seed1.SeedName = sforS2.Player?.PlayerDartname;
+                    m.Seed2.SeedName = sforS2.Player?.PlayerDartname ?? sforS2.SeedName;
                 }
                 else
                 {
@@ -202,11 +204,11 @@ namespace ChemodartsWebApp.Models
                 {
                     Match mForS1 = r.Groups.ElementAt(i - 1).Matches.ElementAt(2 * matchNr);
                     if (mForS1.WinnerSeed is object) m.Seed1Id = mForS1.WinnerSeed.SeedId;
-                    else m.Seed1.SeedName = $"{mForS1.Seed1.Player?.PlayerDartname} | {mForS1.Seed2.Player?.PlayerDartname}";
+                    else m.Seed1.SeedName = $"{mForS1.Seed1.Player?.PlayerDartname ?? mForS1.Seed1.SeedName } | {mForS1.Seed2.Player?.PlayerDartname ?? mForS1.Seed2.SeedName}";
 
                     Match mForS2 = r.Groups.ElementAt(i - 1).Matches.ElementAt(2 * matchNr + 1);
                     if (mForS2.WinnerSeed is object) m.Seed2Id = mForS2.WinnerSeed.SeedId;
-                    else m.Seed2.SeedName = $"{mForS2.Seed1.SeedName} | {mForS2.Seed2.SeedName}";
+                    else m.Seed2.SeedName = $"{mForS2.Seed1.Player?.PlayerDartname ?? mForS2.Seed1.SeedName} | {mForS2.Seed2.Player?.PlayerDartname ?? mForS2.Seed2.SeedName}";
 
                     matchNr++;
                 }
