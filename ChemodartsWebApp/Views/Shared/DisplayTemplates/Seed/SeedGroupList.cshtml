@@ -24,7 +24,7 @@
             </td>
             @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Seed/Columns/SeedStats", new { RenderType = "Content" })
-            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedGroupAdmin", new { RenderType = "Content" })
+            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Seed/Columns/SeedGroupAdmin", new { RenderType = "Content" })
         </tr>
     }
     </tbody>

@@ -253,6 +253,41 @@ namespace ChemodartsWebApp.Controllers
 
         #endregion
 
+        #region Shuffle Seeds
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> ShufflePlayerSeeds(int? tournamentId)
+        {
+            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            if (t is null) return NotFound();
+
+            //Store all Players
+            List<Player> players = t.MappedSeedsPlayers.Select(msp => msp.Player).OfType<Player>().ToList();
+
+            //And clear old mapping
+            foreach(MapTournamentSeedPlayer mps in t.MappedSeedsPlayers)
+            {
+                mps.TSP_PlayerId = null;
+            }
+
+            //Randomize
+            int iSeed = 0;
+            Random random = new Random();
+            while(players.Count > 0)
+            {
+                Player randomPlayer = players.ElementAt(random.Next(players.Count));
+                t.MappedSeedsPlayers.ElementAt(iSeed++).TSP_PlayerId = randomPlayer.PlayerId;
+                players.Remove(randomPlayer);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Players), new { tournamentId = tournamentId });
+        }
+
+        #endregion
+
         #endregion
 
         #region Matches
