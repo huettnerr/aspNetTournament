@@ -48,7 +48,7 @@ namespace ChemodartsWebApp.Models
                 seeds.Add(new Seed()
                 {
                     SeedNr = 0,
-                    SeedName = "",
+                    SeedName = "Seed #0",
                     GroupId = groupId,
                 });
             }
@@ -62,7 +62,7 @@ namespace ChemodartsWebApp.Models
             groups.ToList().ForEach(g => allSeeds.AddRange(g.Seeds));
 
             int seedNr = 1;
-            allSeeds.ForEach(s => s.SeedNr = seedNr++);
+            allSeeds.ForEach(s => { s.SeedNr = seedNr; s.SeedName = $"Seed #{seedNr}"; seedNr++; });
         }
 
         public List<MapTournamentSeedPlayer>? CreateMapping(int? tournamentId, List<Seed>? seeds)
@@ -83,6 +83,141 @@ namespace ChemodartsWebApp.Models
             }
 
             return mtsps;
+        }
+    }
+
+    public class KoFactory
+    {
+        public int NumberOfRounds { get; set; }
+        public int? ThisRoundId { get; set; }
+
+        public bool CreateSystem(Data.ChemodartsContext context)
+        {
+            if (ThisRoundId is null) return false;
+
+            List<Group> groups = new List<Group>();
+            for(int roundNr = 0; roundNr <= NumberOfRounds; roundNr++)
+            {
+                int playersInRound = 2 * getMatchesPerRound(NumberOfRounds - roundNr);
+                Group g = new Group()
+                {
+                    GroupName = $"Stufe der besten {playersInRound}",
+                    RoundId = ThisRoundId ?? 0,
+                };
+                g.Matches = new List<Match>();
+                groups.Add(g);
+                context.Groups.Add(g);
+                context.SaveChanges();
+
+                //Make Seeds
+                List<Seed> seeds = new List<Seed>();
+                for (int iPlayer = 0; iPlayer < playersInRound; iPlayer++)
+                {
+                    Seed s = new Seed()
+                    {
+                        SeedName = "Please Run Script",
+                        GroupId = g.GroupId,
+                    };
+
+                    if (roundNr > 1)
+                    {
+                        //Link Ancestors
+                        s.AncestorMatch = groups.ElementAt(roundNr - 1).Matches.ElementAt(iPlayer);
+                    }else
+                    {
+                        //First round
+                        s.SeedNr = iPlayer;
+                    }
+
+                    seeds.Add(s);
+                }
+                context.Seeds.AddRange(seeds);
+                context.SaveChanges();
+
+                //Make Matches
+                List<Match> matches = new List<Match>();
+                for (var iMatch = 0; iMatch < getMatchesPerRound(NumberOfRounds - roundNr); iMatch++)
+                {
+                    Match m = new Match()
+                    {
+                        Seed1Id = seeds.ElementAt(2 * iMatch).SeedId,
+                        Seed2Id = seeds.ElementAt(2 * iMatch + 1).SeedId,
+                        MatchOrderValue = iMatch,
+                        GroupId = g.GroupId,
+                        Status = Match.MatchStatus.Created,
+                    };
+                    g.Matches.Add(m);
+                    matches.Add(m);
+                }
+                context.Matches.AddRange(matches);
+                context.SaveChanges();
+            }
+
+            return true;
+        }
+
+        public static void UpdateFirstRoundSeeds(Data.ChemodartsContext context, Round previousRound, Group firstKoRoundGroup)
+        {
+            int numberOfMatches = firstKoRoundGroup.Matches.Count;
+            int matchNr = 0;
+            foreach (Match m in firstKoRoundGroup.Matches)
+            {
+                if (numberOfMatches == (2 * previousRound.Groups.Count))
+                {
+                    Seed sforS1 = previousRound.Groups.ElementAt(2 * matchNr).RankedSeeds.ElementAt(0);
+                    m.Seed1Id = sforS1.SeedId;
+                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname;
+
+                    Seed sforS2 = previousRound.Groups.ElementAt(2 * matchNr + 1).RankedSeeds.ElementAt(0);
+                    m.Seed2Id = sforS2.SeedId;
+                    m.Seed1.SeedName = sforS2.Player?.PlayerDartname;
+                }
+                else if (numberOfMatches == previousRound.Groups.Count)
+                {
+                    Seed sforS1 = previousRound.Groups.ElementAt(matchNr).RankedSeeds.ElementAt(0);
+                    m.Seed1Id = sforS1.SeedId;
+                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname;
+
+                    Seed sforS2 = previousRound.Groups.ElementAt(numberOfMatches - 1 - matchNr).RankedSeeds.ElementAt(1);
+                    m.Seed2Id = sforS2.SeedId;
+                    m.Seed1.SeedName = sforS2.Player?.PlayerDartname;
+                }
+                else
+                {
+                    //Group count does not match
+                    return;
+                }
+                matchNr++;
+            }
+
+            context.SaveChanges();
+        }
+
+        public static void UpdateKoRoundSeeds(Data.ChemodartsContext context, Round r)
+        {
+            for(int i = 1; i < r.Groups.Count; i++)
+            {
+                int matchNr = 0;
+                foreach (Match m in r.Groups.ElementAt(i).Matches)
+                {
+                    Match mForS1 = r.Groups.ElementAt(i - 1).Matches.ElementAt(2 * matchNr);
+                    if (mForS1.WinnerSeed is object) m.Seed1Id = mForS1.WinnerSeed.SeedId;
+                    else m.Seed1.SeedName = $"{mForS1.Seed1.Player?.PlayerDartname} | {mForS1.Seed2.Player?.PlayerDartname}";
+
+                    Match mForS2 = r.Groups.ElementAt(i - 1).Matches.ElementAt(2 * matchNr + 1);
+                    if (mForS2.WinnerSeed is object) m.Seed2Id = mForS2.WinnerSeed.SeedId;
+                    else m.Seed2.SeedName = $"{mForS2.Seed1.SeedName} | {mForS2.Seed2.SeedName}";
+
+                    matchNr++;
+                }
+            }
+
+            context.SaveChanges();
+        }
+
+        private int getMatchesPerRound(int depth)
+        {
+            return Convert.ToInt32(Math.Pow(2, depth));
         }
     }
 }

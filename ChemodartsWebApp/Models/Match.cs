@@ -36,10 +36,27 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Gast")] 
         public virtual Seed Seed2 { get; set; }
         public virtual Score? Score { get; set; }
+        public virtual Seed? WinnerSeedFollowUp { get; set; }
+        [NotMapped] public Seed? WinnerSeed { 
+            get {
+                if (HasSeedWon(Seed1)) return Seed1;
+                else if (HasSeedWon(Seed2)) return Seed2;
+                else return null;
+            } 
+        }
 
 
         //[NotMapped][Display(Name = "Heim")] public virtual Player? Player1 { get => Seed1.Player; }
         //[NotMapped][Display(Name = "Gast")] public virtual Player? Player2 { get => Seed2.Player; }
+
+        public void HandleNewStatus(MatchStatus? newStatus)
+        {
+            if (newStatus == MatchStatus.Created) Score = null;
+            //else if (newStatus == MatchStatus.Finished)
+            //{
+            //    if(WinnerSeedFollowUp is object) WinnerSeedFollowUp.M
+            //}
+        }
 
         public static IEnumerable<Match> OrderMatches(IEnumerable<Match> matches)
         {

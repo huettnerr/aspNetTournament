@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Settings Page";
     int selectedRoundId = 0;
+    int selectedRound2Id = 0;
 }
 
 @Html.ActionLink("Back to previous page", null, null, null, new { href = Context.Request.Query["UrlReferer"]})
@@ -24,4 +25,25 @@
         <button type="submit">Recreate Matches of Round</button>
     </form>
     <div style="color:red;">@ViewBag.RecreateMatchesMessage</div>
+</div>
+
+<br /><br />
+
+<div>
+    <form asp-action="SettingsUpdateKoFirstRound">
+        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select First Round")
+        @Html.DropDownListFor(m => selectedRound2Id, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select Second Round")
+        <button type="submit">Update Second from First Round</button>
+    </form>
+    <div style="color:red;">@ViewBag.UpdateKoFirstRoundMessage</div>
+</div>
+
+<br /><br />
+
+<div>
+    <form asp-action="SettingsUpdateKoRound">
+        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select Round")
+        <button type="submit">Update KO Round</button>
+    </form>
+    <div style="color:red;">@ViewBag.UpdateKoRoundMessage</div>
 </div>

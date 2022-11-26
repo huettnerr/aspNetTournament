@@ -4,9 +4,12 @@
 
     bool showGroup = false; ;
     if(ViewData["ShowGroup"]?.Equals("true") ?? false) showGroup = true;
+
+    bool showAll = false;
+    if (Context.Request.Query["showAll"].Equals("true") || (ViewData["showAll"]?.Equals("true") ?? false)) showAll = true;
 }
 
-@if (!(Context.Request.Query["showAll"]).Equals("true")){ <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a> }
+@if (!showAll){ <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a> }
 
 <table class="table">
     <thead>

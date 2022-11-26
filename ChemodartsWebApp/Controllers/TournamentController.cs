@@ -131,6 +131,55 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Matches), new { id = tournamentId });
         }
 
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> SettingsUpdateKoFirstRound(int? tournamentId, int selectedRoundId, int selectedRound2Id)
+        {
+            //KoFactory.UpdateFirstRoundSeeds(
+            //    _context, 
+            //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } }, 
+            //    new Group() { Matches = new List<Match>() { new Match(), new Match(), new Match(), new Match() } });
+
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            Round? r1 = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+            Round? r2 = t.Rounds.Where(x => x.RoundId == selectedRound2Id).FirstOrDefault();
+            if (r1 is null || r2 is null)
+            {
+                ViewBag.UpdateKoFirstRoundMessage = "RoundId ungültig";
+                return View("TournamentSettings", t);
+            }
+
+            KoFactory.UpdateFirstRoundSeeds(_context, r1, r2.Groups.ElementAt(0));
+
+            return RedirectToAction(nameof(Round), new { id = selectedRound2Id });
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> SettingsUpdateKoRound(int? tournamentId, int selectedRoundId)
+        {
+            //Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            //if (t is null) return NotFound();
+
+            //Group? g1 = t.Rounds.Where(r => r.Modus == Round.RoundModus.SingleKo).FirstOrDefault()?.Groups.Where(g => g.GroupId == finishedGroup).FirstOrDefault();
+            ////Group? g2 = t.Rounds.Where(x => x.RoundId == selectedRound2Id).FirstOrDefault();
+            //if (g1 is null || g2 is null)
+            //{
+            //    ViewBag.UpdateKoFirstRoundMessage = "RoundId ungültig";
+            //    return View("TournamentSettings", t);
+            //}
+
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+            if (r is null) return NotFound();
+
+            KoFactory.UpdateKoRoundSeeds(_context, r);
+
+            return RedirectToAction(nameof(Round), new { id = selectedRoundId });
+        }
+
         #endregion
 
         #region Venues
@@ -334,7 +383,7 @@ namespace ChemodartsWebApp.Controllers
         #region Matches
 
         // GET Vollständige Matchliste
-        public async Task<IActionResult> Matches(int? tournamentId, string? showAll)
+        public async Task<IActionResult> Matches(int? tournamentId, int? id, string? showAll)
         {
             //search for spezific tournament
             Tournament? t = await queryId(tournamentId, _context.Tournaments);
@@ -343,11 +392,16 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            IEnumerable<Match> matches = getAllTournamentMatches(tournamentId);
+            var relevantRounds = t.Rounds.Where(r => r.Modus == Models.Round.RoundModus.RoundRobin).ToList();
+            List<Match> matches = new List<Match>();
+            relevantRounds.ForEach(r => matches.AddRange(getAllRoundMatches(r.RoundId)));
+
+            if (matches.Count == 0) return NotFound();
+
             if (!showAll?.Equals("true") ?? true)
             {
                 //Filter for active and not started matches
-                matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active);
+                matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active).ToList();
             }
 
             return View("TournamentMatches", matches);
@@ -419,7 +473,8 @@ namespace ChemodartsWebApp.Controllers
 
                 if (newStatus is null) { m.Status = Match.MatchStatus.Finished; } 
                 else { m.Status = newStatus; }
-                //else { m.Status = (Match.MatchStatus)Enum.Parse(typeof(Match.MatchStatus), newStatus); }
+
+                m.HandleNewStatus(m.Status);
 
                 if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
                 else { m.Venue = await queryId(newVenueId, _context.Venues); }
@@ -498,6 +553,8 @@ namespace ChemodartsWebApp.Controllers
             }
         }
 
+        #region Group Create (normal)
+
         // GET: Tournament/Create
         [Authorize(Roles = "Administrator")]
         public IActionResult GroupCreate(int? tournamentId, int? roundId)
@@ -538,7 +595,7 @@ namespace ChemodartsWebApp.Controllers
 
                 return RedirectToAction(nameof(Group), new { id = g.GroupId });
             }
-            return View("TournamentCreate", groupFactory);
+            return View("GroupCreate", groupFactory);
         }
 
         public async Task<IActionResult> GroupDeleteSeed(int? tournamentId, int? id, int? seedId)
@@ -554,6 +611,45 @@ namespace ChemodartsWebApp.Controllers
 
             return RedirectToAction(nameof(Round), new { id = g.RoundId });
         }
+
+        #endregion
+
+        #region Group Create Ko-System
+
+        // GET: Tournament/Create
+        [Authorize(Roles = "Administrator")]
+        public IActionResult GroupCreateKO(int? tournamentId, int? roundId)
+        {
+            return View();
+        }
+
+        // POST: Players/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GroupCreateKO(int? tournamentId, int? id, int? roundId, [Bind("NumberOfRounds,ThisRoundId")] KoFactory groupFactoryKo)
+        {
+            if (ModelState.IsValid)
+            {
+                Round? r = await queryId(groupFactoryKo.ThisRoundId, _context.Rounds);
+                if (r is null) return NotFound();
+                _context.Groups.RemoveRange(r.Groups);
+                await _context.SaveChangesAsync();
+
+                //Create Group
+                if (!groupFactoryKo.CreateSystem(_context))
+                {
+                    return NotFound();
+                }
+
+                return RedirectToAction(nameof(Round), new { id = groupFactoryKo.ThisRoundId });
+            }
+            return View("GroupCreateKO", groupFactoryKo);
+        }
+
+        #endregion
 
         #endregion
 
@@ -595,11 +691,11 @@ namespace ChemodartsWebApp.Controllers
             return set.FindAsync(id);
         }
 
-        private IEnumerable<Match> getAllTournamentMatches(int? tournamentId)
+        private IEnumerable<Match> getAllRoundMatches(int? roundId)
         {
-            if(tournamentId is null) return Enumerable.Empty<Match>();
+            if (roundId is null) return Enumerable.Empty<Match>();
 
-            IEnumerable<Match> matches = _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync().Result;
+            IEnumerable<Match> matches = _context.Matches.Where(m => m.Group.RoundId == roundId).ToListAsync().Result;
             IEnumerable<Match> orderedMatches = Match.OrderMatches(matches);
             return orderedMatches;
         }

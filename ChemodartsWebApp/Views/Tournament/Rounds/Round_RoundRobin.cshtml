@@ -1,5 +1,7 @@
 ﻿@model Round
 
+@if (User.Identity.IsAuthenticated){ <a asp-controller="Tournament" asp-action="GroupCreate" asp-route-roundId="@Model.RoundId">Gruppe hinzufügen</a> <hr />}
+
 @foreach (var group in Model.Groups) {
     <h2 class="display-4">
         <a asp-controller="Tournament" asp-action="Group" asp-route-id="@group.GroupId">
