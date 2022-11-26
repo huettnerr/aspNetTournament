@@ -90,10 +90,11 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int id, [Bind("playerId,name,dartname,contactData,interpret,song")] Player player)
+        public async Task<IActionResult> Edit(int id, [Bind("PlayerId,PlayerName,PlayerDartname,PlayerContactData,PlayerInterpret,PlayerSong")] Player player)
         {
             if (id != player.PlayerId)
             {
+                return RedirectToAction(nameof(Create));
                 return NotFound();
             }
 

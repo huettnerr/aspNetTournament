@@ -76,8 +76,8 @@ namespace ChemodartsWebApp.Models
                 stat.LegsWon += this.Score.P1Legs;
 
                 //Lost
-                stat.SetsWon += this.Score.P2Sets;
-                stat.LegsWon += this.Score.P2Legs;
+                stat.SetsLost += this.Score.P2Sets;
+                stat.LegsLost += this.Score.P2Legs;
             } 
             else if (this.Seed2.Equals(s))
             {
@@ -86,8 +86,8 @@ namespace ChemodartsWebApp.Models
                 stat.LegsWon += this.Score.P2Legs;
 
                 //Lost
-                stat.SetsWon += this.Score.P1Sets;
-                stat.LegsWon += this.Score.P1Legs;
+                stat.SetsLost += this.Score.P1Sets;
+                stat.LegsLost += this.Score.P1Legs;
             } 
             else return false;
 

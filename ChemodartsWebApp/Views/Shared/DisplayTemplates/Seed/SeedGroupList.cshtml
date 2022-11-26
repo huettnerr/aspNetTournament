@@ -11,7 +11,7 @@
             </th>
             @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedPlayer", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
-            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedGroupAdmin", new { RenderType = "Header" })
+            @*@if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedGroupAdmin", new { RenderType = "Header" })*@
         </tr>
     </thead>
     <tbody>
@@ -24,7 +24,7 @@
             </td>
             @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Seed/Columns/SeedStats", new { RenderType = "Content" })
-            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Seed/Columns/SeedGroupAdmin", new { RenderType = "Content" })
+            @*@if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Seed/Columns/SeedGroupAdmin", new { RenderType = "Content" })*@
         </tr>
     }
     </tbody>

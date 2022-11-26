@@ -3,9 +3,9 @@
 @switch(ViewData["RenderType"])
 {
     case "Header":
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => Model.SeedNr)
-        </th>
+        </th>*@
         @*<th>
             @Html.DisplayNameFor(model => model.SeedName)
         </th>*@
@@ -13,11 +13,11 @@
         @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Header"})
         break;
     case "Content":
-        <td>
+        @*<td>
             <a asp-action="Players" asp-route-id="@Model.SeedId">
                 #@Model.SeedNr
             </a>
-        </td>
+        </td>*@
         @*<td>
             @Html.DisplayFor(model => model.SeedName)
         </td>*@

@@ -50,7 +50,7 @@ namespace ChemodartsWebApp.Models
 
         [Display(Name = "Record")] public string Record { get => $"{MatchesWon} - {MatchesLost}"; }
 
-        [Display(Name = "Pts")] 
+        [Display(Name = "Legs")] 
         public int Points 
         { 
             get 
@@ -64,7 +64,7 @@ namespace ChemodartsWebApp.Models
             } 
         }
 
-        [Display(Name = "Pts Diff")]
+        [Display(Name = "Legs Diff.")]
         public int PointsDiff
         {
             get
