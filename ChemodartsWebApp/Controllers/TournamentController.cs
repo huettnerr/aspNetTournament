@@ -131,7 +131,6 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Matches), new { id = tournamentId });
         }
 
-
         #endregion
 
         #region Players
@@ -326,12 +325,47 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            //List<Match> matches = t.Rounds.SelectMany(r => r.Groups).Distinct().SelectMany(g => g.Matches).Distinct().ToList();
-            //var matches = t.Rounds.FirstOrDefault().Groups.FirstOrDefault().Matches.ToList();
-            IEnumerable<Match> matches = await _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync();
-            IEnumerable<Match> orderedMatches = Match.OrderMatches(matches);
+            return View("TournamentMatches", getAllTournamentMatches(tournamentId));
+        }
 
-            return View("TournamentMatches", orderedMatches);
+        public async Task<IActionResult> MatchStart(int? tournamentId, int? id)
+        {
+            Match? m = await queryId(id, _context.Matches);
+            if (m is null) return NotFound();
+
+            m.Status = Match.MatchStatus.Active;
+            Score score = ScoreFactory.CreateScore(m);
+            _context.Scores.Add(score); 
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId });
+        }
+
+        public async Task<IActionResult> MatchAssignBoard(int? tournamentId, int? id)
+        {
+            Match? m = await queryId(id, _context.Matches);
+            if (m is null) return NotFound();
+
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            m.Venue = m.Group.Round.MappedVenues.Where(mv => mv.Venue.Match is null).Select(mv => mv.Venue).FirstOrDefault();
+            if (m.Venue is object)
+            {
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                ViewBag.Message = "Kein freies Board gefunden";
+            }
+
+            return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId });
+        }
+
+        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id)
+        {
+            //TODO
+            return NotFound();
         }
 
         #endregion
@@ -497,6 +531,15 @@ namespace ChemodartsWebApp.Controllers
             if (id == null || set == null) return new ValueTask<T?>(result: null);
 
             return set.FindAsync(id);
+        }
+
+        private IEnumerable<Match> getAllTournamentMatches(int? tournamentId)
+        {
+            if(tournamentId is null) return Enumerable.Empty<Match>();
+
+            IEnumerable<Match> matches = _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync().Result;
+            IEnumerable<Match> orderedMatches = Match.OrderMatches(matches);
+            return orderedMatches;
         }
     }
 }

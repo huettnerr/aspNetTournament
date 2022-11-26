@@ -6,11 +6,17 @@
         <th>
             @Html.DisplayNameFor(model => model.Group.GroupName)
         </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.MatchOrderValue)
+        </th>*@
         break;
     case "Content":
         <td>
             @Html.DisplayFor(model => Model.Group.GroupName)
         </td>
+        @*<td>
+            @Html.DisplayFor(model => Model.MatchOrderValue)
+        </td>*@
         break;
     default:
         goto case "Content";

@@ -17,7 +17,7 @@ namespace ChemodartsWebApp.Data
         public DbSet<Group> Groups { get; set; } = default!;
         public DbSet<Seed> Seeds { get; set; } = default!;
         public DbSet<Match> Matches { get; set; } = default!;
-        //public DbSet<Score> Scores { get; set; } = default!;
+        public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<MapRoundVenue> MapperRV { get; set; } = default!;
         public DbSet<MapTournamentSeedPlayer> MapperTP { get; set; } = default!;
 

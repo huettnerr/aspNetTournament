@@ -1,0 +1,24 @@
+﻿@model Match
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            Aktion
+        </th>
+        break;
+    case "Content":
+        <td>
+            @if(Model.Status.Equals(Match.MatchStatus.Created)) 
+            {
+                <a asp-action="MatchStart" asp-route-id="@Model.MatchId"> Start </a>
+            }else {
+                <a asp-action="MatchEditScore" asp-route-id="@Model.MatchId">Edit</a>
+                <p> | </p>
+                <a asp-action="MatchAssignBoard" asp-route-id="@Model.MatchId">Assign Board</a>
+            }
+        </td>
+        break;
+    default:
+        goto case "Content";
+}

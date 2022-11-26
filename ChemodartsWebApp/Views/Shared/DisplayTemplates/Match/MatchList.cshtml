@@ -13,7 +13,8 @@
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchScore", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchVenue", new { RenderType = "Header"})
-            @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchTime", new { RenderType = "Header"})
+            @*@Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchTime", new { RenderType = "Header"})*@
+            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchAdmin", new { RenderType = "Header" })
         </tr>
     </thead>
     <tbody>
@@ -23,7 +24,8 @@
             @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})
-            @Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})
+            @*@Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})*@
+            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Match/Columns/MatchAdmin", new { RenderType = "Content" })
         </tr>
     }
     </tbody>

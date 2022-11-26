@@ -1,10 +1,10 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Match>
 
-<div>
+@*<div>
     <form asp-action="StartNextMatch">
         <button type="submit">Nächstes Match Starten</button>
     </form>
 </div>
-<hr />
+<hr />*@
 
 @Html.DisplayFor(m => Model, "Match/MatchList", new { ShowGroup = "true"})
