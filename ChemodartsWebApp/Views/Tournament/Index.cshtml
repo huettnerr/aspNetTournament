@@ -5,6 +5,8 @@
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
+<h1>Willkommen bei Chemodarts!</h1>
+
 @if (User.Identity.IsAuthenticated){ <a asp-controller="Tournament" asp-action="TournamentCreate" asp-route-id=0>Turnier erstellen</a> <hr /> }
 
 <table class="table">

@@ -4,6 +4,8 @@
     ViewData["Title"] = "Home Page";
 }
 
+<h1>@Model.FirstOrDefault().Tournament.TournamentName</h1>
+
 @if (User.Identity.IsAuthenticated){ <a asp-controller="Tournament" asp-action="RoundCreate">Runde hinzufügen</a>  <hr />}
 
 <table class="table">
