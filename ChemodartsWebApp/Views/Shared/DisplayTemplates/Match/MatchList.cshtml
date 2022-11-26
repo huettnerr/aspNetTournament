@@ -6,6 +6,8 @@
     if(ViewData["ShowGroup"]?.Equals("true") ?? false) showGroup = true;
 }
 
+@if (!(Context.Request.Query["showAll"]).Equals("true")){ <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a> }
+
 <table class="table">
     <thead>
         <tr>

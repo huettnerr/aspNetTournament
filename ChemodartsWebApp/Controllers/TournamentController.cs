@@ -316,7 +316,7 @@ namespace ChemodartsWebApp.Controllers
         #region Matches
 
         // GET Vollständige Matchliste
-        public async Task<IActionResult> Matches(int? tournamentId)
+        public async Task<IActionResult> Matches(int? tournamentId, string? showAll)
         {
             //search for spezific tournament
             Tournament? t = await queryId(tournamentId, _context.Tournaments);
@@ -325,7 +325,14 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            return View("TournamentMatches", getAllTournamentMatches(tournamentId));
+            IEnumerable<Match> matches = getAllTournamentMatches(tournamentId);
+            if (!showAll?.Equals("true") ?? true)
+            {
+                //Filter for active and not started matches
+                matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active);
+            }
+
+            return View("TournamentMatches", matches);
         }
 
         public async Task<IActionResult> MatchStart(int? tournamentId, int? id)

@@ -2,7 +2,7 @@
 
 @if (Model.Player is object)
 {
-    @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Content"})
+    @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Content", bold = ViewData["boldSeed"]})
 }
 else
 {

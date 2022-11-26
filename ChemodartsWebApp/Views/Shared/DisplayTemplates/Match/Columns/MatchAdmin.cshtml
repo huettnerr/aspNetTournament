@@ -13,8 +13,8 @@
             {
                 <a asp-action="MatchStart" asp-route-id="@Model.MatchId"> Start </a>
             }else {
-                <a asp-action="MatchEditScore" asp-route-id="@Model.MatchId">Edit</a>
-                <p> | </p>
+                <a asp-action="MatchEditScore" asp-route-id="@Model.MatchId" asp-route-editMatchId="@Model.MatchId">Edit</a>
+                <span> | </span>
                 <a asp-action="MatchAssignBoard" asp-route-id="@Model.MatchId">Assign Board</a>
             }
         </td>

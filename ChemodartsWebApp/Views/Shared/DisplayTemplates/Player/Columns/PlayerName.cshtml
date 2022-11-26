@@ -1,5 +1,10 @@
 ﻿@model Player
 
+@{
+    bool boldPlayerName = false;
+    if(ViewData["bold"]?.Equals("true") ?? false) boldPlayerName = true;
+}
+
 @switch(ViewData["RenderType"])
 {
     case "Header":
@@ -11,7 +16,14 @@
         <td>
         @if (Model is object) {
             <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId">
-                @Html.DisplayFor(model => Model.CombinedName)
+                @if(boldPlayerName)
+                {
+                    <b>@Html.DisplayFor(model => Model.CombinedName)</b>
+                }
+                else
+                {
+                    @Html.DisplayFor(model => Model.CombinedName)
+                }
             </a>
         }else{
             @Html.DisplayFor(model => Model.CombinedName)

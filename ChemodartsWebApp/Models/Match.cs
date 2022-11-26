@@ -100,7 +100,7 @@ namespace ChemodartsWebApp.Models
                     //Seed 1 won
                     return s.Equals(this.Seed1) ? true : false;
                 }
-                else
+                else if (this.Score.P1Legs < this.Score.P2Legs)
                 {
                     //Seed 2 won
                     return s.Equals(this.Seed2) ? true : false;
@@ -114,7 +114,7 @@ namespace ChemodartsWebApp.Models
                     //Player 1 won
                     return s.Equals(this.Seed1) ? true : false;
                 }
-                else
+                else if (this.Score.P1Sets < this.Score.P2Sets)
                 {
                     //Player 2 won
                     return s.Equals(this.Seed2) ? true : false;
