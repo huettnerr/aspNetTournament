@@ -6,6 +6,12 @@
     ViewData["Title"] = "Home Page";
 }
 
+@if (User.Identity.IsAuthenticated){ <a asp-controller="Tournament" asp-action="GroupCreate" asp-route-roundId="@Model.RoundId">Gruppe hinzufügen</a> <hr />}
+
+<div>
+    <a asp-action="Index">Back</a>
+</div>
+
 <div class="text-center">
     <h1 class="display-4"><b>@Model.RoundName</b> - @Html.DisplayFor(model => model.Modus)</h1>
 </div>

@@ -18,6 +18,11 @@
                     @*@Html.ActionLink("Matches", "Matches")*@
                     <a class="nav-link text-dark" asp-action="Matches">Matches</a>
                 </li>
+                @if (User.Identity.IsAuthenticated){ 
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-action="Settings">Einstellungen</a>
+                    </li>
+                }
             </ul>
         </div>
     </div>

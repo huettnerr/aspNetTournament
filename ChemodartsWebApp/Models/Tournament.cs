@@ -15,4 +15,21 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<MapTournamentSeedPlayer> MappedSeedsPlayers { get; set; }
         [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedSeedsPlayers.Select(msp => msp.Seed).ToList(); }
     }
+
+    public class TournamentFactory
+    {
+        public string Name { get; set; }
+        public DateTime StartTime { get; set; }
+
+        public Tournament? CreateTournament()
+        {
+            Tournament tournament = new Tournament()
+            {
+                TournamentName = Name,
+                TournamentStart = StartTime,
+            };
+
+            return tournament;
+        }
+    }
 }

@@ -3,34 +3,56 @@
 @switch(ViewData["RenderType"])
 {
     case "Header":
-        @*<th>
-            @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
-        </th>*@
-        <th>
-            @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
-        </th>
-        <th>
-            Aktion
-        </th>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @*<th>
+                @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
+                </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+            </th>
+            <th>
+                Aktion
+            </th>
+        }
+        else
+        {
+            <th>
+                @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+            </th>
+        }
         break;
     case "Content":
-        @*<td>
-            @Html.DisplayFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
-            </td>*@
-        <td>
-            @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
-            {
-                <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId">CheckIn</a>
-            }else{
-                <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId"> @Html.Raw("&#10004;")</a>
-            }
-        </td>
-        <td>
-            @if (Model.MappedTournamentPlayer.Player is object)
-            {
-                <a asp-action="PlayerRemove" asp-route-id="@Model.SeedId">Entfernen</a>
-            }
-        </td>
+        @if (User.Identity.IsAuthenticated){ 
+            @*<td>
+                @Html.DisplayFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
+                </td>*@
+            <td>
+                @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+                {
+                    <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId">@Html.Raw("&#10006;")</a>
+                }else{
+                    <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId"> @Html.Raw("&#10004;")</a>
+                }
+            </td>
+            <td>
+                @if (Model.MappedTournamentPlayer.Player is object)
+                {
+                    <a asp-action="PlayerRemove" asp-route-id="@Model.SeedId">Entfernen</a>
+                }
+            </td>
+        }
+        else
+        {
+            <td>
+                @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+                {
+                    <p>@Html.Raw("&#10006;")</p>
+                }else{
+                    <p>@Html.Raw("&#10004;")</p>
+                }
+            </td>
+        }
         break;
     default:
         goto case "Content";

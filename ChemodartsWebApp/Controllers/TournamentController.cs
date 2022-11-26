@@ -21,6 +21,8 @@ namespace ChemodartsWebApp.Controllers
             _context = context;
         }
 
+        #region Turnier anzeigen/erstellen
+
         //GET Turnierübersicht
         public async Task<IActionResult> Index(int? tournamentId)
         {
@@ -40,6 +42,75 @@ namespace ChemodartsWebApp.Controllers
 
             return View("Index", await _context.Tournaments.ToListAsync());
         }
+
+        #region Tournament Create
+
+        // GET: Tournament/Create
+        [Authorize(Roles = "Administrator")]
+        public IActionResult TournamentCreate(int? tournamentId)
+        {
+            return View();
+        }
+
+        // POST: Players/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> TournamentCreate([Bind("Name,StartTime")] TournamentFactory factory)
+        {
+            if (ModelState.IsValid)
+            {
+                Tournament? t = factory.CreateTournament();
+                if(t is null) return NotFound();
+
+                 _context.Tournaments.Add(t);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index), t.TournamentId);
+            }
+            return View("TournamentCreate", factory);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Settings
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Settings(int? tournamentId)
+        {
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            return View("TournamentSettings", t);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> SettingsUpdateSeeds(int? tournamentId, int selectedRoundId)
+        {
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+            if (r is null)
+            {
+                ViewBag.UpdateSeedsMessage = "RoundId ungültig";
+                return View("TournamentSettings", t);
+            }
+
+            GroupFactory.UpdateSeeds(r.Groups);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Round), new { id = r.RoundId });
+        }
+
+
+        #endregion
+
+        #region Players
 
         // GET Spielerübersicht
         public IActionResult Players(int? tournamentId, int? id)
@@ -182,6 +253,10 @@ namespace ChemodartsWebApp.Controllers
 
         #endregion
 
+        #endregion
+
+        #region Matches
+
         // GET Vollständige Matchliste
         public async Task<IActionResult> Matches(int? tournamentId)
         {
@@ -199,8 +274,12 @@ namespace ChemodartsWebApp.Controllers
             return View("TournamentMatches", matches);
         }
 
+        #endregion
+
+        #region Rounds
+
         //GET Rundenansicht
-        public async Task<IActionResult> Round(int? id)
+        public async Task<IActionResult> Round(int? tournamentId, int? id)
         {
             //search for spezific tournament
             Round? r = await queryId(id, _context.Rounds);
@@ -214,8 +293,43 @@ namespace ChemodartsWebApp.Controllers
             }
         }
 
+        // GET: Rounds/Create
+        [Authorize(Roles = "Administrator")]
+        public IActionResult RoundCreate(int? tournamentId, int? id)
+        {
+            return View();
+        }
+
+        // POST: Rounds/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> RoundCreate(int? tournamentId, int? id, [Bind("Name,RoundModus")] RoundFactory roundFactory)
+        {
+            if (ModelState.IsValid)
+            {
+                Round? r = roundFactory.CreateRound(tournamentId);
+                if (r is null)
+                {
+                    return NotFound();
+                }
+
+                _context.Rounds.Add(r);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Round), new { id = r.RoundId });
+            }
+            return View("RoundCreate", roundFactory);
+        }
+
+        #endregion
+
+        #region Groups
+
         // GET: Gruppenansicht
-        public async Task<IActionResult> Group(int? id)
+        public async Task<IActionResult> Group(int? tournamentId, int? id)
         {
             Group? g = await queryId(id, _context.Groups);
             if (g is null)
@@ -227,6 +341,51 @@ namespace ChemodartsWebApp.Controllers
                 return View("GroupOverview", g);
             }
         }
+
+        // GET: Tournament/Create
+        [Authorize(Roles = "Administrator")]
+        public IActionResult GroupCreate(int? tournamentId, int? roundId)
+        {
+            return View();
+        }
+
+        // POST: Players/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> GroupCreate(int? tournamentId, int? id, int? roundId, [Bind("Name,PlayersPerGroup,RoundId")] GroupFactory groupFactory)
+        {
+            if (ModelState.IsValid)
+            {
+                //Create Group
+                Group? g = groupFactory.CreateGroup();
+                if (g is null)  return NotFound();
+
+                _context.Groups.Add(g);
+                await _context.SaveChangesAsync();
+
+                //Create the seeds
+                List<Seed>? seeds = groupFactory.CreateSeeds(g.GroupId);
+                if (seeds is null) return NotFound();
+
+                _context.Seeds.AddRange(seeds);
+                await _context.SaveChangesAsync();
+
+                //Map the seeds to the tournament
+                List<MapTournamentSeedPlayer>? mappers = groupFactory.CreateMapping(tournamentId, seeds);
+                if (mappers is null) return NotFound();
+
+                _context.MapperTP.AddRange(mappers);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Group), new { id = g.GroupId });
+            }
+            return View("TournamentCreate", groupFactory);
+        }
+
+        #endregion
 
         //// GET: Matchansicht
         //public async Task<IActionResult> Matches(int? id)

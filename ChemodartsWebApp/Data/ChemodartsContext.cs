@@ -81,6 +81,12 @@ namespace ChemodartsWebApp.Data
                 new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(3) },
                 new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(4) }
             };
+
+            DebugTournament.Rounds = new List<Round>()
+            {
+                new Round() { RoundName = "Peter", RoundId=1 },
+                new Round() { RoundName = "Julian", RoundId=2 },
+            };
         }
 
         private int playerId = 0;

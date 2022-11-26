@@ -1,0 +1,22 @@
+﻿@model Tournament
+
+@{
+    ViewData["Title"] = "Settings Page";
+    int selectedRoundId = 0;
+}
+
+<div>
+    <form asp-action="SettingsUpdateSeeds">
+        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select Round")
+        <button type="submit">Update Seeds of Round</button>
+    </form>
+    <div style="color:red;">@ViewBag.UpdateSeedsMessage</div>
+</div>
+
+<div>
+    <form asp-action="SettingsRecreateMatches">
+        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select Round")
+        <button type="submit">Recreate Matches of Round</button>
+    </form>
+    <div style="color:red;">@ViewBag.RecreateMatchesMessage</div>
+</div>

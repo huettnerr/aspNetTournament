@@ -19,4 +19,70 @@ namespace ChemodartsWebApp.Models
         [NotMapped] public virtual ICollection<Seed> RankedSeeds { get => Seeds.OrderByDescending(s => s.Statistics.MatchesWon).ThenByDescending(s => s.Statistics.PointsDiff).ToList(); }
     }
 
+    public class GroupFactory
+    {
+        public string Name { get; set; }
+        public int PlayersPerGroup { get; set; }
+        public int? RoundId { get; set; }
+
+        public Group? CreateGroup()
+        {
+            if (RoundId is null) return null;
+
+            Group g = new Group()
+            {
+                GroupName = Name,
+                RoundId = RoundId ?? 0,
+            };
+
+            return g;
+        }
+
+        public List<Seed>? CreateSeeds(int groupId)
+        {
+            //if (tournament is null) return null;
+
+            List<Seed> seeds = new List<Seed>();
+            for (int i = 0; i < PlayersPerGroup; i++)
+            {
+                seeds.Add(new Seed()
+                {
+                    SeedNr = 0,
+                    SeedName = "",
+                    GroupId = groupId,
+                });
+            }
+
+            return seeds;
+        }
+
+        public static void UpdateSeeds(ICollection<Group> groups)
+        {
+            List<Seed> allSeeds = new List<Seed>();
+            groups.ToList().ForEach(g => allSeeds.AddRange(g.Seeds));
+
+            int seedNr = 1;
+            allSeeds.ForEach(s => s.SeedNr = seedNr++);
+        }
+
+        public List<MapTournamentSeedPlayer>? CreateMapping(int? tournamentId, List<Seed>? seeds)
+        {
+            if (tournamentId is null || seeds is null) return null;
+
+            List<MapTournamentSeedPlayer> mtsps = new List<MapTournamentSeedPlayer>();
+            foreach (Seed seed in seeds)
+            {
+                mtsps.Add(new MapTournamentSeedPlayer()
+                {
+                    TSP_SeedId = seed.SeedId,
+                    TSP_TournamentId = tournamentId ?? 0,
+                    TSP_PlayerCheckedIn = false,
+                    TSP_PlayerFixed = false,
+                    Player = null
+                }); ;
+            }
+
+            return mtsps;
+        }
+    }
 }

@@ -1,0 +1,26 @@
+﻿@model Seed
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            Aktionen
+        </th>
+
+        @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Header"})
+        break;
+    case "Content":
+        <td>
+            <a asp-action="Players" asp-route-id="@Model.SeedId">
+                #@Model.SeedNr
+            </a>
+        </td>
+        @*<td>
+            @Html.DisplayFor(model => model.SeedName)
+        </td>*@
+
+        <partial name="DisplayTemplates/Seed/Columns/SeedPlayerName" model="@Model"/>
+        break;
+    default:
+        goto case "Content";
+}

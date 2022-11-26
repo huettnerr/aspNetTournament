@@ -5,17 +5,14 @@
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (User.Identity.IsAuthenticated){ <a asp-controller="Tournament" asp-action="TournamentCreate" asp-route-id=0>Turnier erstellen</a> <hr /> }
 
 <table class="table">
     <thead>
         <tr>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.TournamentId)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.TournamentName)
             </th>
@@ -27,9 +24,9 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.TournamentId)
-            </td>
+            </td>*@
             <td>
                 <a asp-route-tournamentId="@item.TournamentId" asp-action="Index">
                     @Html.DisplayFor(modelItem => item.TournamentName)
