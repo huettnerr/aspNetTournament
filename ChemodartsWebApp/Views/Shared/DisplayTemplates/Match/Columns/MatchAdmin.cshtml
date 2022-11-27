@@ -17,7 +17,12 @@
                 @if (Model.Status.Equals(Match.MatchStatus.Active))
                 {
                     <span> | </span>
-                    <a asp-action="MatchAssignBoard" asp-route-id="@Model.MatchId">Assign Board</a>
+                    @if (!(Model.Venue is object) && Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).ToList().Count > 0)
+                    {
+                        <span> | </span>
+                        <a asp-action="MatchAssignBoard" asp-route-id="@Model.MatchId">Assign Board</a>
+@*                        <span>@Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).ToList().Count</span>*@
+                    }
                 }
 @*                <span>@Model.WinnerSeed?.Player?.CombinedName</span>*@
             }

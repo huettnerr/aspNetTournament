@@ -436,7 +436,7 @@ namespace ChemodartsWebApp.Controllers
             Tournament? t = await queryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
-            m.Venue = m.Group.Round.MappedVenues.Where(mv => mv.Venue.Match is null).Select(mv => mv.Venue).FirstOrDefault();
+            m.Venue = m.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).FirstOrDefault();
             if (m.Venue is object)
             {
                 await _context.SaveChangesAsync();
