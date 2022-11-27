@@ -16,7 +16,6 @@
                 <a asp-action="MatchEditScore" asp-route-id="@Model.MatchId">Edit</a>
                 @if (Model.Status.Equals(Match.MatchStatus.Active))
                 {
-                    <span> | </span>
                     @if (!(Model.Venue is object) && Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).ToList().Count > 0)
                     {
                         <span> | </span>
