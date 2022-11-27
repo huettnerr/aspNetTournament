@@ -19,7 +19,7 @@
                     @if (!(Model.Venue is object) && Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).ToList().Count > 0)
                     {
                         <span> | </span>
-                        <a asp-action="MatchAssignBoard" asp-route-id="@Model.MatchId">Assign Board</a>
+                        <a asp-action="MatchAssignBoard" asp-route-id="@Model.MatchId">Assign Board (@Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).ToList().Count frei)</a>
 @*                        <span>@Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).ToList().Count</span>*@
                     }
                 }
