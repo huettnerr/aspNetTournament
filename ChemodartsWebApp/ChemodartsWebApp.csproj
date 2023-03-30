@@ -30,9 +30,4 @@
     <PackageReference Include="MySql.EntityFrameworkCore" Version="6.0.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.3.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
-  </ItemGroup>
-
 </Project>

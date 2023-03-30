@@ -11,6 +11,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ChemodartsWebApp.Controllers
 {
+    //https://learn.microsoft.com/de-de/aspnet/core/mvc/views/tag-helpers/built-in/anchor-tag-helper?view=aspnetcore-7.0
+    //[Route("/Tournament/Creaate", Name = "t_create")]
+    //using --> <a asp-route="t_create">Create Tournament</a>
+
     public class TournamentController : Controller
     {
 

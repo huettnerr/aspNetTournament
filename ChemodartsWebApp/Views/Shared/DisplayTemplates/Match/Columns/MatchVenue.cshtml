@@ -31,6 +31,7 @@
         <td>
             @if (edit)
             {
+                //<select asp-for="@newStatus" asp-items="@Html.GetEnumSelectList<Match.MatchStatus>()" />
                 @Html.DropDownListFor(m => newStatus, new SelectList(Enum.GetValues(typeof(Match.MatchStatus))), "Select Status")
             }
             else
