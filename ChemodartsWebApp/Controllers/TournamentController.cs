@@ -232,7 +232,7 @@ namespace ChemodartsWebApp.Controllers
             List<Player>? SubscribedPlayers = t?.MappedSeedsPlayers.Where(msp => msp.Seed.Player is object).Select(msp => msp.Seed.Player).ToList();
             SubscribedPlayers?.ForEach(p => Players.Remove(p));
 
-            return new MultiSelectList(Players, "PlayerId", "CombinedName", null);
+            return new MultiSelectList(Players.OrderBy(p => p.PlayerName), "PlayerId", "CombinedName", null);
         }
 
         [HttpGet]
@@ -414,7 +414,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchStart(int? tournamentId, int? id)
+        public async Task<IActionResult> MatchStart(int? tournamentId, int? id, string? showAll)
         {
             Match? m = await queryId(id, _context.Matches);
             if (m is null) return NotFound();
@@ -428,11 +428,11 @@ namespace ChemodartsWebApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId });
+            return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchAssignBoard(int? tournamentId, int? id)
+        public async Task<IActionResult> MatchAssignBoard(int? tournamentId, int? id, string? showAll)
         {
             Match? m = await queryId(id, _context.Matches);
             if (m is null) return NotFound();
@@ -450,12 +450,12 @@ namespace ChemodartsWebApp.Controllers
                 ViewBag.Message = "Kein freies Board gefunden";
             }
 
-            return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId });
+            return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
         }
 
         [Authorize(Roles = "Administrator")]
         [HttpGet]
-        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id)
+        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, string? showAll)
         {
             Match? m = await queryId(id, _context.Matches);
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
@@ -466,7 +466,7 @@ namespace ChemodartsWebApp.Controllers
 
         [Authorize(Roles = "Administrator")]
         [HttpPost]
-        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newStatus, int? newVenueId)
+        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newStatus, int? newVenueId, string? showAll)
         {
             Match? m = await queryId(id, _context.Matches);
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
@@ -488,7 +488,7 @@ namespace ChemodartsWebApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Matches), new { tournamentId = tournamentId, showAll = "true" });
+            return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
         }
 
         #endregion

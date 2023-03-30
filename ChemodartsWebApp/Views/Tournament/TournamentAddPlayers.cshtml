@@ -5,6 +5,9 @@
 
 @*https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions/working-with-the-dropdownlist-box-and-jquery/using-the-dropdownlist-helper-with-aspnet-mvc*@
 
+<a asp-controller="Players" asp-action="Create" target="_blank">Create Player</a>
+<hr />
+
 @if (ViewBag.YouSelected is object) {
     <div> You Selected:  @ViewBag.YouSelected</div>
 }
@@ -17,11 +20,11 @@
 
     <fieldset>
 
-        <legend>Multi-Select Demo</legend>
+        <legend>Spieler hinzufügen</legend>
 
         <div class="editor-field">
 
-            @Html.ListBox("Players", ViewBag.Playerslist as MultiSelectList)
+            @Html.ListBox("Players", ViewBag.Playerslist as MultiSelectList, new {size=20})
 
         </div>
 

@@ -24,7 +24,7 @@
     </thead>
     <tbody>
     @foreach (var item in Model) {
-        <tr>
+        <tr id="Match_@item.MatchId">
             @if(showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
             @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
