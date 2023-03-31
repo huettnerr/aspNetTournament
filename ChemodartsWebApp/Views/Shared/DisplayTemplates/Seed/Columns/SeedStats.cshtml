@@ -1,8 +1,11 @@
 ﻿@model Seed
 
-@switch(ViewData["RenderType"])
+@switch (ViewData["RenderType"])
 {
     case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.Statistics.Matches)
+        </th>
         <th>
             @Html.DisplayNameFor(model => model.Statistics.MatchesWon)
         </th>
@@ -17,6 +20,9 @@
         </th>
         break;
     case "Content":
+        <td>
+            @Html.DisplayFor(model => model.Statistics.Matches)
+        </td> 
         <td>
             @Html.DisplayFor(model => model.Statistics.MatchesWon)
         </td>

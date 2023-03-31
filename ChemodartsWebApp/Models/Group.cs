@@ -16,7 +16,41 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<Match> Matches { get; set; }
         public virtual ICollection<Seed> Seeds { get ; set; }
 
-        [NotMapped] public virtual ICollection<Seed> RankedSeeds { get => Seeds.OrderByDescending(s => s.Statistics.MatchesWon).ThenByDescending(s => s.Statistics.PointsDiff).ToList(); }
+        [NotMapped] public virtual ICollection<Seed> RankedSeeds {
+            get
+            {
+                List<Seed> rankedSeeds = new List<Seed>();
+                Seeds.ToList().ForEach(s => {
+                    s.UpdateSeedStatistics(RoundId);
+                    rankedSeeds.Add(s);
+                });
+                rankedSeeds = rankedSeeds
+                    .OrderByDescending(s => s.Statistics.MatchesWon)
+                    .ThenByDescending(s => s.Statistics.PointsDiff)
+                    .ThenByDescending(s => s.Statistics.Points).ToList();
+
+                for (int i = 0; i < rankedSeeds.Count - 1; i++)
+                {
+                    //Check if some seeds are totally identical
+                    if (rankedSeeds[i].Statistics.MatchesWon == rankedSeeds[i + 1].Statistics.MatchesWon &&
+                        rankedSeeds[i].Statistics.PointsDiff == rankedSeeds[i + 1].Statistics.PointsDiff &&
+                        rankedSeeds[i].Statistics.Points == rankedSeeds[i + 1].Statistics.Points)
+                    {
+                        Match? m = Matches.Where(m => m.IsMatchOfSeeds(rankedSeeds[i], rankedSeeds[i + 1])).FirstOrDefault();
+                        if (m is object)
+                        {
+                            if (m.HasSeedWon(rankedSeeds[i + 1]))
+                            {
+                                Seed tmp = rankedSeeds[i];
+                                rankedSeeds[i] = rankedSeeds[i + 1];
+                                rankedSeeds[i + 1] = tmp;
+                            }
+                        }
+                    }
+                }
+                return rankedSeeds;
+            }
+        }
         [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Match.OrderMatches(this.Matches).ToList(); }
     }
 

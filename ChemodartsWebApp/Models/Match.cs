@@ -124,7 +124,8 @@ namespace ChemodartsWebApp.Models
             else return false;
 
             //Update Winning Stat
-            if(HasSeedWon(s))
+            stat.Matches++;
+            if (HasSeedWon(s))
             {
                 stat.MatchesWon++;
             }
@@ -171,6 +172,16 @@ namespace ChemodartsWebApp.Models
                 }
                 return false;
             }
+        }
+
+        public bool IsMatchOfSeeds(Seed s1, Seed s2)
+        {
+            if (Seed1.Equals(s1) && Seed2.Equals(s2) || Seed1.Equals(s2) && Seed2.Equals(s1))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 
