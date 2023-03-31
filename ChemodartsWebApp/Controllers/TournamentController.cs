@@ -490,7 +490,14 @@ namespace ChemodartsWebApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+            try
+            {
+                return RedirectToPreviousPage("editId", "Match_");
+            }
+            catch 
+            {
+                return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+            }
         }
 
         #endregion
@@ -704,6 +711,22 @@ namespace ChemodartsWebApp.Controllers
             if (roundId is null) return Enumerable.Empty<Match>();
 
             return _context.Matches.Where(m => m.Group.RoundId == roundId).ToListAsync().Result;
+        }
+
+        private RedirectResult RedirectToPreviousPage(string query, string fragment)
+        {
+            var uri = new System.Uri(HttpContext.Request.Headers.Referer);
+            var queryDictionary = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            var id = queryDictionary[query];
+            UriBuilder uriB = new UriBuilder();
+            uriB.Path = uri.AbsolutePath;
+            if (id is object)
+            {
+                queryDictionary.Remove(query);
+                uriB.Fragment = $"{fragment}{id}";
+            }
+            uriB.Query = queryDictionary.ToString();
+            return Redirect(uriB.Uri.PathAndQuery + uriB.Fragment);
         }
     }
 }

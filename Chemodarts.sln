@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MudBlazorTemplates1", "MudB
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApplication1", "WebApplication1\WebApplication1.csproj", "{4ED3EBBB-9E5C-4D0F-A1BA-7B2474210DA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcWebApplication1", "MvcWebApplication1\MvcWebApplication1.csproj", "{F8846482-332C-4C80-B13D-877F4520A94D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{4ED3EBBB-9E5C-4D0F-A1BA-7B2474210DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4ED3EBBB-9E5C-4D0F-A1BA-7B2474210DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4ED3EBBB-9E5C-4D0F-A1BA-7B2474210DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8846482-332C-4C80-B13D-877F4520A94D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8846482-332C-4C80-B13D-877F4520A94D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8846482-332C-4C80-B13D-877F4520A94D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8846482-332C-4C80-B13D-877F4520A94D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

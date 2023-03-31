@@ -7,6 +7,8 @@ namespace WebApplication1.Pages
     {
         private readonly ILogger<IndexModel> _logger;
 
+        public string Name { get; set; }
+
         public IndexModel(ILogger<IndexModel> logger)
         {
             _logger = logger;

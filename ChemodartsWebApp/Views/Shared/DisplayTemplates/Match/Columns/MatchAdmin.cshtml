@@ -15,7 +15,7 @@
             }
             else 
             {
-                <a asp-route-editId="@Model.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">Edit</a>
+                <a asp-route-editId="@Model.MatchId" asp-fragment="Match_@Model.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">Edit</a>
                 @*<a asp-action="MatchEditScore" asp-route-id="@Model.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">Edit</a>*@
 
                 @if (Model.Status.Equals(Match.MatchStatus.Active))
