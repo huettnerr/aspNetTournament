@@ -8,6 +8,7 @@ using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
+using System.Xml.Linq;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -453,8 +454,8 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
         }
 
-        [Authorize(Roles = "Administrator")]
         [HttpGet]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, string? showAll)
         {
             Match? m = await queryId(id, _context.Matches);
@@ -464,9 +465,11 @@ namespace ChemodartsWebApp.Controllers
             return View("DisplayTemplates/Match/MatchEdit", m);
         }
 
-        [Authorize(Roles = "Administrator")]
         [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        //public async Task<IActionResult> MatchEditScore(Match m2, int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, string? showAll)
         public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newStatus, int? newVenueId, string? showAll)
+
         {
             Match? m = await queryId(id, _context.Matches);
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
@@ -477,10 +480,16 @@ namespace ChemodartsWebApp.Controllers
                 m.Score.P1Legs = seed1Legs ?? 0;
                 m.Score.P2Legs = seed2Legs ?? 0;
 
-                if (newStatus is null) { m.Status = Match.MatchStatus.Finished; } 
-                else { m.Status = newStatus; }
+                if (newStatus is object) { m.Status = newStatus; }
+                //else { m.Status = Match.MatchStatus.Finished; }
 
                 m.HandleNewStatus(m.Status);
+
+                //if (newVenueId == -1) { 
+                //    m.VenueId = null; 
+                //} else { 
+                //    m.Venue = newVenueId; 
+                //}
 
                 if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
                 else { m.Venue = await queryId(newVenueId, _context.Venues); }

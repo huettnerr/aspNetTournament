@@ -7,10 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Shared\DisplayTemplates\Match\Columns\MatchVenueEdit.cshtml" />
     <Content Remove="wwwroot\css\BracketStyle.css" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\Shared\DisplayTemplates\Match\Columns\MatchVenueEdit.cshtml" />
     <None Include="wwwroot\css\BracketStyle.css" />
   </ItemGroup>
 

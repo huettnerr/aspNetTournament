@@ -9,7 +9,10 @@
     if (Context.Request.Query["showAll"].Equals("true") || (ViewData["showAll"]?.Equals("true") ?? false)) showAll = true;
 }
 
-@if (!showAll){ <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a> }
+@if (!showAll)
+{
+     <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a>
+}
 
 <table class="table">
     <thead>
@@ -23,14 +26,29 @@
         </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model) {
+@foreach(Match item in Model) {
         <tr id="Match_@item.MatchId">
-            @if(showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
-            @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
-            @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
-            @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})
-            @*@Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})*@
-            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Match/Columns/MatchAdmin", new { RenderType = "Content" })
+            @if (showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
+            @if (User.Identity.IsAuthenticated && Context.Request.Query["editId"].Equals(item.MatchId.ToString()))
+            {
+                <form asp-action="MatchEditScore" asp-route-id="@item.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
+                    @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
+                    @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content", Edit = "true" })
+                    @await Html.PartialAsync("../Shared/DisplayTemplates/Match/Columns/MatchVenue", item, new ViewDataDictionary(ViewData) { { "RenderType", "Content" }, { "Edit",  "true"}})
+                    <td>
+                        <button type="submit">Speichern</button>
+                    </td>
+                </form>
+            }
+            else
+            {
+                @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
+                @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
+                @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})
+                @if (User.Identity.IsAuthenticated)
+                    @Html.DisplayFor(m => item, "Match/Columns/MatchAdmin", new { RenderType = "Content" })
+                @*@Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})*@
+            }
         </tr>
     }
     </tbody>

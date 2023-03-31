@@ -1,4 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChemodartsWebApp.Models
@@ -44,6 +47,33 @@ namespace ChemodartsWebApp.Models
                 else return null;
             } 
         }
+
+        //Helpers
+        [NotMapped]
+        [BindProperty]
+        public Venue? SelectedVenue { get; set; }
+
+        [NotMapped]
+        public List<SelectListItem> AvailableVenues
+        {
+            get
+            {
+                List<SelectListItem> res = new List<SelectListItem>();
+                Group?.Round?.MappedVenues?.Select(mv => mv.Venue).Where(v => v?.Match is null).ToList().
+                    ForEach(v => res.Add(new SelectListItem(v.VenueName, v.VenueId.ToString())));
+                return res;
+            }
+        }
+
+        //[NotMapped]
+        //public SelectList AvailableVenues
+        //{
+        //    get => new SelectList(Group?.Round?.MappedVenues?.Select(mv => mv.Venue).Where(v => v?.Match is null), "VenueId", "VenueName", Venue is object ? "No Venue" : "Select Venue");
+        //}
+
+        [NotMapped]
+        [BindProperty]
+        public MatchStatus? NewStatus { get; set; }
 
 
         //[NotMapped][Display(Name = "Heim")] public virtual Player? Player1 { get => Seed1.Player; }

@@ -14,7 +14,7 @@
     </thead>
     <tbody>
         <tr>
-            <form asp-action="MatchEditScore">
+            <form asp-action="MatchEditScore" asp-route-id="@Model.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
                 @Html.DisplayFor(m => Model, "Match/Columns/MatchGroup", new { RenderType = "Content"})
                 @Html.DisplayFor(m => Model, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                 @Html.DisplayFor(m => Model, "Match/Columns/MatchScore", new { RenderType = "Content", Edit = "true" })
