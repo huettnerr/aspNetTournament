@@ -12,6 +12,9 @@
 @if (!showAll)
 {
      <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a>
+}else
+{
+    <a asp-controller="Tournament" asp-action="Matches">Beendete Ausblenden</a>
 }
 
 <table class="table">

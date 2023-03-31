@@ -21,7 +21,7 @@
         <td>
             @if (edit)
             {
-                @Html.DropDownListFor(m => newVenueId, new SelectList(Model.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null), "VenueId", "VenueName"), Model.Venue is object ? "No Venue" : "Select Venue")
+                @Html.DropDownListFor(m => newVenueId, Model.AvailableVenues, Model.Venue is object ? "No Venue" : "Select Venue")
             }
             else
             {
@@ -32,7 +32,7 @@
             @if (edit)
             {
                 //<select asp-for="@newStatus" asp-items="@Html.GetEnumSelectList<Match.MatchStatus>()" />
-                @Html.DropDownListFor(m => newStatus, new SelectList(Enum.GetValues(typeof(Match.MatchStatus))), "Select Status")
+                @Html.DropDownListFor(m => newStatus, Html.GetEnumSelectList<Match.MatchStatus>(), $"Beibehalten ({Model.Status})")
             }
             else
             {

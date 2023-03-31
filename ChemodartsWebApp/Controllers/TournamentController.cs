@@ -454,20 +454,19 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
         }
 
-        [HttpGet]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, string? showAll)
-        {
-            Match? m = await queryId(id, _context.Matches);
-            //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
-            if (m is null) return NotFound();
+        //[HttpGet]
+        //[Authorize(Roles = "Administrator")]
+        //public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, string? showAll)
+        //{
+        //    Match? m = await queryId(id, _context.Matches);
+        //    //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
+        //    if (m is null) return NotFound();
 
-            return View("DisplayTemplates/Match/MatchEdit", m);
-        }
+        //    return View("DisplayTemplates/Match/MatchEdit", m);
+        //}
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        //public async Task<IActionResult> MatchEditScore(Match m2, int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, string? showAll)
         public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newStatus, int? newVenueId, string? showAll)
 
         {
@@ -483,16 +482,10 @@ namespace ChemodartsWebApp.Controllers
                 if (newStatus is object) { m.Status = newStatus; }
                 //else { m.Status = Match.MatchStatus.Finished; }
 
+                if (newVenueId?.Equals(0) ?? true) {  m.VenueId = null; } 
+                m.Venue = await queryId(newVenueId, _context.Venues);
+
                 m.HandleNewStatus(m.Status);
-
-                //if (newVenueId == -1) { 
-                //    m.VenueId = null; 
-                //} else { 
-                //    m.Venue = newVenueId; 
-                //}
-
-                if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
-                else { m.Venue = await queryId(newVenueId, _context.Venues); }
 
                 await _context.SaveChangesAsync();
             }

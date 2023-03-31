@@ -59,6 +59,7 @@ namespace ChemodartsWebApp.Models
             get
             {
                 List<SelectListItem> res = new List<SelectListItem>();
+                if (Venue is object) res.Add(new SelectListItem($"{Venue.VenueName} (aktuell)", Venue.VenueId.ToString(), true));
                 Group?.Round?.MappedVenues?.Select(mv => mv.Venue).Where(v => v?.Match is null).ToList().
                     ForEach(v => res.Add(new SelectListItem(v.VenueName, v.VenueId.ToString())));
                 return res;
@@ -82,6 +83,7 @@ namespace ChemodartsWebApp.Models
         public void HandleNewStatus(MatchStatus? newStatus)
         {
             if (newStatus == MatchStatus.Created) Score = null;
+            else if (newStatus == MatchStatus.Finished) Venue = null;
             //else if (newStatus == MatchStatus.Finished)
             //{
             //    if(WinnerSeedFollowUp is object) WinnerSeedFollowUp.M
