@@ -9,6 +9,8 @@ using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
 using System.Xml.Linq;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -190,17 +192,55 @@ namespace ChemodartsWebApp.Controllers
         #region Venues
 
         // GET Spielerübersicht
-        public IActionResult Venues(int? tournamentId)
+        public IActionResult Venues(int? tournamentId, int? roundId)
         {
             //search for spezific tournament
             Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
             if (t is null) return NotFound();
 
+            //Round r = t.Rounds.Where(r => r.RoundId == roundId).FirstOrDefault();
+            //if (r is null) return NotFound();
+
             IEnumerable<Venue>? venues = t.Rounds.FirstOrDefault().MappedVenues.Select(x => x.Venue);
-            List<Venue> v = _context.Venues.Where(v => v.VenueId > 0).ToList();
             if (venues is null) return NotFound();
 
+            //List<Venue> v = _context.Venues.Where(v => v.VenueId > 0).ToList();
+            List<Venue> allUnmappedVenues = _context.Venues.ToListAsync().Result
+                .Where(v => !v.MappedRounds.Any(mr => mr.RVM_RoundId == roundId)).ToList();
+            ViewBag.UnmappedVenueList = allUnmappedVenues;
+
             return View("TournamentVenues", venues);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        //[HttpPost]
+        public async Task<IActionResult> AddVenues(int? tournamentId, int? roundId, int? selectedVenueId)
+        {
+            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            Round r = t.Rounds.Where(r => r.RoundId == roundId).FirstOrDefault();
+            if (r is null) return NotFound();
+
+            Venue v = await queryId(selectedVenueId, _context.Venues);
+            if (v is null) return NotFound();
+
+            try
+            {
+                MapRoundVenue mrv = new MapRoundVenue() 
+                { 
+                    RVM_RoundId = r.RoundId,
+                    RVM_VenueId = v.VenueId,
+                };
+                _context.MapperRV.Add(mrv);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Round), new { id = r.RoundId });
         }
 
         #endregion

@@ -6,9 +6,6 @@
     int selectedRound2Id = 0;
 }
 
-@Html.ActionLink("Back to previous page", null, null, null, new { href = Context.Request.Query["UrlReferer"]})
-@Html.ActionLink("Back to previous page2", null, null, null, new { href = Context.Request.Query["Referer"]})
-
 <div>
     <form asp-action="SettingsUpdateSeeds">
         @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.Rounds, "RoundId", "RoundName"), "Select Round")

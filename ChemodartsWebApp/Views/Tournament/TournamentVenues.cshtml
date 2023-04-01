@@ -1,8 +1,20 @@
 ﻿@model IEnumerable<ChemodartsWebApp.Models.Venue>
 
+@{
+    ViewData["Title"] = "Settings Page";
+    int selectedVenueId = 0;
+    int selectedRound2Id = 0;
+}
+
+
 @if (User.Identity.IsAuthenticated)
 {
-    <a asp-action="AddVenues">Add Venues</a>
+    <div>
+        <form asp-route-roundId="@Context.Request.Query["roundId"]" asp-action="AddVenues">
+            @Html.DropDownListFor(m => selectedVenueId, new SelectList(ViewBag.UnmappedVenueList, "VenueId", "VenueName"))
+            <button type="submit">Add Venue to RoundId @Context.Request.Query["roundId"]</button>
+        </form>
+    </div>
     <hr />
 }
 

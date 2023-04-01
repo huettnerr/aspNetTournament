@@ -134,10 +134,11 @@ namespace ChemodartsWebApp.Models
             List<Group> groups = new List<Group>();
             for(int roundNr = 0; roundNr <= NumberOfRounds; roundNr++)
             {
+
                 int playersInRound = 2 * getMatchesPerRound(NumberOfRounds - roundNr);
                 Group g = new Group()
                 {
-                    GroupName = $"Stufe der besten {playersInRound}",
+                    GroupName = getGroupName(playersInRound),
                     RoundId = ThisRoundId ?? 0,
                 };
                 g.Matches = new List<Match>();
@@ -254,6 +255,19 @@ namespace ChemodartsWebApp.Models
         private int getMatchesPerRound(int depth)
         {
             return Convert.ToInt32(Math.Pow(2, depth));
+        }
+
+        private string getGroupName(int players)
+        {
+            switch(players) 
+            {
+                case 2: return "Finale";
+                case 4: return "Halbfinale";
+                case 8: return "Viertelfinale";
+                //case 16: return "Finale";
+                default:
+                    return $"Stufe der besten {players}";
+            }
         }
     }
 }
