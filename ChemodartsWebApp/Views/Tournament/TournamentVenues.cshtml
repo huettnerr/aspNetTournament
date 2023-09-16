@@ -1,21 +1,8 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Venue>
-
-@{
-    ViewData["Title"] = "Settings Page";
-    int selectedVenueId = 0;
-    int selectedRound2Id = 0;
-}
-
-
-@if (User.Identity.IsAuthenticated)
+﻿@if (User.Identity.IsAuthenticated)
 {
-    <div>
-        <form asp-route-roundId="@Context.Request.Query["roundId"]" asp-action="AddVenues">
-            @Html.DropDownListFor(m => selectedVenueId, new SelectList(ViewBag.UnmappedVenueList, "VenueId", "VenueName"))
-            <button type="submit">Add Venue to RoundId @Context.Request.Query["roundId"]</button>
-        </form>
-    </div>
+    @foreach (Round r in ViewBag.TournamentRounds)
+    {
+        <a asp-controller="Tournament" asp-action="AddVenue" asp-route-roundId="@r.RoundId">Venues für Runde <b>@r.RoundName</b> (ID @r.RoundId)</a><br />
+    }
     <hr />
 }
-
-@Html.DisplayFor(m => Model, "Venue/VenueList")

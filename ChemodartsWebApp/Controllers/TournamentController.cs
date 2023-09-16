@@ -198,18 +198,32 @@ namespace ChemodartsWebApp.Controllers
             Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
             if (t is null) return NotFound();
 
-            //Round r = t.Rounds.Where(r => r.RoundId == roundId).FirstOrDefault();
-            //if (r is null) return NotFound();
+            ViewBag.TournamentRounds = t.Rounds.ToList();
 
-            IEnumerable<Venue>? venues = t.Rounds.FirstOrDefault().MappedVenues.Select(x => x.Venue);
+            return View("TournamentVenues");
+        }
+
+        // GET: Rounds/Create
+        [Authorize(Roles = "Administrator")]
+        public IActionResult AddVenue(int? tournamentId, int? roundId)
+        {
+            //search for spezific tournament
+            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            if (t is null) return NotFound();
+
+            Round r = t.Rounds.Where(r => r.RoundId == roundId).FirstOrDefault();
+            if (r is null) return NotFound();
+
+            IEnumerable<Venue>? venues = r.MappedVenues.Select(x => x.Venue);
             if (venues is null) return NotFound();
 
-            //List<Venue> v = _context.Venues.Where(v => v.VenueId > 0).ToList();
+            ViewBag.VenuesForRound = venues;    
+
             List<Venue> allUnmappedVenues = _context.Venues.ToListAsync().Result
                 .Where(v => !v.MappedRounds.Any(mr => mr.RVM_RoundId == roundId)).ToList();
             ViewBag.UnmappedVenueList = allUnmappedVenues;
 
-            return View("TournamentVenues", venues);
+            return View("TournamentVenuesRound", new { tournamentId = tournamentId, roundId = roundId });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -240,7 +254,7 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            return RedirectToAction(nameof(Round), new { id = r.RoundId });
+            return RedirectToAction(nameof(AddVenue), new { tournamentId = tournamentId, roundId = roundId });
         }
 
         #endregion

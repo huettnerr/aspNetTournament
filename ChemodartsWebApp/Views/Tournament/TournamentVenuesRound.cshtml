@@ -1,0 +1,17 @@
+﻿@{
+    int? selectedVenueId = null;
+    IEnumerable<Venue> vfr = ViewBag.VenuesForRound;
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div>
+        <form asp-route-roundId="@Context.Request.Query["roundId"]" asp-action="AddVenues">
+            @Html.DropDownListFor(m => selectedVenueId, new SelectList(ViewBag.UnmappedVenueList, "VenueId", "VenueName"))
+            <button type="submit">Add Venue to RoundId @Context.Request.Query["roundId"]</button>
+        </form>
+    </div>
+    <hr />
+}
+
+@Html.DisplayFor(m => vfr, "Venue/VenueList")
