@@ -34,7 +34,7 @@
             @if (showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
             @if (User.Identity.IsAuthenticated && Context.Request.Query["editId"].Equals(item.MatchId.ToString()))
             {
-                <form asp-action="MatchEditScore" asp-route-id="@item.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
+                <form asp-action="MatchEditScore" asp-route-matchId="@item.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
                     @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                     @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content", Edit = "true" })
                     @await Html.PartialAsync("../Shared/DisplayTemplates/Match/Columns/MatchVenue", item, new ViewDataDictionary(ViewData) { { "RenderType", "Content" }, { "Edit",  "true"}})

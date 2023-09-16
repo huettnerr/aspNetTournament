@@ -58,8 +58,8 @@
 
 @if(tournamentId is null)
 {
-    @Html.DisplayFor(m => Model.Matches, "Match/MatchList")
+    @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Matches)
 }
 else{
-    @Html.DisplayFor(m => Model.Matches.Where(m => m.Group.Round.TournamentId == tournamentId), "Match/MatchList")
+    @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Matches.Where(m => m.Group.Round.TournamentId == tournamentId))
 }

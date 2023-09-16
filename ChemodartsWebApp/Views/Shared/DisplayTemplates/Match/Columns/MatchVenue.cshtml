@@ -4,7 +4,7 @@
     bool edit = false;
     if(ViewData["Edit"]?.Equals("true") ?? false) edit = true;
     int? newVenueId = null;
-    Match.MatchStatus? newStatus = null;
+    Match.MatchStatus? newMatchStatus = null;
 }
 
 @switch(ViewData["RenderType"])
@@ -32,7 +32,7 @@
             @if (edit)
             {
                 //<select asp-for="@newStatus" asp-items="@Html.GetEnumSelectList<Match.MatchStatus>()" />
-                @Html.DropDownListFor(m => newStatus, Html.GetEnumSelectList<Match.MatchStatus>(), $"Beibehalten ({Model.Status})")
+                @Html.DropDownListFor(m => newMatchStatus, Html.GetEnumSelectList<Match.MatchStatus>(), $"Beibehalten ({Model.Status})")
             }
             else
             {

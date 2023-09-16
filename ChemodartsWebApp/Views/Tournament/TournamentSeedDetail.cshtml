@@ -10,6 +10,6 @@ else
     <p2>Keinem Spieler zugeordnet</p2>
 }
 
-
+<br />
 <h2>Matches im Turnier "@Model.Tournament.TournamentName"</h2>
-@Html.DisplayFor(m => Model.Matches, "Match/MatchList")
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Matches)

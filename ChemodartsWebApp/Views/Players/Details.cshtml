@@ -67,5 +67,5 @@
 @if (showMatches)
 {
     <h2>Alle Matches</h2>
-    @Html.DisplayFor(m => Model.Matches, "Match/MatchList")
+    @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Matches)
 }

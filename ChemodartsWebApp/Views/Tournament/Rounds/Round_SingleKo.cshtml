@@ -9,5 +9,5 @@
         </a>
     </h2>
 
-    @Html.DisplayFor(m => group.OrderedMatches, "Match/MatchList", new { showAll = "true"})
+    @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", group.OrderedMatches, new ViewDataDictionary(ViewData) { { "showAll", "true" }})
 }

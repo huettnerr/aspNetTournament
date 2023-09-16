@@ -14,13 +14,13 @@
     </thead>
     <tbody>
         <tr>
-            <form asp-action="MatchEditScore" asp-route-id="@Model.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
+            <form asp-action="MatchEditScore" asp-route-matchId="@Model.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
                 @Html.DisplayFor(m => Model, "Match/Columns/MatchGroup", new { RenderType = "Content"})
                 @Html.DisplayFor(m => Model, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                 @Html.DisplayFor(m => Model, "Match/Columns/MatchScore", new { RenderType = "Content", Edit = "true" })
-                @Html.DisplayFor(m => Model, "Match/Columns/MatchVenue", new { RenderType = "Content", Edit = "true" })
-                <td>
-                    <button type="submit">Speichern</button>
+                @await Html.PartialAsync("../Shared/DisplayTemplates/Match/Columns/MatchVenue", Model, new ViewDataDictionary(ViewData) { { "RenderType", "Content" }, { "Edit",  "true"}})
+            <td>
+                    <button type="submit">Speichern2</button>
                 </td>
             </form>
         </tr>

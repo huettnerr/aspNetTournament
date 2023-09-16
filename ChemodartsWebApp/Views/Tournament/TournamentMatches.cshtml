@@ -9,4 +9,4 @@
 
 <p>@ViewBag.Message</p>
 
-@Html.DisplayFor(m => Model, "Match/MatchList", new { ShowGroup = "true"})
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model, new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }})

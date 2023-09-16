@@ -483,7 +483,14 @@ namespace ChemodartsWebApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+            if(m.Group.Round.Modus == Models.Round.RoundModus.RoundRobin)
+            {
+                return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+            }
+            else
+            {
+                return RedirectToAction(nameof(Round), "Tournament", new { tournamentId = tournamentId, id = m.Group.Round.RoundId, showAll = showAll }, $"Match_{id}");
+            }
         }
 
         [Authorize(Roles = "Administrator")]
@@ -505,12 +512,19 @@ namespace ChemodartsWebApp.Controllers
                 ViewBag.Message = "Kein freies Board gefunden";
             }
 
-            return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+            if (m.Group.Round.Modus == Models.Round.RoundModus.RoundRobin)
+            {
+                return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+            }
+            else
+            {
+                return RedirectToAction(nameof(Round), "Tournament", new { tournamentId = tournamentId, id = m.Group.Round.RoundId, showAll = showAll }, $"Match_{id}");
+            }
         }
 
         //[HttpGet]
         //[Authorize(Roles = "Administrator")]
-        //public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, string? showAll)
+        //public async Task<IActionResult> MatchEditScore(int? tournamentId, int? matchId, string? showAll)
         //{
         //    Match? m = await queryId(id, _context.Matches);
         //    //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
@@ -521,10 +535,10 @@ namespace ChemodartsWebApp.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? id, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newStatus, int? newVenueId, string? showAll)
+        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? matchId, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newMatchStatus, int? newVenueId, string? showAll)
 
         {
-            Match? m = await queryId(id, _context.Matches);
+            Match? m = await queryId(matchId, _context.Matches);
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
             if (m is null) return NotFound();
 
@@ -533,7 +547,7 @@ namespace ChemodartsWebApp.Controllers
                 m.Score.P1Legs = seed1Legs ?? 0;
                 m.Score.P2Legs = seed2Legs ?? 0;
 
-                if (newStatus is object) { m.Status = newStatus; }
+                if (newMatchStatus is object) { m.Status = newMatchStatus; }
                 //else { m.Status = Match.MatchStatus.Finished; }
 
                 if (newVenueId?.Equals(0) ?? true) {  m.VenueId = null; } 
@@ -550,7 +564,14 @@ namespace ChemodartsWebApp.Controllers
             }
             catch 
             {
-                return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
+                if (m.Group.Round.Modus == Models.Round.RoundModus.RoundRobin)
+                {
+                    return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{matchId}");
+                }
+                else
+                {
+                    return RedirectToAction(nameof(Round), "Tournament", new { tournamentId = tournamentId, id = m.Group.Round.RoundId, showAll = showAll }, $"Match_{matchId}");
+                }
             }
         }
 
