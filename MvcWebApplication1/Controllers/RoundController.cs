@@ -5,24 +5,24 @@ using System.Diagnostics;
 
 namespace MvcWebApplication1.Controllers
 {
-    public class HomeController : Controller
+    public class RoundController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly ILogger<RoundController> _logger;
         private TestViewModel vm;
 
-        public HomeController(ILogger<HomeController> logger)
+        public RoundController(ILogger<RoundController> logger)
         {
             _logger = logger;
             vm = new TestViewModel();
         }
 
-        public IActionResult Index(int? homeId, int? id)
+        public IActionResult Index(int? tId, int? roundId, int? id)
         {
             return View();
         }
 
         [HttpPost]
-        public IActionResult Create(int? homeId, int? id, TestViewModel tvm)
+        public IActionResult Create(int? tId, int? roundId, int? id, TestViewModel tvm)
         {
             var d = HttpContext.Request.Headers.Referer;
             RouteValueDictionary ds = HttpContext.Request.RouteValues;
@@ -41,13 +41,13 @@ namespace MvcWebApplication1.Controllers
             return Redirect(uriB.Uri.PathAndQuery+uriB.Fragment);
         }
 
-        public IActionResult Privacy(int? homeId, int? id)
+        public IActionResult Privacy(int? tId, int? roundId, int? id)
         {
             return View();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error(int? homeId, int? id)
+        public IActionResult Error(int? tId, int? roundId, int? id)
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }

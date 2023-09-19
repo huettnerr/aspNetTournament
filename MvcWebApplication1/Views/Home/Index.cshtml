@@ -2,13 +2,19 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    RouteValueDictionary rvd = Context.Request.RouteValues;
+    //rvd.Add("roundId", "3");
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+    <h1 class="display-4">Welcome @ViewBag.Route @ViewData["Route"] @TempData["Route"] a</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
+@*<a asp-controller="Round" asp-route-roundId="3" asp-all-route-data="@Context.Request.RouteValues.ToDictionary(kvp => kvp.Key, kvp => (string)kvp.Value)"> dfdf </a>>*@
+<a asp-action="Create" asp-controller="Round" asp-route-roundId="3" asp-route-homeId="@Context.Request.RouteValues["homeId"]"> dfdf </a>>
+@Html.Link(Context, "sfdfysdf", "roundId", 7, "Round")
+<a asp-route-homeId="3a"> Home 3a </a>>
 
 <form asp-action="Create">
     <div class="form-group">
