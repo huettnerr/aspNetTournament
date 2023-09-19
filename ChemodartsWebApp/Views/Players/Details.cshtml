@@ -94,7 +94,7 @@
 
 @if(showSeeds) {
     <h2>Gespielte Turniere</h2>
-    @foreach (var seed in Model.Seeds)
+    @foreach (var seed in Model.Seeds.OrderBy(s => s.Tournament.TournamentId))
     {
         //@Html.DisplayFor(m => seed, "Tournament/SeedResult")
         <h3><a asp-controller="Tournament" asp-route-tournamentId=@seed.Tournament.TournamentId asp-action="Players" asp-route-id=@seed.SeedId>
