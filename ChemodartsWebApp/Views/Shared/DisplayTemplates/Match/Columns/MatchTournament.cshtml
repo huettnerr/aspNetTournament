@@ -1,0 +1,22 @@
+﻿@model Match
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.Group.Round.Tournament.TournamentName)
+        </th>
+        break;
+    case "Content":
+        <td>
+            <a asp-controller="Tournament" asp-action="Group" asp-route-tournamentId="@Model.Group.Round.TournamentId" asp-route-id="@Model.GroupId">
+                @Html.DisplayFor(model => Model.Group.Round.Tournament.TournamentName)
+            </a>
+            @*(<a asp-controller="Tournament" asp-action="Round" asp-route-tournamentId="@Model.Group.Round.TournamentId" asp-route-id="@Model.Group.RoundId">
+                @Html.DisplayFor(model => Model.Group.Round.RoundName)
+            </a>)*@
+        </td>
+        break;
+    default:
+        goto case "Content";
+}

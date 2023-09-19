@@ -16,7 +16,10 @@
             @Html.DisplayNameFor(model => model.Statistics.PointsDiff)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.Points)
+            @Html.DisplayNameFor(model => model.Statistics.PointsFor)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Statistics.PointsAgainst)
         </th>
         break;
     case "Content":
@@ -33,7 +36,10 @@
             @Html.DisplayFor(model => model.Statistics.PointsDiff)
         </td>
         <td>
-            @Html.DisplayFor(model => model.Statistics.Points)
+            @Html.DisplayFor(model => model.Statistics.PointsFor)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.Statistics.PointsAgainst)
         </td>
         break;
     default:

@@ -183,6 +183,18 @@ namespace ChemodartsWebApp.Models
 
             return false;
         }
+
+        public bool IsMatchOfPlayers(Player p1, Player p2)
+        {
+            if (Seed1.Player is null || Seed2.Player is null) return false;
+
+            if (Seed1.Player.Equals(p1) && Seed2.Player.Equals(p2) || Seed1.Player.Equals(p2) && Seed2.Player.Equals(p1))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 
     public class MatchFactory

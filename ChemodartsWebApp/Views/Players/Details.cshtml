@@ -10,11 +10,13 @@
     if(ViewData["ShowMatches"]?.Equals("false") ?? false) showMatches = false;
 }
 
-<h1>Details</h1>
-
+<h1>Spieler <b>@Html.DisplayFor(model => model.CombinedName)</b></h1>
 <div>
-    <h4>Player</h4>
+    <a asp-action="Edit" asp-route-id="@Model?.PlayerId">Edit</a> |
+    <a asp-action="Index">Back to List</a>
     <hr />
+</div>
+<div>
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.PlayerName)
@@ -48,9 +50,46 @@
         </dd>
     </dl>
 </div>
+
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.PlayerId">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <h2>Statistik</h2>
+    @{
+        var dummySeed = Model.Seeds?.FirstOrDefault();
+
+        Seed seedAllMatches = new Seed();
+        seedAllMatches.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+        Model.Seeds.ToList().ForEach(s => s.Matches.ToList().ForEach(m => m.UpdateSeedStat(s, seedAllMatches.Statistics)));
+
+        Seed seedRR = new Seed();
+        seedRR.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+        Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus == Round.RoundModus.RoundRobin).ToList() .ForEach(m => m.UpdateSeedStat(s, seedRR.Statistics)));
+   
+        Seed seedKO = new Seed();
+        seedKO.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+        Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus != Round.RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedKO.Statistics)));
+    }
+    <table class="table">
+    <thead>
+        <tr>
+            <th>Kategorie</th>
+            @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Alle Matches</td>
+            @Html.DisplayFor(m => seedAllMatches, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+        </tr>
+        <tr>
+            <td>Gruppenphase</td>
+            @Html.DisplayFor(m => seedRR, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+        </tr>
+        <tr>
+            <td>KO-Phase</td>
+            @Html.DisplayFor(m => seedKO, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+        </tr>
+    </tbody>
+</table>
 </div>
 
 @if(showSeeds) {
@@ -58,14 +97,13 @@
     @foreach (var seed in Model.Seeds)
     {
         //@Html.DisplayFor(m => seed, "Tournament/SeedResult")
-        <a asp-controller="Tournament" asp-route-tournamentId=@seed.Tournament.TournamentId asp-action="Players" asp-route-id=@seed.SeedId>
+        <h3><a asp-controller="Tournament" asp-route-tournamentId=@seed.Tournament.TournamentId asp-action="Players" asp-route-id=@seed.SeedId>
             @seed.Tournament.TournamentName
-        </a>
+        </a></h3>
+        <br />
+        if(showMatches)
+        {
+            @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", seed.Matches.OrderBy(m => m.MatchId), new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }})
+        }
     }
-}
-
-@if (showMatches)
-{
-    <h2>Alle Matches</h2>
-    @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Matches)
 }

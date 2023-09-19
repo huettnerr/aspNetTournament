@@ -441,6 +441,19 @@ namespace ChemodartsWebApp.Controllers
 
         #region Matches
 
+        // GET: Players/Details/5
+        public async Task<IActionResult> MatchDetails(int? tournamentId, int? matchId)
+        {
+            //search for spezific tournament
+            Match? m = await queryId(matchId, _context.Matches);
+            if (m is null)
+            {
+                return NotFound();
+            }
+
+            return View("DisplayTemplates/Match/MatchDetails", m);
+        }
+
         // GET Vollständige Matchliste
         public async Task<IActionResult> Matches(int? tournamentId, int? id, string? showAll)
         {

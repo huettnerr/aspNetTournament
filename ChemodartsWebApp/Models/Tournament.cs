@@ -7,7 +7,7 @@ namespace ChemodartsWebApp.Models
     public class Tournament
     {
         [Key][Display(Name = "ID")][Column("tournamentId")] public int TournamentId { get; set; }
-        [Required][Display(Name = "Turniername")][Column("name")] public string? TournamentName { get; set; }
+        [Required][Display(Name = "Turnier")][Column("name")] public string? TournamentName { get; set; }
         [Display(Name = "Turnierbeginn")][DisplayFormat(NullDisplayText = "Nicht festgelegt")][DataType(DataType.DateTime)][Column("starttime")] public DateTime? TournamentStart { get; set; }
 
         //Navigation

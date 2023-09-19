@@ -50,8 +50,8 @@ namespace ChemodartsWebApp.Models
 
         [Display(Name = "Record")] public string Record { get => $"{MatchesWon} - {MatchesLost}"; }
 
-        [Display(Name = "Legs")] 
-        public int Points 
+        [Display(Name = "Legs Won")] 
+        public int PointsFor
         { 
             get 
             { 
@@ -59,6 +59,20 @@ namespace ChemodartsWebApp.Models
                 {
                     case Round.ScoreType.SetsOnly: return SetsWon;
                     case Round.ScoreType.LegsOnly: return LegsWon;
+                    default: return 0;
+                }
+            } 
+        }
+        
+        [Display(Name = "Legs Lost")] 
+        public int PointsAgainst
+        { 
+            get 
+            { 
+                switch(scoreType)
+                {
+                    case Round.ScoreType.SetsOnly: return SetsLost;
+                    case Round.ScoreType.LegsOnly: return LegsLost;
                     default: return 0;
                 }
             } 

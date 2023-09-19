@@ -12,7 +12,9 @@
         break;
     case "Content":
         <td>
-            @Html.DisplayFor(model => Model.Group.GroupName)
+            <a asp-controller="Tournament" asp-action="Group" asp-route-tournamentId="@Model.Group.Round.TournamentId" asp-route-id="@Model.GroupId">
+                @Html.DisplayFor(model => Model.Group.GroupName)
+            </a>
         </td>
         @*<td>
             @Html.DisplayFor(model => Model.MatchOrderValue)

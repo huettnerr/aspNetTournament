@@ -9,5 +9,20 @@
 </div>
 
 @Html.DisplayFor(m => Model.RankedSeeds, "Seed/SeedGroupList")
+<br />
+
+@{
+    bool showAll = false;
+    if (Context.Request.Query["showAll"].Equals("true") || (ViewData["showAll"]?.Equals("true") ?? false)) showAll = true;
+
+    if (!showAll)
+    {
+             <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a>
+    }
+    else
+    {
+            <a asp-controller="Tournament" asp-action="Matches">Beendete Ausblenden</a>
+    }
+}
 
 @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.OrderedMatches)

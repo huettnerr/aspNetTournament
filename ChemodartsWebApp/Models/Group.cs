@@ -27,14 +27,14 @@ namespace ChemodartsWebApp.Models
                 rankedSeeds = rankedSeeds
                     .OrderByDescending(s => s.Statistics.MatchesWon)
                     .ThenByDescending(s => s.Statistics.PointsDiff)
-                    .ThenByDescending(s => s.Statistics.Points).ToList();
+                    .ThenByDescending(s => s.Statistics.PointsFor).ToList();
 
                 for (int i = 0; i < rankedSeeds.Count - 1; i++)
                 {
                     //Check if some seeds are totally identical
                     if (rankedSeeds[i].Statistics.MatchesWon == rankedSeeds[i + 1].Statistics.MatchesWon &&
                         rankedSeeds[i].Statistics.PointsDiff == rankedSeeds[i + 1].Statistics.PointsDiff &&
-                        rankedSeeds[i].Statistics.Points == rankedSeeds[i + 1].Statistics.Points)
+                        rankedSeeds[i].Statistics.PointsFor == rankedSeeds[i + 1].Statistics.PointsFor)
                     {
                         Match? m = Matches.Where(m => m.IsMatchOfSeeds(rankedSeeds[i], rankedSeeds[i + 1])).FirstOrDefault();
                         if (m is object)

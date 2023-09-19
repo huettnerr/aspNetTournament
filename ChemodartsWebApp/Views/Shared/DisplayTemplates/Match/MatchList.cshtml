@@ -5,32 +5,27 @@
     bool showGroup = false; ;
     if(ViewData["ShowGroup"]?.Equals("true") ?? false) showGroup = true;
 
-    bool showAll = false;
-    if (Context.Request.Query["showAll"].Equals("true") || (ViewData["showAll"]?.Equals("true") ?? false)) showAll = true;
-}
-
-@if (!showAll)
-{
-     <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a>
-}else
-{
-    <a asp-controller="Tournament" asp-action="Matches">Beendete Ausblenden</a>
+    bool showTournament = false; ;
+    if (ViewData["ShowTournament"]?.Equals("true") ?? false) showTournament = true;
 }
 
 <table class="table">
     <thead>
         <tr>
+            @if(showTournament) @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchTournament", new { RenderType = "Header"})
             @if(showGroup) @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchGroup", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchScore", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchVenue", new { RenderType = "Header"})
             @*@Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchTime", new { RenderType = "Header"})*@
+            <th>Infos</th>
             @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchAdmin", new { RenderType = "Header" })
         </tr>
     </thead>
     <tbody>
 @foreach(Match item in Model) {
         <tr id="Match_@item.MatchId">
+            @if (showTournament) @Html.DisplayFor(m => item, "Match/Columns/MatchTournament", new { RenderType = "Content"})
             @if (showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
             @if (User.Identity.IsAuthenticated && Context.Request.Query["editId"].Equals(item.MatchId.ToString()))
             {
@@ -48,6 +43,7 @@
                 @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                 @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
                 @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})
+                <td><a asp-controller="Tournament" asp-action="MatchDetails" asp-route-tournamentId="@item.Group.Round.TournamentId" asp-route-matchId="@item.MatchId">Details</a> </td>
                 @if (User.Identity.IsAuthenticated)
                     @Html.DisplayFor(m => item, "Match/Columns/MatchAdmin", new { RenderType = "Content" })
                 @*@Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})*@
