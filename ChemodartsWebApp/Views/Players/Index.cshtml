@@ -6,8 +6,11 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 
-@Html.DisplayFor(m => Model, "Player/PlayerList")
+@await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerList", Model.OrderBy(p => p.PlayerName).ThenBy(p => p.PlayerDartname))

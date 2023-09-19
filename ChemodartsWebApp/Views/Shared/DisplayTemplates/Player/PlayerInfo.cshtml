@@ -1,0 +1,110 @@
+﻿@model ChemodartsWebApp.Models.Player
+
+@{
+    ViewData["Title"] = "Details";
+
+    bool showHistory = true; ;
+    if (ViewData["ShowHistory"]?.Equals("false") ?? false) showHistory = false;
+}
+
+<h1>Spieler <b>@Html.DisplayFor(model => model.CombinedName)</b></h1>
+<div>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <a asp-action="Edit" asp-route-id="@Model?.PlayerId">Edit</a>
+        <P> | </P>
+    }
+    <a asp-action="Index">Back to List</a>
+    <hr />
+</div>
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PlayerName)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PlayerName)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PlayerDartname)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PlayerDartname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PlayerContactData)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PlayerContactData)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PlayerInterpret)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PlayerInterpret)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PlayerSong)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PlayerSong)
+        </dd>
+    </dl>
+</div>
+
+@if (showHistory)
+{
+    <div>
+        <h2>Statistik</h2>
+        @{
+            var dummySeed = Model.Seeds?.FirstOrDefault();
+
+            Seed seedAllMatches = new Seed();
+            seedAllMatches.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+            Model.Seeds.ToList().ForEach(s => s.Matches.ToList().ForEach(m => m.UpdateSeedStat(s, seedAllMatches.Statistics)));
+
+            Seed seedRR = new Seed();
+            seedRR.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus == Round.RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedRR.Statistics)));
+
+            Seed seedKO = new Seed();
+            seedKO.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus != Round.RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedKO.Statistics)));
+        }
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Kategorie</th>
+                    @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedStats", new { RenderType = "Header" })
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Alle Matches</td>
+                    @Html.DisplayFor(m => seedAllMatches, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+                </tr>
+                <tr>
+                    <td>Gruppenphase</td>
+                    @Html.DisplayFor(m => seedRR, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+                </tr>
+                <tr>
+                    <td>KO-Phase</td>
+                    @Html.DisplayFor(m => seedKO, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <h2>Gespielte Turniere</h2>
+    @foreach (var seed in Model.Seeds.OrderBy(s => s.Tournament.TournamentId))
+    {
+        //@Html.DisplayFor(m => seed, "Tournament/SeedResult")
+        <h3>
+            <a asp-controller="Tournament" asp-route-tournamentId=@seed.Tournament.TournamentId asp-action="Players" asp-route-id=@seed.SeedId>
+                @seed.Tournament.TournamentName
+            </a>
+        </h3>
+        <br />
+        @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", seed.Matches.OrderBy(m => m.MatchId), new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }})
+    }
+}

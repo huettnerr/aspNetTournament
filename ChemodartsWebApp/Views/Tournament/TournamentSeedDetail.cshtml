@@ -3,7 +3,7 @@
 <h2>Details von Seed #@Model.SeedNr</h2>
 
 @if(Model.Player is object) {
-    @Html.DisplayFor(m => m.Player, "Views/Players/PlayerDetails", new { ShowSeeds = "false", ShowMatches = "false"})
+    @await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerInfo", Model.Player, new ViewDataDictionary(ViewData) { { "ShowHistory", "false" }})
 }
 else
 {

@@ -3,32 +3,35 @@
 @switch(ViewData["RenderType"])
 {
     case "Header":
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => model.PlayerContactData)
-        </th>
+        </th>*@
         <th>
             @Html.DisplayNameFor(model => model.PlayerInterpret)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.PlayerSong)
         </th>
-        <th></th>
+        @if (User.Identity.IsAuthenticated){ <th>Admin</th> }
         break;
     case "Content":
-        <td>
+        @*<td>
             @Html.DisplayFor(modelItem => Model.PlayerContactData)
-        </td>
+        </td>*@
         <td>
             @Html.DisplayFor(modelItem => Model.PlayerInterpret)
         </td>
         <td>
             @Html.DisplayFor(modelItem => Model.PlayerSong)
         </td>
-        <td>
-            <a asp-action="Edit" asp-route-id="@Model.PlayerId">Edit</a> |
-            <a asp-action="Details" asp-route-id="@Model.PlayerId">Details</a> |
-            <a asp-action="Delete" asp-route-id="@Model.PlayerId">Delete</a>
-        </td>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <td>
+                <a asp-action="Edit" asp-route-id="@Model.PlayerId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@Model.PlayerId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@Model.PlayerId">Delete</a>
+            </td>
+        }
         break;
     default:
         goto case "Content";
