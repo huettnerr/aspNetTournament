@@ -4,6 +4,9 @@ using ChemodartsWebApp.Data;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Configuration;
 using ChemodartsWebApp.Models;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.Data.SqlClient;
+using System.Web.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +24,8 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.LoginPath = "/Admin/Login";
     });
+
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 
 builder.Services.Configure<User>(builder.Configuration.GetSection("Admin"));
 
@@ -44,10 +49,29 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+//Monitor Controller
+//app.MapControllerRoute(
+//    name: "Monitor",
+//    pattern: "Monitor/{action}",
+//    defaults: new { controller = "Monitor", action = "Index"});
+
+//Tournament Controller
 app.MapControllerRoute(
     name: "Tournament",
-    pattern: "Tournament/{tournamentId?}/{action}/{id?}",
+    pattern: "Tournament/{action}/{tournamentId:int?}",
     defaults: new { controller = "Tournament", action = "Index"});
+
+//Round Controller
+app.MapControllerRoute(
+    name: "Round",
+    pattern: "Tournament/{tournamentId}/Round/{action}/{roundId:int?}",
+    defaults: new { controller = "Round", action = "Index"});
+
+//Round Controller
+app.MapControllerRoute(
+    name: "Group",
+    pattern: "Tournament/{tournamentId}/Round/{roundId}/Group/{action}/{groupId:int?}",
+    defaults: new { controller = "Group", action = "Index" });
 
 app.MapControllerRoute(
     name: "default",

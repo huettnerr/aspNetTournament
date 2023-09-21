@@ -36,7 +36,7 @@ namespace ChemodartsWebApp.Controllers
             if (tournamentId != null)
             {
                 //search for spezific tournament
-                Tournament? t = await queryId(tournamentId, _context.Tournaments);
+                Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
                 if (t is null)
                 {
                     return NotFound();
@@ -89,7 +89,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Settings(int? tournamentId)
         {
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             return View("TournamentSettings", t);
@@ -98,7 +98,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> SettingsUpdateSeeds(int? tournamentId, int selectedRoundId)
         {
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -117,7 +117,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> SettingsRecreateMatches(int? tournamentId, int selectedRoundId)
         {
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -146,7 +146,7 @@ namespace ChemodartsWebApp.Controllers
             //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } },
             //    new Group() { Matches = new List<Match>() { new Match(), new Match() } });
 
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             Round? r1 = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -176,7 +176,7 @@ namespace ChemodartsWebApp.Controllers
             //    return View("TournamentSettings", t);
             //}
 
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -195,7 +195,7 @@ namespace ChemodartsWebApp.Controllers
         public IActionResult Venues(int? tournamentId, int? roundId)
         {
             //search for spezific tournament
-            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
             if (t is null) return NotFound();
 
             ViewBag.TournamentRounds = t.Rounds.ToList();
@@ -208,7 +208,7 @@ namespace ChemodartsWebApp.Controllers
         public IActionResult AddVenue(int? tournamentId, int? roundId)
         {
             //search for spezific tournament
-            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
             if (t is null) return NotFound();
 
             Round r = t.Rounds.Where(r => r.RoundId == roundId).FirstOrDefault();
@@ -230,13 +230,13 @@ namespace ChemodartsWebApp.Controllers
         //[HttpPost]
         public async Task<IActionResult> AddVenues(int? tournamentId, int? roundId, int? selectedVenueId)
         {
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             Round r = t.Rounds.Where(r => r.RoundId == roundId).FirstOrDefault();
             if (r is null) return NotFound();
 
-            Venue v = await queryId(selectedVenueId, _context.Venues);
+            Venue v = await ControllerHelper.QueryId(selectedVenueId, _context.Venues);
             if (v is null) return NotFound();
 
             try
@@ -265,7 +265,7 @@ namespace ChemodartsWebApp.Controllers
         public IActionResult Players(int? tournamentId, int? id)
         {
             //search for spezific tournament
-            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
             if (t is null) return NotFound();
 
             if (id is null) return View("TournamentSeeds", t.Seeds.OrderBy(s => s.SeedNr));
@@ -294,7 +294,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddPlayers(int? tournamentId, int? id)
         {
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             //Tournament t = _context.DebugTournament;
             if (t is null)
             {
@@ -314,7 +314,7 @@ namespace ChemodartsWebApp.Controllers
             ViewBag.YouSelected = form["Players"];
             string selectedValues = form["Players"];
 
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             //Tournament t = _context.DebugTournament;
 
             if (t is null)
@@ -363,7 +363,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public IActionResult PlayerRemove(int? tournamentId, int? id)
         {
-            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
             if (t is null || id is null) return NotFound();
 
             MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == id).FirstOrDefault();
@@ -381,7 +381,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> PlayerCheckIn(int? tournamentId, int? id)
         {
-            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
             if (t is null || id is null) return NotFound();
 
             MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == id).FirstOrDefault();
@@ -408,7 +408,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ShufflePlayerSeeds(int? tournamentId)
         {
-            Tournament? t = queryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
             if (t is null) return NotFound();
 
             //Store all Players
@@ -445,7 +445,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> MatchDetails(int? tournamentId, int? matchId)
         {
             //search for spezific tournament
-            Match? m = await queryId(matchId, _context.Matches);
+            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
             if (m is null)
             {
                 return NotFound();
@@ -458,7 +458,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> Matches(int? tournamentId, int? id, string? showAll)
         {
             //search for spezific tournament
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null)
             {
                 return NotFound();
@@ -484,7 +484,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> MatchStart(int? tournamentId, int? id, string? showAll)
         {
-            Match? m = await queryId(id, _context.Matches);
+            Match? m = await ControllerHelper.QueryId(id, _context.Matches);
             if (m is null) return NotFound();
 
             m.Status = Match.MatchStatus.Active;
@@ -509,10 +509,10 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> MatchAssignBoard(int? tournamentId, int? id, string? showAll)
         {
-            Match? m = await queryId(id, _context.Matches);
+            Match? m = await ControllerHelper.QueryId(id, _context.Matches);
             if (m is null) return NotFound();
 
-            Tournament? t = await queryId(tournamentId, _context.Tournaments);
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
             if (t is null) return NotFound();
 
             m.Venue = m.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).FirstOrDefault();
@@ -551,7 +551,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> MatchEditScore(int? tournamentId, int? matchId, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newMatchStatus, int? newVenueId, string? showAll)
 
         {
-            Match? m = await queryId(matchId, _context.Matches);
+            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
             if (m is null) return NotFound();
 
@@ -564,7 +564,7 @@ namespace ChemodartsWebApp.Controllers
                 //else { m.Status = Match.MatchStatus.Finished; }
 
                 if (newVenueId?.Equals(0) ?? true) {  m.VenueId = null; } 
-                m.Venue = await queryId(newVenueId, _context.Venues);
+                m.Venue = await ControllerHelper.QueryId(newVenueId, _context.Venues);
 
                 m.HandleNewStatus(m.Status);
 
@@ -590,71 +590,8 @@ namespace ChemodartsWebApp.Controllers
 
         #endregion
 
-        #region Rounds
-
-        //GET Rundenansicht
-        public async Task<IActionResult> Round(int? tournamentId, int? id)
-        {
-            //search for spezific tournament
-            Round? r = await queryId(id, _context.Rounds);
-            if (r is null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return View("RoundsOverview", r);
-            }
-        }
-
-        // GET: Rounds/Create
-        [Authorize(Roles = "Administrator")]
-        public IActionResult RoundCreate(int? tournamentId, int? id)
-        {
-            return View();
-        }
-
-        // POST: Rounds/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> RoundCreate(int? tournamentId, int? id, [Bind("Name,RoundModus")] RoundFactory roundFactory)
-        {
-            if (ModelState.IsValid)
-            {
-                Round? r = roundFactory.CreateRound(tournamentId);
-                if (r is null)
-                {
-                    return NotFound();
-                }
-
-                _context.Rounds.Add(r);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Round), new { id = r.RoundId });
-            }
-            return View("RoundCreate", roundFactory);
-        }
-
-        #endregion
-
         #region Groups
-
-        // GET: Gruppenansicht
-        public async Task<IActionResult> Group(int? tournamentId, int? id)
-        {
-            Group? g = await queryId(id, _context.Groups);
-            if (g is null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                return View("GroupOverview", g);
-            }
-        }
+     
 
         #region Group Create (normal)
 
@@ -703,7 +640,7 @@ namespace ChemodartsWebApp.Controllers
 
         public async Task<IActionResult> GroupDeleteSeed(int? tournamentId, int? id, int? seedId)
         {
-            Group? g = await queryId(id, _context.Groups);
+            Group? g = await ControllerHelper.QueryId(id, _context.Groups);
             if (g is null) return NotFound();
 
             Seed? s = g.Seeds.Where(s => s.SeedId == seedId).FirstOrDefault();
@@ -736,7 +673,7 @@ namespace ChemodartsWebApp.Controllers
         {
             if (ModelState.IsValid)
             {
-                Round? r = await queryId(groupFactoryKo.ThisRoundId, _context.Rounds);
+                Round? r = await ControllerHelper.QueryId(groupFactoryKo.ThisRoundId, _context.Rounds);
                 if (r is null) return NotFound();
                 _context.Groups.RemoveRange(r.Groups);
                 await _context.SaveChangesAsync();
@@ -785,13 +722,6 @@ namespace ChemodartsWebApp.Controllers
             {
                 return false;
             }
-        }
-
-        private ValueTask<T?> queryId<T>(int? id, DbSet<T> set) where T : class
-        {
-            if (id == null || set == null) return new ValueTask<T?>(result: null);
-
-            return set.FindAsync(id);
         }
 
         private IEnumerable<Match> getAllRoundMatches(int? roundId)
