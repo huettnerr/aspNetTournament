@@ -2,7 +2,6 @@
 
 @{
     ViewData["Title"] = "Create Ko Round";
-    Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
 <h1>Create</h1>
@@ -11,23 +10,18 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="GroupCreateKO">
+        <form asp-action="CreateKO">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="NumberOfRounds" class="control-label"></label>
                 <input asp-for="NumberOfRounds" class="form-control" />
                 <span asp-validation-for="NumberOfRounds" class="text-danger"></span>
             </div>
-             <input type="hidden" asp-for="ThisRoundId" value="@(Context.Request.Query["roundId"])"/>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

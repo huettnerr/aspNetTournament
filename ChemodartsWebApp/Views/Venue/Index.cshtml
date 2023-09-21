@@ -1,0 +1,18 @@
+﻿@model IEnumerable<ChemodartsWebApp.Models.Venue>
+
+@{
+    int? venueId = null;
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+   <div>
+        <form asp-action="Add">
+            @Html.DropDownListFor(m => venueId, new SelectList(ViewBag.UnmappedVenueList, "VenueId", "VenueName"))
+            <button type="submit">Add Venue to RoundId @Context.Request.Query["roundId"]</button>
+        </form>
+    </div>
+    <hr />
+}
+
+@Html.DisplayFor(m => Model, "Venue/VenueList")

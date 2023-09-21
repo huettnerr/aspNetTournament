@@ -30,15 +30,15 @@
             <td>
                 @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
                 {
-                    <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId">@Html.Raw("&#10006;")</a>
+                    <a cd-route="Seed" cd-action="CheckIn" cd-route-seedId="@Model.SeedId">@Html.Raw("&#10006;")</a>
                 }else{
-                    <a asp-action="PlayerCheckIn" asp-route-id="@Model.SeedId"> @Html.Raw("&#10004;")</a>
+                    <a cd-route="Seed" cd-action="CheckIn" cd-route-seedId="@Model.SeedId"> @Html.Raw("&#10004;")</a>
                 }
             </td>
             <td>
                 @if (Model.MappedTournamentPlayer.Player is object)
                 {
-                    <a asp-action="PlayerRemove" asp-route-id="@Model.SeedId">Entfernen</a>
+                    <a cd-route="Seed" cd-action="RemovePlayerFromSeed" cd-route-seedId="@Model.SeedId">Entfernen</a>
                 }
             </td>
         }

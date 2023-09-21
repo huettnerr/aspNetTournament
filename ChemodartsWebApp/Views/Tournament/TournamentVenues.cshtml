@@ -1,8 +1,0 @@
-﻿@if (User.Identity.IsAuthenticated)
-{
-    @foreach (Round r in ViewBag.TournamentRounds)
-    {
-        <a asp-controller="Tournament" asp-action="AddVenue" asp-route-roundId="@r.RoundId">Venues für Runde <b>@r.RoundName</b> (ID @r.RoundId)</a><br />
-    }
-    <hr />
-}

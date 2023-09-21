@@ -1,42 +1,52 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Tournament>
+﻿@model Tournament
 
 @{
     ViewData["Title"] = "Home Page";
-    Layout = "~/Views/Shared/_MasterLayout.cshtml";
+    Round dummyRound = Model.Rounds.FirstOrDefault();
 }
 
-<h1>Willkommen bei Chemodarts!</h1>
+<h1>@Model.TournamentName</h1>
 
-@if (User.Identity.IsAuthenticated){ <a asp-controller="Tournament" asp-action="TournamentCreate" asp-route-id=0>Turnier erstellen</a> <hr /> }
+@if (User.Identity.IsAuthenticated){ <a cd-route="Round" cd-action="Create">Runde hinzufügen</a>  <hr />}
 
 <table class="table">
     <thead>
         <tr>
             @*<th>
-                @Html.DisplayNameFor(model => model.TournamentId)
+                @Html.DisplayNameFor(model => model.RoundId)
             </th>*@
             <th>
-                @Html.DisplayNameFor(model => model.TournamentName)
+                @Html.DisplayNameFor(model => dummyRound.RoundName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TournamentStart)
+                @Html.DisplayNameFor(model => dummyRound.Modus)
             </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th>Aktion</th>
+            }
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Rounds) {
         <tr>
             @*<td>
-                @Html.DisplayFor(modelItem => item.TournamentId)
+                @Html.DisplayFor(modelItem => item.RoundId)
             </td>*@
             <td>
-                <a asp-route-tournamentId="@item.TournamentId" asp-action="Index">
-                    @Html.DisplayFor(modelItem => item.TournamentName)
+                <a cd-route="Round" cd-route-roundId="@item.RoundId">
+                    @Html.DisplayFor(modelItem => item.RoundName)
                 </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TournamentStart)
+                @Html.DisplayFor(modelItem => item.Modus)
             </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+                        <a cd-route="Round" cd-action="Delete" cd-route-roundId="@item.RoundId" onclick="return confirm('Are you sure?')"> Delete </a>
+                </td>  
+            }
         </tr>
 }
     </tbody>

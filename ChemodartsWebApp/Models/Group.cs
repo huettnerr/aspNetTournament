@@ -13,14 +13,14 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "RoundID")][Column("roundId")] public int RoundId { get; set; }
         public virtual Round Round { get; set; }
         //public virtual ICollection<MapGroupPlayer> MappedPlayers { get; set; }
-        public virtual ICollection<Match> Matches { get; set; }
-        public virtual ICollection<Seed> Seeds { get ; set; }
+        [NotMapped] public virtual ICollection<Match> Matches { get; set; }
+        [NotMapped] public virtual ICollection<Seed> Seeds { get ; set; }
 
         [NotMapped] public virtual ICollection<Seed> RankedSeeds {
             get
             {
                 List<Seed> rankedSeeds = new List<Seed>();
-                Seeds.ToList().ForEach(s => {
+                Seeds?.ToList().ForEach(s => {
                     s.UpdateSeedStatistics(RoundId);
                     rankedSeeds.Add(s);
                 });
@@ -51,31 +51,29 @@ namespace ChemodartsWebApp.Models
                 return rankedSeeds;
             }
         }
-        [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Match.OrderMatches(this.Matches).ToList(); }
+        [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Match.OrderMatches(this.Matches)?.ToList(); }
     }
 
     public class GroupFactory
     {
         public string Name { get; set; }
         public int PlayersPerGroup { get; set; }
-        public int? RoundId { get; set; }
 
-        public Group? CreateGroup()
+        public Group? CreateGroup(Round? r)
         {
-            if (RoundId is null) return null;
+            if (r is null) return null;
 
             Group g = new Group()
             {
                 GroupName = Name,
-                RoundId = RoundId ?? 0,
+                RoundId = r.RoundId,
             };
-
             return g;
         }
 
-        public List<Seed>? CreateSeeds(int groupId)
+        public List<Seed>? CreateSeeds(Group? g)
         {
-            //if (tournament is null) return null;
+            if (g is null) return null;
 
             List<Seed> seeds = new List<Seed>();
             for (int i = 0; i < PlayersPerGroup; i++)
@@ -84,7 +82,7 @@ namespace ChemodartsWebApp.Models
                 {
                     SeedNr = 0,
                     SeedName = "Seed #0",
-                    GroupId = groupId,
+                    GroupId = g.GroupId,
                 });
             }
 
@@ -124,11 +122,11 @@ namespace ChemodartsWebApp.Models
     public class KoFactory
     {
         public int NumberOfRounds { get; set; }
-        public int? ThisRoundId { get; set; }
 
-        public bool CreateSystem(Data.ChemodartsContext context)
+        public bool CreateSystem(Round? r, Data.ChemodartsContext context)
         {
-            if (ThisRoundId is null) return false;
+            if (r is null) return false;
+
             NumberOfRounds--; // Fühlt sich natürlicher an das Finale mitzuzählen
 
             List<Group> groups = new List<Group>();
@@ -139,7 +137,7 @@ namespace ChemodartsWebApp.Models
                 Group g = new Group()
                 {
                     GroupName = getGroupName(playersInRound),
-                    RoundId = ThisRoundId ?? 0,
+                    RoundId = r.RoundId,
                 };
                 g.Matches = new List<Match>();
                 groups.Add(g);

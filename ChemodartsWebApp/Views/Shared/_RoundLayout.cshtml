@@ -1,0 +1,21 @@
+﻿@{
+    ViewBag.Title = "Runde";
+    Layout = "~/Views/Shared/_TournamentLayout.cshtml";
+    //ChemodartsWebApp.Controllers.ControllerHelper.QueryId(ViewContext.RouteData.Values["tournamentId"], )
+}
+@section TournamentLinks {
+    <li class="nav-item">
+        @*@Html.ActionLink("Matches", "Matches")*@
+        <a cd-route="Match" class="nav-link text-dark" asp-action="Index">Upcoming Matches</a>
+    </li>
+    <li class="nav-item">
+        @*@Html.ActionLink("Matches", "Matches")*@
+        <a cd-route="Venue" class="nav-link text-dark" asp-action="Index">Boards</a>
+    </li>
+}
+
+@RenderBody()
+
+@section Scripts {
+    @await RenderSectionAsync("Scripts", required: false)
+}

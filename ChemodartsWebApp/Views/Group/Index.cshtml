@@ -1,0 +1,32 @@
+﻿@model Group
+
+<div class="text-center">
+    <h1 class="display-4">
+        Gruppe <b>@Model.GroupName</b> 
+        @if (User.Identity.IsAuthenticated)
+        {
+                <a cd-route="Group" cd-action="Edit" cd-route-groupId="@Model.GroupId">Edit</a>
+                <span> | </span>
+                <a cd-route="Group" cd-action="Delete" cd-route-groupId="@Model.GroupId" onclick="return confirm('Are you sure?')"> Delete </a>
+        }
+    </h1>
+</div>
+
+@Html.DisplayFor(m => Model.RankedSeeds, "Seed/SeedGroupList")
+<br />
+
+@{
+    bool showAll = false;
+    if (Context.Request.Query["showAll"].Equals("true") || (ViewData["showAll"]?.Equals("true") ?? false)) showAll = true;
+
+    if (!showAll)
+    {
+             <a asp-controller="Tournament" asp-action="Matches" asp-route-showAll="true">Alle Anzeigen</a>
+    }
+    else
+    {
+            <a asp-controller="Tournament" asp-action="Matches">Beendete Ausblenden</a>
+    }
+}
+
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.OrderedMatches)

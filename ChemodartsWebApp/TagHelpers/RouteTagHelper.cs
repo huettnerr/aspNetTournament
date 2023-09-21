@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace ChemodartsWebApp.TagHelpers
 {
-    [HtmlTargetElement("abc", Attributes = ActionAttributeName)]
+    [HtmlTargetElement("a", Attributes = ActionAttributeName)]
     [HtmlTargetElement("a", Attributes = RouteAttributeName)]
     [HtmlTargetElement("a", Attributes = RouteValuesDictionaryName)]
     [HtmlTargetElement("a", Attributes = RouteValuesPrefix + "*")]
@@ -19,7 +19,6 @@ namespace ChemodartsWebApp.TagHelpers
         private const string RouteAttributeName = "cd-route";
         private const string RouteValuesDictionaryName = "cd-all-route-data";
         private const string RouteValuesPrefix = "cd-route-";
-        private const string Href = "href";
         private IDictionary<string, string> _routeValues;
 
         [HtmlAttributeName(ActionAttributeName)]
@@ -79,6 +78,7 @@ namespace ChemodartsWebApp.TagHelpers
                 if (rd.Key.Equals("controller")) return;
                 else if (rd.Key.Equals("action")) return;
 
+                if(RouteValues.ContainsKey(rd.Key)) RouteValues.Remove(rd.Key);
                 RouteValues.Add(new KeyValuePair<string, string>(rd.Key.ToString(), rd.Value?.ToString() ?? ""));
             });
 

@@ -2,13 +2,10 @@
 
 @if (User.Identity.IsAuthenticated)
 {
-    <a asp-action="AddPlayers">Add Players</a>
-    <hr />
-
     <div>
-        <form asp-action="ShufflePlayerSeeds">
-            <button type="submit">Seeds Mischen</button>
-        </form>
+        <a cd-route="Seed" cd-action="AddPlayersToSeed">Add Players</a>
+       |
+        <a cd-route="Seed" cd-action="ShuffleSeeds">Seeds Mischen </a>
     </div>
     <hr />
 }

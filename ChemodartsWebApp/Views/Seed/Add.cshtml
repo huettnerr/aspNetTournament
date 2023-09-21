@@ -1,4 +1,4 @@
-﻿@model List<string>
+﻿@model MultiSelectList
 @{
     ViewBag.Title = "MultiSelect Player";
 }
@@ -24,7 +24,7 @@
 
         <div class="editor-field">
 
-            @Html.ListBox("Players", ViewBag.Playerslist as MultiSelectList, new {size=20})
+            @Html.ListBox("Players", Model, new {size=20})
 
         </div>
 

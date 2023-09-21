@@ -31,7 +31,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                return View("Overview", r);
+                return View(r);
             }
         }
 
@@ -63,7 +63,19 @@ namespace ChemodartsWebApp.Controllers
 
                 return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
             }
-            return View("Create", roundFactory);
+            return View(roundFactory);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Delete(int? tournamentId, int? roundId)
+        {
+            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            if (r is null) return NotFound();
+
+            _context.Rounds.Remove(r);
+            await _context.SaveChangesAsync();
+
+            return RedirectToRoute("Tournament", new { controller = "Tournament", tournamentId = tournamentId, action = "Index"});
         }
     }
 }

@@ -11,11 +11,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ChemodartsWebApp.Controllers
 {
-    public class PlayersController : Controller
+    public class PlayerController : Controller
     {
         private readonly ChemodartsContext _context;
 
-        public PlayersController(ChemodartsContext context)
+        public PlayerController(ChemodartsContext context)
         {
             _context = context;
         }

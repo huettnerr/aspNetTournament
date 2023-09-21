@@ -9,7 +9,7 @@
         break;
     case "Content":
         <td>
-            @Html.DisplayFor(model => Model.VenueName)
+            <a cd-route="Venue" cd-action="Detail" cd-route-venueId="@Model.VenueId">@Html.DisplayFor(model => Model.VenueName)</a>
         </td>
         break;
     default:

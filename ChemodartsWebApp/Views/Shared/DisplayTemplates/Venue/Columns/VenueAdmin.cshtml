@@ -1,0 +1,17 @@
+﻿@model Venue
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            Aktion
+        </th>
+        break;
+    case "Content":
+        <td>
+            <a cd-route="Venue" cd-action="Remove" cd-route-venueId="@Model.VenueId">Remove</a>
+        </td>
+        break;
+    default:
+        goto case "Content";
+}

@@ -10,6 +10,7 @@
             @Html.DisplayFor(m => dummyVenue.Match, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyVenue.Match, "Match/Columns/MatchScore", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyVenue.Match, "Match/Columns/MatchGroup", new { RenderType = "Header"})
+            @if (User.Identity.IsAuthenticated) @Html.DisplayFor(m => dummyVenue, "Venue/Columns/VenueAdmin", new { RenderType = "Header" })
         </tr>
     </thead>
     <tbody>
@@ -21,7 +22,10 @@
                 @Html.DisplayFor(m => item.Match, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                 @Html.DisplayFor(m => item.Match, "Match/Columns/MatchScore", new { RenderType = "Content"})
                 @Html.DisplayFor(m => item.Match, "Match/Columns/MatchGroup", new { RenderType = "Content"})
+            }else{
+                <td colspan="4">Derzeit kein Match</td>
             }
+            @if (User.Identity.IsAuthenticated) @Html.DisplayFor(m => dummyVenue, "Venue/Columns/VenueAdmin", new { RenderType = "Content" })
         </tr>
     }
     </tbody>

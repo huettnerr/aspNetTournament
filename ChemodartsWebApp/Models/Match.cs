@@ -92,7 +92,7 @@ namespace ChemodartsWebApp.Models
 
         public static IEnumerable<Match> OrderMatches(IEnumerable<Match> matches)
         {
-            return matches.OrderBy(m => m.MatchOrderValue);
+            return matches?.OrderBy(m => m.MatchOrderValue);
         }
 
         public bool UpdateSeedStat(Seed s, SeedStatistics stat)
