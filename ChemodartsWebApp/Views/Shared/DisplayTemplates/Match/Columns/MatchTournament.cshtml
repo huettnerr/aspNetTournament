@@ -9,12 +9,9 @@
         break;
     case "Content":
         <td>
-            <a asp-controller="Tournament" asp-action="Group" asp-route-tournamentId="@Model.Group.Round.TournamentId" asp-route-id="@Model.GroupId">
+            <a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.Group.Round.TournamentId">
                 @Html.DisplayFor(model => Model.Group.Round.Tournament.TournamentName)
             </a>
-            @*(<a asp-controller="Tournament" asp-action="Round" asp-route-tournamentId="@Model.Group.Round.TournamentId" asp-route-id="@Model.Group.RoundId">
-                @Html.DisplayFor(model => Model.Group.Round.RoundName)
-            </a>)*@
         </td>
         break;
     default:

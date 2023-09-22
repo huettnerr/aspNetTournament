@@ -27,9 +27,9 @@
         <tr id="Match_@item.MatchId">
             @if (showTournament) @Html.DisplayFor(m => item, "Match/Columns/MatchTournament", new { RenderType = "Content"})
             @if (showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
-            @if (User.Identity.IsAuthenticated && Context.Request.Query["editId"].Equals(item.MatchId.ToString()))
+                    @if (User.Identity.IsAuthenticated && Context.Request.Query["editMatchId"].Equals(item.MatchId.ToString()))
             {
-                <form asp-action="MatchEditScore" asp-route-matchId="@item.MatchId" asp-route-showAll="@Context.Request.Query["showAll"]">
+                    <form cd-route="Match" cd-action="Edit" cd-route-tournamentId="@item.Group.Round.TournamentId" cd-route-roundId="@item.Group.RoundId" cd-route-matchId="@item.MatchId">
                     @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                     @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content", Edit = "true" })
                     @await Html.PartialAsync("../Shared/DisplayTemplates/Match/Columns/MatchVenue", item, new ViewDataDictionary(ViewData) { { "RenderType", "Content" }, { "Edit",  "true"}})
@@ -43,7 +43,7 @@
                 @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})
                 @Html.DisplayFor(m => item, "Match/Columns/MatchScore", new { RenderType = "Content"})
                 @Html.DisplayFor(m => item, "Match/Columns/MatchVenue", new { RenderType = "Content"})
-                <td><a asp-controller="Tournament" asp-action="MatchDetails" asp-route-tournamentId="@item.Group.Round.TournamentId" asp-route-matchId="@item.MatchId">Details</a> </td>
+                    <td><a cd-route="Match" cd-action="Details" cd-route-tournamentId="@item.Group.Round.TournamentId" cd-route-roundId="@item.Group.RoundId" cd-route-matchId="@item.MatchId">Details</a> </td>
                 @if (User.Identity.IsAuthenticated)
                     @Html.DisplayFor(m => item, "Match/Columns/MatchAdmin", new { RenderType = "Content" })
                 @*@Html.DisplayFor(m => item, "Match/Columns/MatchTime", new { RenderType = "Content"})*@

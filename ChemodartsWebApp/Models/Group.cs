@@ -51,7 +51,7 @@ namespace ChemodartsWebApp.Models
                 return rankedSeeds;
             }
         }
-        [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Match.OrderMatches(this.Matches)?.ToList(); }
+        [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Matches.OrderBy(m => m.MatchOrderValue).ToList(); }
     }
 
     public class GroupFactory

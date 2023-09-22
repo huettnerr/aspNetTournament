@@ -11,31 +11,31 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ChemodartsWebApp.Controllers
 {
-    public class PlayerController : Controller
+    public class PlayersController : Controller
     {
         private readonly ChemodartsContext _context;
 
-        public PlayerController(ChemodartsContext context)
+        public PlayersController(ChemodartsContext context)
         {
             _context = context;
         }
 
         // GET: Players
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? playerId)
         {
               return View(await _context.Players.ToListAsync());
         }
 
         // GET: Players/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? playerId)
         {
-            if (id == null || _context.Players == null)
+            if (playerId == null || _context.Players == null)
             {
                 return NotFound();
             }
 
             var player = await _context.Players
-                .FirstOrDefaultAsync(m => m.PlayerId == id);
+                .FirstOrDefaultAsync(m => m.PlayerId == playerId);
             if (player == null)
             {
                 return NotFound();
@@ -69,14 +69,14 @@ namespace ChemodartsWebApp.Controllers
 
         // GET: Players/Edit/5
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? playerId)
         {
-            if (id == null || _context.Players == null)
+            if (playerId == null || _context.Players == null)
             {
                 return NotFound();
             }
 
-            var player = await _context.Players.FindAsync(id);
+            var player = await _context.Players.FindAsync(playerId);
             if (player == null)
             {
                 return NotFound();
@@ -90,9 +90,9 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int id, [Bind("PlayerId,PlayerName,PlayerDartname,PlayerContactData,PlayerInterpret,PlayerSong")] Player player)
+        public async Task<IActionResult> Edit(int? playerId, [Bind("PlayerId,PlayerName,PlayerDartname,PlayerContactData,PlayerInterpret,PlayerSong")] Player player)
         {
-            if (id != player.PlayerId)
+            if (playerId != player.PlayerId)
             {
                 return RedirectToAction(nameof(Create));
                 return NotFound();
@@ -123,15 +123,15 @@ namespace ChemodartsWebApp.Controllers
 
         // GET: Players/Delete/5
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Delete(int? id)
+        public async Task<IActionResult> Delete(int? playerId)
         {
-            if (id == null || _context.Players == null)
+            if (playerId == null || _context.Players == null)
             {
                 return NotFound();
             }
 
             var player = await _context.Players
-                .FirstOrDefaultAsync(m => m.PlayerId == id);
+                .FirstOrDefaultAsync(m => m.PlayerId == playerId);
             if (player == null)
             {
                 return NotFound();
@@ -144,13 +144,13 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int? playerId)
         {
             if (_context.Players == null)
             {
                 return Problem("Entity set 'ChemodartsContext.Player'  is null.");
             }
-            var player = await _context.Players.FindAsync(id);
+            var player = await _context.Players.FindAsync(playerId);
             if (player != null)
             {
                 _context.Players.Remove(player);
@@ -160,9 +160,9 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool PlayerExists(int id)
+        private bool PlayerExists(int? playerId)
         {
-          return _context.Players.Any(e => e.PlayerId == id);
+          return _context.Players.Any(e => e.PlayerId == playerId);
         }
     }
 }

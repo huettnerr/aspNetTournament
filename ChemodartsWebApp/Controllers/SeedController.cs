@@ -34,7 +34,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                return View("Detail", s);
+                return View("Details", s);
             }  
         }
 

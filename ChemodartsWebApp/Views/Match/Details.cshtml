@@ -2,11 +2,11 @@
 
 @{
     ViewData["Title"] = "Match Details";
-    List<Match> matchesBetween = Model.Seed1.Player.Matches.Where(m => m.IsMatchOfPlayers(Model.Seed1.Player, Model.Seed2.Player)).ToList();
+    List<Match>? matchesBetween = Model.Seed1?.Player?.Matches?.Where(m => m.IsMatchOfPlayers(Model.Seed1.Player, Model.Seed2.Player))?.ToList();
 
     Seed statsSeed = new Seed();
     statsSeed.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
-    matchesBetween.ForEach(m => m.UpdateSeedStat((m.Seed1.Player.Equals(Model.Seed1.Player) ? m.Seed1 : m.Seed2), statsSeed.Statistics));
+    matchesBetween?.ForEach(m => m.UpdateSeedStat((m.Seed1.Player.Equals(Model.Seed1.Player) ? m.Seed1 : m.Seed2), statsSeed.Statistics));
 }
 
 <h1>Match Info (@Model.Group.Round.Tournament.TournamentName - @Model.Group.Round.RoundName)</h1>
@@ -18,17 +18,19 @@
 <div>
     <table class="table">
         <tr>
-            <th><b>@Model.Seed1.Player.CombinedName</b></th>
+            <th><b>@Model?.Seed1?.Player.CombinedName</b></th>
             <th>vs.</th>
-            <th><b>@Model.Seed2.Player.CombinedName</b></th>
+            <th><b>@Model?.Seed2?.Player.CombinedName</b></th>
         </tr>
         @if (Model.Group.Round.Modus != Round.RoundModus.RoundRobin) {
             <tr>
-                <td><a asp-controller="Tournament" asp-action="Group" asp-route-tournamentId="@Model.Seed1.Group.Round.TournamentId" asp-route-id="@Model.Seed1.Group.GroupId">
+                <td>
+                    <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.Seed1.Group.GroupId">
                     @Html.DisplayFor(model => model.Seed1.Group.GroupName)
                 </a></td>
                 @Html.DisplayFor(m => m, "Match/Columns/MatchGroup", new { RenderType = "Header"})
-                <td><a asp-controller="Tournament" asp-action="Group" asp-route-tournamentId="@Model.Seed2.Group.Round.TournamentId" asp-route-id="@Model.Seed2.Group.GroupId">
+                <td>
+                    <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.Seed1.Group.GroupId">
                     @Html.DisplayFor(model => model.Seed2.Group.GroupName)
                 </a></td>
             </tr>

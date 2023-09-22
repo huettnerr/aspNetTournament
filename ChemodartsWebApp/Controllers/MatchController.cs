@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -20,8 +21,30 @@ namespace ChemodartsWebApp.Controllers
             _context = context;
         }
 
+        // GET Vollständige Matchliste
+        public async Task<IActionResult> Index(int? tournamentId, int? roundId, int? matchId, string? showAll)
+        {
+            //search for spezific tournament
+            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            if (r is null)
+            {
+                return NotFound();
+            }
+
+            List<Match> matches = new List<Match>();
+            r.Groups.ToList().ForEach(g => matches.AddRange(g.Matches));
+
+            if (!showAll?.Equals("true") ?? true)
+            {
+                //Filter for active and not started matches
+                matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active).ToList();
+            }
+
+            return View(matches.OrderBy(m => m.MatchOrderValue));
+        }
+
         // GET: Players/Details/5
-        public async Task<IActionResult> MatchDetails(int? tournamentId, int? matchId)
+        public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? matchId)
         {
             //search for spezific tournament
             Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
@@ -30,40 +53,13 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            return View("DisplayTemplates/Match/MatchDetails", m);
-        }
-
-        // GET Vollständige Matchliste
-        public async Task<IActionResult> Matches(int? tournamentId, int? id, string? showAll)
-        {
-            //search for spezific tournament
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
-            if (t is null)
-            {
-                return NotFound();
-            }
-
-            var relevantRounds = t.Rounds.Where(r => r.Modus == Models.Round.RoundModus.RoundRobin).ToList();
-            List<Match> matches = new List<Match>();
-            relevantRounds.ForEach(r => matches.AddRange(getAllRoundMatches(r.RoundId)));
-
-            matches = Match.OrderMatches(matches).ToList();
-
-            if (matches.Count == 0) return NotFound();
-
-            if (!showAll?.Equals("true") ?? true)
-            {
-                //Filter for active and not started matches
-                matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active).ToList();
-            }
-
-            return View("TournamentMatches", matches);
+            return View(m);
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchStart(int? tournamentId, int? id, string? showAll)
+        public async Task<IActionResult> Start(int? tournamentId, int? roundId, int? matchId)
         {
-            Match? m = await ControllerHelper.QueryId(id, _context.Matches);
+            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
             if (m is null) return NotFound();
 
             m.Status = Match.MatchStatus.Active;
@@ -75,20 +71,13 @@ namespace ChemodartsWebApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            if (m.Group.Round.Modus == Models.Round.RoundModus.RoundRobin)
-            {
-                return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
-            }
-            else
-            {
-                return RedirectToAction(nameof(Round), "Tournament", new { tournamentId = tournamentId, id = m.Group.Round.RoundId, showAll = showAll }, $"Match_{id}");
-            }
+            return RedirectToPreviousPage(matchId);
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchAssignBoard(int? tournamentId, int? id, string? showAll)
+        public async Task<IActionResult> AssignBoard(int? tournamentId, int? roundId, int? matchId)
         {
-            Match? m = await ControllerHelper.QueryId(id, _context.Matches);
+            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
             if (m is null) return NotFound();
 
             Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
@@ -104,30 +93,12 @@ namespace ChemodartsWebApp.Controllers
                 ViewBag.Message = "Kein freies Board gefunden";
             }
 
-            if (m.Group.Round.Modus == Models.Round.RoundModus.RoundRobin)
-            {
-                return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{id}");
-            }
-            else
-            {
-                return RedirectToAction(nameof(Round), "Tournament", new { tournamentId = tournamentId, id = m.Group.Round.RoundId, showAll = showAll }, $"Match_{id}");
-            }
+            return RedirectToPreviousPage(matchId);
         }
-
-        //[HttpGet]
-        //[Authorize(Roles = "Administrator")]
-        //public async Task<IActionResult> MatchEditScore(int? tournamentId, int? matchId, string? showAll)
-        //{
-        //    Match? m = await queryId(id, _context.Matches);
-        //    //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
-        //    if (m is null) return NotFound();
-
-        //    return View("DisplayTemplates/Match/MatchEdit", m);
-        //}
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> MatchEditScore(int? tournamentId, int? matchId, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newMatchStatus, int? newVenueId, string? showAll)
+        public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? matchId, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newMatchStatus, int? newVenueId)
 
         {
             Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
@@ -150,44 +121,32 @@ namespace ChemodartsWebApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            try
-            {
-                return RedirectToPreviousPage("editId", "Match_");
-            }
-            catch
-            {
-                if (m.Group.Round.Modus == Models.Round.RoundModus.RoundRobin)
-                {
-                    return RedirectToAction(nameof(Matches), "Tournament", new { tournamentId = tournamentId, showAll = showAll }, $"Match_{matchId}");
-                }
-                else
-                {
-                    return RedirectToAction(nameof(Round), "Tournament", new { tournamentId = tournamentId, id = m.Group.Round.RoundId, showAll = showAll }, $"Match_{matchId}");
-                }
-            }
+            return RedirectToPreviousPage(matchId, true);
         }
 
-        private IEnumerable<Match> getAllRoundMatches(int? roundId)
+        private const string editQuery = "editMatchId";
+        private ActionResult RedirectToPreviousPage(int? fragmentId, bool removeEdit = false)
         {
-            if (roundId is null) return Enumerable.Empty<Match>();
+            //Uri uri = new Uri(HttpContext.Request.Headers.Referer);
+            UriBuilder uriBuilder = new UriBuilder(HttpContext.Request.Headers.Referer);
 
-            return _context.Matches.Where(m => m.Group.RoundId == roundId).ToListAsync().Result;
-        }
-
-        private RedirectResult RedirectToPreviousPage(string query, string fragment)
-        {
-            var uri = new System.Uri(HttpContext.Request.Headers.Referer);
-            var queryDictionary = System.Web.HttpUtility.ParseQueryString(uri.Query);
-            var id = queryDictionary[query];
-            UriBuilder uriB = new UriBuilder();
-            uriB.Path = uri.AbsolutePath;
-            if (id is object)
+            if(fragmentId is object)
             {
-                queryDictionary.Remove(query);
-                uriB.Fragment = $"{fragment}{id}";
+                uriBuilder.Fragment = $"Match_{fragmentId}";
             }
-            uriB.Query = queryDictionary.ToString();
-            return Redirect(uriB.Uri.PathAndQuery + uriB.Fragment);
+
+            if(removeEdit)
+            {
+                var queryDictionary = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
+                var id = queryDictionary[editQuery];
+                if (id is object)
+                {
+                    queryDictionary.Remove(editQuery);
+                }
+                uriBuilder.Query = queryDictionary.ToString();
+            }
+
+            return Redirect(uriBuilder.Uri.AbsoluteUri);
         }
     }
 }

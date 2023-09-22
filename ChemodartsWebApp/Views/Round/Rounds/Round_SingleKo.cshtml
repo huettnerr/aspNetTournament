@@ -2,7 +2,7 @@
 
 @foreach (var group in Model.Groups) {
     <h2 class="display-4">
-        <a asp-controller="Tournament" asp-action="Group" asp-route-id="@group.GroupId">
+        <a cd-route="Group" cd-action="Index" asp-route-groupId="@group.GroupId">
         Gruppe <b>@group.GroupName</b>
         </a>
     </h2>

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 using Microsoft.AspNetCore.Mvc.TagHelpers;
 using MySqlX.XDevAPI.Common;
 using Microsoft.AspNetCore.Mvc.Routing;
+using ChemodartsWebApp.Controllers;
 
 namespace ChemodartsWebApp.TagHelpers
 {
@@ -13,6 +14,10 @@ namespace ChemodartsWebApp.TagHelpers
     [HtmlTargetElement("a", Attributes = RouteAttributeName)]
     [HtmlTargetElement("a", Attributes = RouteValuesDictionaryName)]
     [HtmlTargetElement("a", Attributes = RouteValuesPrefix + "*")]
+    [HtmlTargetElement("form", Attributes = ActionAttributeName)]
+    [HtmlTargetElement("form", Attributes = RouteAttributeName)]
+    [HtmlTargetElement("form", Attributes = RouteValuesDictionaryName)]
+    [HtmlTargetElement("form", Attributes = RouteValuesPrefix + "*")]
     public class RouteTagHelper : TagHelper
     {
         private const string ActionAttributeName = "cd-action";
@@ -75,22 +80,33 @@ namespace ChemodartsWebApp.TagHelpers
 
             ViewContext.RouteData.Values.ToList().ForEach(rd =>
             {
-                if (rd.Key.Equals("controller")) return;
-                else if (rd.Key.Equals("action")) return;
+                if (!ControllerHelper.IsRouteAttributeAllowed(RouteName, rd.Key)) return; 
+                if (RouteValues.ContainsKey(rd.Key)) return;
 
-                if(RouteValues.ContainsKey(rd.Key)) RouteValues.Remove(rd.Key);
                 RouteValues.Add(new KeyValuePair<string, string>(rd.Key.ToString(), rd.Value?.ToString() ?? ""));
             });
 
             if(Action is object)
             {
                 if (RouteValues.ContainsKey("action")) RouteValues.Remove("action");
-
                 RouteValues.Add(new KeyValuePair<string, string>("action", Action));
             }
 
             string url = _urlHelper.RouteUrl(RouteName, RouteValues);
-            output.Attributes.SetAttribute("href", url);
+
+            if(context.TagName.Equals("a")) 
+            {
+                output.Attributes.SetAttribute("href", url);
+            }
+            else if(context.TagName.Equals("form"))
+            {
+                output.Attributes.SetAttribute("action", url);
+                output.Attributes.SetAttribute("method", "post");
+            }
+            else
+            {
+                Console.WriteLine(context.TagName);
+            }
         }
     }
 }

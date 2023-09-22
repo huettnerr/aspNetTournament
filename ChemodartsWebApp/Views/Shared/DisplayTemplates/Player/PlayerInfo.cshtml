@@ -11,10 +11,8 @@
 <div>
     @if (User.Identity.IsAuthenticated)
     {
-        <a asp-action="Edit" asp-route-id="@Model?.PlayerId">Edit</a>
-        <P> | </P>
+        <a cd-route="Players" cd-action="Edit" cd-route-playerId="@Model?.PlayerId">Edit</a>
     }
-    <a asp-action="Index">Back to List</a>
     <hr />
 </div>
 <div>
@@ -100,7 +98,7 @@
     {
         //@Html.DisplayFor(m => seed, "Tournament/SeedResult")
         <h3>
-            <a asp-controller="Tournament" asp-route-tournamentId=@seed.Tournament.TournamentId asp-action="Players" asp-route-id=@seed.SeedId>
+            <a cd-route="Seed" cd-action="Index" cd-route-tournamentId=@seed.Tournament.TournamentId cd-route-seedId=@seed.SeedId>
                 @seed.Tournament.TournamentName
             </a>
         </h3>

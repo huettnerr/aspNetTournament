@@ -55,6 +55,12 @@ app.MapRazorPages();
 //    pattern: "Monitor/{action}",
 //    defaults: new { controller = "Monitor", action = "Index"});
 
+//Player Controller
+app.MapControllerRoute(
+    name: "Players",
+    pattern: "Players/{action}/{playerId:int?}",
+    defaults: new { controller = "Players", action = "Index"});
+
 //Tournament Controller
 app.MapControllerRoute(
     name: "Tournament",
@@ -73,19 +79,25 @@ app.MapControllerRoute(
     pattern: "Tournament/{tournamentId}/Seed/{action}/{seedId:int?}",
     defaults: new { controller = "Seed", action = "Index"});
 
+//Settings Controller
+app.MapControllerRoute(
+    name: "Settings",
+    pattern: "Tournament/{tournamentId}/Settings/{action}/{id:int?}",
+    defaults: new { controller = "Settings", action = "Index" });
+
 //Group Controller
 app.MapControllerRoute(
     name: "Group",
     pattern: "Tournament/{tournamentId}/Round/{roundId}/Group/{action}/{groupId:int?}",
     defaults: new { controller = "Group", action = "Index" });
 
-//Round Controller
+//Match Controller
 app.MapControllerRoute(
     name: "Match",
     pattern: "Tournament/{tournamentId}/Round/{roundId}/Match/{action}/{matchId:int?}",
     defaults: new { controller = "Match", action = "Index" });
 
-//Round Controller
+//Venue Controller
 app.MapControllerRoute(
     name: "Venue",
     pattern: "Tournament/{tournamentId}/Round/{roundId}/Venue/{action}/{venueId:int?}",

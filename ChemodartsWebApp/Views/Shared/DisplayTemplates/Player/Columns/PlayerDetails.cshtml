@@ -27,9 +27,9 @@
         @if (User.Identity.IsAuthenticated)
         {
             <td>
-                <a asp-action="Edit" asp-route-id="@Model.PlayerId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@Model.PlayerId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@Model.PlayerId">Delete</a>
+                <a cd-route="Players" cd-action="Edit" cd-route-playerId="@Model.PlayerId">Edit</a> |
+                <a cd-route="Players" cd-action="Details" cd-route-playerId="@Model.PlayerId">Details</a> |
+                <a cd-route="Players" cd-action="Delete" cd-route-playerId="@Model.PlayerId">Delete</a>
             </td>
         }
         break;

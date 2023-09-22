@@ -8,16 +8,14 @@
         <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
             <ul class="navbar-nav flex-grow-1">
                 <li class="nav-item">
-                    @*@Html.ActionLink("Übersicht", "Index")*@
-                    <a cd-route="Tournament" class="nav-link text-dark" cd-action="Index">Übersicht</a>
+                    <a cd-route="Tournament" cd-action="Index" class="nav-link text-dark">Übersicht</a>
                 </li>
                 <li class="nav-item">
-                    @*@Html.ActionLink("Teilnehmer", "Players")*@
-                    <a class="nav-link text-dark" cd-route="Seed" cd-action="Index">Teilnehmer</a>
+                    <a cd-route="Seed" cd-action="Index" class="nav-link text-dark">Teilnehmer</a>
                 </li>
                 @if (User.Identity.IsAuthenticated){ 
                     <li class="nav-item">
-                        <a class="nav-link text-dark" cd-route="Tournament" cd-action="Settings">Einstellungen</a>
+                        <a cd-route="Settings" cd-action="Index" class="nav-link text-dark">Einstellungen</a>
                     </li>
                 }
                 @await RenderSectionAsync("TournamentLinks", required: false)

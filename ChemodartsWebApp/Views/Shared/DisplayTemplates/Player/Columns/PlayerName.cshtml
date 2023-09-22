@@ -15,7 +15,7 @@
     case "Content":
         <td>
         @if (Model is object) {
-            <a asp-controller="Players" asp-action="Details" asp-route-id="@Model.PlayerId">
+            <a cd-route="Players" cd-action="Details" cd-route-playerId="@Model.PlayerId">
                 @if(boldPlayerName)
                 {
                     <b>@Html.DisplayFor(model => Model.CombinedName)</b>

@@ -18,6 +18,12 @@ html {
     }
 }
 
+#youtubeVideo {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    filter: invert();
+}
+
 html {
   position: relative;
   min-height: 100%;
