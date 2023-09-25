@@ -1,18 +1,18 @@
-﻿@model Group
+﻿@model GroupViewModel
 
 <div class="text-center">
     <h1 class="display-4">
-        Gruppe <b>@Model.GroupName</b> 
+        Gruppe <b>@Model.G.GroupName</b> 
         @if (User.Identity.IsAuthenticated)
         {
-                <a cd-route="Group" cd-action="Edit" cd-route-groupId="@Model.GroupId">Edit</a>
+                <a cd-route="Group" cd-action="Edit" cd-route-groupId="@Model.G.GroupId">Edit</a>
                 <span> | </span>
-                <a cd-route="Group" cd-action="Delete" cd-route-groupId="@Model.GroupId" onclick="return confirm('Are you sure?')"> Delete </a>
+                <a cd-route="Group" cd-action="Delete" cd-route-groupId="@Model.G.GroupId" onclick="return confirm('Are you sure?')"> Delete </a>
         }
     </h1>
 </div>
 
-@Html.DisplayFor(m => Model.RankedSeeds, "Seed/SeedGroupList")
+@Html.DisplayFor(m => Model.G.RankedSeeds, "Seed/SeedGroupList")
 <br />
 
-@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.OrderedMatches)
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.G.OrderedMatches)

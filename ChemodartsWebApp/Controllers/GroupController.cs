@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -30,7 +31,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                return View(g);
+                return View(new GroupViewModel(g));
             }
         }
 
@@ -44,9 +45,9 @@ namespace ChemodartsWebApp.Controllers
             switch(r.Modus)
             {
                 case RoundModus.RoundRobin:
-                    return View("Create");
+                    return View("CreateEdit", new GroupViewModel(r, new GroupFactoryRR()));
                 case RoundModus.SingleKo:
-                    return View("CreateKO");
+                    return View("CreateEdit", new GroupViewModel(r, new GroupFactoryKO()));
                 default:
                     return NotFound();
             }
@@ -58,7 +59,7 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Create(int? tournamentId, int? roundId, int? groupId, [Bind("Name,PlayersPerGroup,RoundId")] GroupFactory groupFactory)
+        public async Task<IActionResult> CreateRR(int? tournamentId, int? roundId, int? groupId, [Bind("GroupName,PlayersPerGroup")] GroupFactoryRR rrFactory)
         {
             Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
             if (r is null) return NotFound();
@@ -66,21 +67,21 @@ namespace ChemodartsWebApp.Controllers
             if (ModelState.IsValid)
             {
                 //Create Group
-                Group? g = groupFactory.CreateGroup(r);
+                Group? g = rrFactory.CreateGroup(r);
                 if (g is null) return NotFound();
 
                 _context.Groups.Add(g);
                 await _context.SaveChangesAsync();
 
                 //Create the seeds
-                List<Seed>? seeds = groupFactory.CreateSeeds(g);
+                List<Seed>? seeds = rrFactory.CreateSeeds(g);
                 if (seeds is null) return NotFound();
 
                 _context.Seeds.AddRange(seeds);
                 await _context.SaveChangesAsync();
 
                 //Map the seeds to the tournament
-                List<MapTournamentSeedPlayer>? mappers = groupFactory.CreateMapping(tournamentId, seeds);
+                List<MapTournamentSeedPlayer>? mappers = rrFactory.CreateMapping(tournamentId, seeds);
                 if (mappers is null) return NotFound();
 
                 _context.MapperTP.AddRange(mappers);
@@ -88,7 +89,7 @@ namespace ChemodartsWebApp.Controllers
 
                 return RedirectToAction(nameof(Index), new { groupId = g.GroupId });
             }
-            return View(groupFactory);
+            return View("CreateEdit", new GroupViewModel(r, rrFactory));
         }
 
         // POST: Players/Create
@@ -97,7 +98,7 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, [Bind("NumberOfRounds,ThisRoundId")] KoFactory groupFactoryKo)
+        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, [Bind("NumberOfRounds")] GroupFactoryKO koFactory)
         {
             Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
             if (r is null) return NotFound();
@@ -108,13 +109,50 @@ namespace ChemodartsWebApp.Controllers
                 await _context.SaveChangesAsync();
 
                 //Create Group
-                if (!groupFactoryKo.CreateSystem(r, _context))
+                if (!koFactory.CreateSystem(r, _context))
                 {
                     return NotFound();
                 }
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }
-            return View(groupFactoryKo);
+            return View("CreateEdit", new GroupViewModel(r, koFactory));
+        }
+
+        // GET: Players/Edit/5
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? groupId)
+        {
+            Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
+            if (g is null) return NotFound();
+
+            return View("CreateEdit", new GroupViewModel(g, GroupFactoryEdit.Create(g)));
+        }
+
+        // POST: Players/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? groupId, GroupFactoryEdit editFactory)
+        {
+            try
+            {
+                Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
+                if (g is null) return NotFound();
+
+                g.GroupName = editFactory.GroupName;
+
+                //_context.Groups.
+                _context.Update(g);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(Index), new {groupId = g.GroupId });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return NotFound();
+            }
         }
 
         [Authorize(Roles = "Administrator")]
@@ -127,48 +165,6 @@ namespace ChemodartsWebApp.Controllers
             await _context.SaveChangesAsync();
 
             return RedirectToRoute("Round", new { controller = "Round", action = "Index", tournamentId = tournamentId, roundId = roundId });
-        }
-
-        // GET: Players/Edit/5
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? groupId)
-        {
-            Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
-            if (g is null) return NotFound();
-
-            return View(g);
-        }
-
-        // POST: Players/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? groupId, [Bind("GroupId,GroupName")] Group group)
-        {
-            if (groupId != group.GroupId)
-            {
-                return RedirectToAction(nameof(Edit));
-            }
-
-            try
-            {
-                Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
-                if (g is null) return NotFound();
-
-                g.GroupName = group.GroupName;
-
-                //_context.Groups.
-                _context.Update(g);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index), new {groupId = g.GroupId });
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                return NotFound();
-            }
         }
     }
 }

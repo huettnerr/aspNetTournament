@@ -1,0 +1,9 @@
+﻿@model GroupFactoryRR
+
+@using (Html.BeginForm("CreateRR", "Group", FormMethod.Post))
+{
+    @Html.ValidationSummary(true)
+
+    @Html.EditorFor(m => Model)
+    <button type="submit" class="btn btn-primary">Create</button>        
+}

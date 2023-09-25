@@ -54,9 +54,27 @@ namespace ChemodartsWebApp.Models
         [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Matches.OrderBy(m => m.MatchOrderValue).ToList(); }
     }
 
-    public class GroupFactory
+    public abstract class GroupFactory
     {
-        public string Name { get; set; }
+
+    }
+
+    public class GroupFactoryEdit : GroupFactory
+    {
+        public string GroupName { get; set; }
+
+        public static GroupFactoryEdit Create(Group g)
+        {
+            return new GroupFactoryEdit()
+            {
+                GroupName = g.GroupName ?? String.Empty
+            };
+        }
+    }
+
+    public class GroupFactoryRR : GroupFactory
+    {
+        public string GroupName { get; set; }
         public int PlayersPerGroup { get; set; }
 
         public Group? CreateGroup(Round? r)
@@ -65,7 +83,7 @@ namespace ChemodartsWebApp.Models
 
             Group g = new Group()
             {
-                GroupName = Name,
+                GroupName = GroupName,
                 RoundId = r.RoundId,
             };
             return g;
@@ -119,7 +137,7 @@ namespace ChemodartsWebApp.Models
         }
     }
 
-    public class KoFactory
+    public class GroupFactoryKO : GroupFactory
     {
         public int NumberOfRounds { get; set; }
 
