@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using ChemodartsWebApp.Data;
+using ChemodartsWebApp.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace ChemodartsWebApp.Controllers
 {

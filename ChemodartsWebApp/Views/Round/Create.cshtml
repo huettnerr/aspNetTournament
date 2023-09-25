@@ -1,4 +1,4 @@
-﻿@model ChemodartsWebApp.Models.RoundFactory
+﻿@model RoundViewModel
 
 @{
     ViewData["Title"] = "Create Round";
@@ -11,23 +11,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="RoundModus" class="control-label"></label>
-                @Html.DropDownListFor(m => m.RoundModus, new SelectList(Enum.GetValues(typeof(Round.RoundModus))), "Select Modus")
-                @*<input asp-for="RoundModus" class="form-control" />*@
-                <span asp-validation-for="RoundModus" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        @await Html.PartialAsync("_createRoundForm", Model.RF);
     </div>
 </div>
 

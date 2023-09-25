@@ -1,36 +1,16 @@
-﻿@model ChemodartsWebApp.Models.TournamentFactory
+﻿@model ChemodartsWebApp.ViewModel.TournamentViewModel
 
 @{
     ViewData["Title"] = "Create Tournament";
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
-
-<div>
-    <a cd-route="Tournament" cd-action="Index">Back to List</a>
-</div>
-
 <h1>Create</h1>
 
 <h4>Tournament</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="StartTime" class="control-label"></label>
-                <input asp-for="StartTime" class="form-control" />
-                <span asp-validation-for="StartTime" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        @await Html.PartialAsync("_createTournamentForm", Model.TF);
     </div>
 </div>
 

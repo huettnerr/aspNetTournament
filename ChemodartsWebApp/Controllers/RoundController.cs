@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -31,15 +32,15 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                return View(r);
+                return View(new RoundViewModel(r));
             }
         }
 
         // GET: Rounds/Create
         [Authorize(Roles = "Administrator")]
-        public IActionResult Create(int? tournamentId, int? roundId)
+        public async Task<IActionResult> Create(int? tournamentId, int? roundId)
         {
-            return View();
+            return View(new RoundViewModel(await ControllerHelper.QueryId(tournamentId, _context.Tournaments), null));
         }
 
         // POST: Rounds/Create
@@ -50,9 +51,12 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create(int? tournamentId, int? roundId, [Bind("Name,RoundModus")] RoundFactory roundFactory)
         {
-            if (ModelState.IsValid)
+            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            if (t is null) return NotFound();
+
+            if (ModelState.IsValid )
             {
-                Round? r = roundFactory.CreateRound(tournamentId);
+                Round? r = roundFactory.CreateRound(t);
                 if (r is null)
                 {
                     return NotFound();
@@ -63,7 +67,7 @@ namespace ChemodartsWebApp.Controllers
 
                 return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
             }
-            return View(roundFactory);
+            return View(new RoundViewModel(await ControllerHelper.QueryId(tournamentId, _context.Tournaments), roundFactory));
         }
 
         [Authorize(Roles = "Administrator")]

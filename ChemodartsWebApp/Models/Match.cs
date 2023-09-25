@@ -137,7 +137,7 @@ namespace ChemodartsWebApp.Models
 
             if(this.Score == null) return false;
 
-            if(this.Group.Round.Scoring == Round.ScoreType.LegsOnly)
+            if(this.Group.Round.Scoring == ScoreType.LegsOnly)
             {
                 //Check for Legs
                 if (this.Score.P1Legs > this.Score.P2Legs)

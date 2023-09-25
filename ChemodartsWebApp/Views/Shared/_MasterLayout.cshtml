@@ -1,5 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@model MainViewModel
+
+<!DOCTYPE html>
 <html lang="en">
+
+@*How to use bootstrap: https://getbootstrap.com/docs/5.1/components/navbar/*@
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -24,20 +29,12 @@
                             <a asp-controller="Home" asp-action="Index" class="nav-link text-dark">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a asp-controller="Home" asp-action="Tournaments" class="nav-link text-dark">Turniere</a>
-                        </li>
-                        <li class="nav-item">
                             <a cd-route="Players" cd-action="Index" class="nav-link text-dark">Spieler</a>
                         </li>
-                        @*@await RenderSectionAsync("Links", required: false)*@
-                        @*<li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Turnier Details</a>
-                            <ul class="dropdown-menu">
-                              <li><%= Html.ActionLink("Matches", "Add", "Log")%></li>
-                              <li><%= Html.ActionLink("", "Edit", "Log")%></li>
-                              <li><%= Html.ActionLink("Delete", "Delete", "Log")%></li>
-                            </ul>
-                      </li>*@
+                        <li class="nav-item">
+                            <a asp-controller="Home" asp-action="Tournaments" class="nav-link text-dark">Turniere</a>
+                        </li>
+                        @await RenderSectionAsync("MainNavigationAdditions", required: false)
                     </ul>
                 </div>
                 @if (!User.Identity.IsAuthenticated)

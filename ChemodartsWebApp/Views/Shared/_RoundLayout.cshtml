@@ -1,9 +1,11 @@
-﻿@{
+﻿@model RoundViewModel
+
+@{
     ViewBag.Title = "Runde";
     Layout = "~/Views/Shared/_TournamentLayout.cshtml";
     //ChemodartsWebApp.Controllers.ControllerHelper.QueryId(ViewContext.RouteData.Values["tournamentId"], )
 }
-@section TournamentLinks {
+@section TournamentNavigationAdditions {
     <li class="nav-item">
         @*@Html.ActionLink("Matches", "Matches")*@
         <a cd-route="Match" class="nav-link text-dark" cd-action="Index">Upcoming Matches</a>

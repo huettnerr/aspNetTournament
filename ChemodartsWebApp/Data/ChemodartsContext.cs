@@ -58,8 +58,8 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);
 
             //Converter for enums
-            modelBuilder.Entity<Round>().Property(e => e.Modus).HasConversion(createValueConverter<Round.RoundModus>());  
-            modelBuilder.Entity<Round>().Property(e => e.Scoring).HasConversion(createValueConverter<Round.ScoreType>());  
+            modelBuilder.Entity<Round>().Property(e => e.Modus).HasConversion(createValueConverter<RoundModus>());  
+            modelBuilder.Entity<Round>().Property(e => e.Scoring).HasConversion(createValueConverter<ScoreType>());  
             modelBuilder.Entity<Match>().Property(e => e.Status).HasConversion(createValueConverter<Match.MatchStatus>());  
         }
 
@@ -108,7 +108,7 @@ namespace ChemodartsWebApp.Data
         private int roundId = 0;
         private Round createRount(string name)
         {
-            Round r = new Round() { RoundId = roundId++, RoundName = name, Modus = Round.RoundModus.RoundRobin };
+            Round r = new Round() { RoundId = roundId++, RoundName = name, Modus = RoundModus.RoundRobin };
             r.Groups = new List<Group>();
             r.Groups.Add(createGroup("A"));
 

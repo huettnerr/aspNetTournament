@@ -58,16 +58,16 @@
             var dummySeed = Model.Seeds?.FirstOrDefault();
 
             Seed seedAllMatches = new Seed();
-            seedAllMatches.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+            seedAllMatches.Statistics = new SeedStatistics(ScoreType.LegsOnly);
             Model.Seeds.ToList().ForEach(s => s.Matches.ToList().ForEach(m => m.UpdateSeedStat(s, seedAllMatches.Statistics)));
 
             Seed seedRR = new Seed();
-            seedRR.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
-            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus == Round.RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedRR.Statistics)));
+            seedRR.Statistics = new SeedStatistics(ScoreType.LegsOnly);
+            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus == RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedRR.Statistics)));
 
             Seed seedKO = new Seed();
-            seedKO.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
-            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus != Round.RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedKO.Statistics)));
+            seedKO.Statistics = new SeedStatistics(ScoreType.LegsOnly);
+            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus != RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedKO.Statistics)));
         }
         <table class="table">
             <thead>

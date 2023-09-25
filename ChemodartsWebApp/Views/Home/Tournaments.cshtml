@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Tournament>
+﻿@model ChemodartsWebApp.ViewModel.HomeViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -13,10 +13,10 @@
                 @Html.DisplayNameFor(model => model.TournamentId)
             </th>*@
             <th>
-                @Html.DisplayNameFor(model => model.TournamentName)
+                @Html.DisplayNameFor(model => model.Ts.First().TournamentName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TournamentStart)
+                @Html.DisplayNameFor(model => model.Ts.First().TournamentStart)
             </th>
             @if (User.Identity.IsAuthenticated)
             {
@@ -25,7 +25,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Ts) {
         <tr>
             @*<td>
                 @Html.DisplayFor(modelItem => item.TournamentId)

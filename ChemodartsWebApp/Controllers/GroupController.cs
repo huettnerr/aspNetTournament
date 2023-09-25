@@ -43,9 +43,9 @@ namespace ChemodartsWebApp.Controllers
 
             switch(r.Modus)
             {
-                case Round.RoundModus.RoundRobin:
+                case RoundModus.RoundRobin:
                     return View("Create");
-                case Round.RoundModus.SingleKo:
+                case RoundModus.SingleKo:
                     return View("CreateKO");
                 default:
                     return NotFound();

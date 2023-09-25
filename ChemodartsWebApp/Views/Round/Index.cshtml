@@ -1,15 +1,11 @@
-﻿@model Round
-@{var GroupDummy = Model.Groups.FirstOrDefault(); }
+﻿@model RoundViewModel
 
 @{
-    ViewData["Title"] = "Runde >" + Model.RoundName + "<";
+    ViewData["Title"] = "Runde >" + Model.R.RoundName + "<";
 }
-<div>
-    <a asp-action="Index">Back</a>
-</div>
 
 <div class="text-center">
-    <h1 class="display-4"><b>@Model.RoundName</b> - @Html.DisplayFor(model => model.Modus)</h1>
+    <h1 class="display-4"><b>@Model.R.RoundName</b> - @Html.DisplayFor(model => model.R.Modus)</h1>
 </div>
 
 @if (User.Identity.IsAuthenticated)
@@ -18,4 +14,4 @@
     <hr />
 }
 
-<partial name="Rounds/Round_@Model.Modus.ToString()" model="@Model"/>
+<partial name="Rounds/Round_@Model.R.Modus.ToString()" model="@Model"/>

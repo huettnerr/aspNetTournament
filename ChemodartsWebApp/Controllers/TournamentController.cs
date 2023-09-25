@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Xml.Linq;
 using System.Linq;
 using System.Collections.Generic;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -35,14 +36,14 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            return View(t);
+            return View(new TournamentViewModel(t));
         }
 
         // GET: Tournament/Create
         [Authorize(Roles = "Administrator")]
         public IActionResult Create(int? tournamentId)
         {
-            return View();
+            return View(new TournamentViewModel((TournamentFactory?)null));
         }
 
         // POST: Players/Create
@@ -63,7 +64,7 @@ namespace ChemodartsWebApp.Controllers
 
                 return RedirectToAction(nameof(Index), new { tournamentId = t.TournamentId });
             }
-            return View(factory);
+            return View(new TournamentViewModel(factory));
         }
 
         [Authorize(Roles = "Administrator")]

@@ -5,7 +5,7 @@
     List<Match>? matchesBetween = Model.Seed1?.Player?.Matches?.Where(m => m.IsMatchOfPlayers(Model.Seed1.Player, Model.Seed2.Player))?.ToList();
 
     Seed statsSeed = new Seed();
-    statsSeed.Statistics = new SeedStatistics(Round.ScoreType.LegsOnly);
+    statsSeed.Statistics = new SeedStatistics(ScoreType.LegsOnly);
     matchesBetween?.ForEach(m => m.UpdateSeedStat((m.Seed1.Player.Equals(Model.Seed1.Player) ? m.Seed1 : m.Seed2), statsSeed.Statistics));
 }
 
@@ -22,7 +22,7 @@
             <th>vs.</th>
             <th><b>@Model?.Seed2?.Player.CombinedName</b></th>
         </tr>
-        @if (Model.Group.Round.Modus != Round.RoundModus.RoundRobin) {
+        @if (Model.Group.Round.Modus != RoundModus.RoundRobin) {
             <tr>
                 <td>
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.Seed1.Group.GroupId">

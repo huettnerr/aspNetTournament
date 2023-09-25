@@ -19,7 +19,7 @@ namespace ChemodartsWebApp.Models
     public class TournamentFactory
     {
         public string Name { get; set; }
-        public DateTime StartTime { get; set; }
+        public DateTime? StartTime { get; set; }
 
         public Tournament? CreateTournament()
         {

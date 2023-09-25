@@ -1,35 +1,34 @@
-﻿@{
+﻿@model MainViewModel
+
+@{
     ViewBag.Title = "Turnier";
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
-    //ChemodartsWebApp.Controllers.ControllerHelper.QueryId(ViewContext.RouteData.Values["tournamentId"], )
-}
-<nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-    <div class="container-fluid">
-        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-            <ul class="navbar-nav flex-grow-1">
-                <li class="nav-item">
-                    <a cd-route="Tournament" cd-action="Index" class="nav-link text-dark">Übersicht</a>
-                </li>
-                <li class="nav-item">
-                    <a cd-route="Seed" cd-action="Index" class="nav-link text-dark">Teilnehmer</a>
-                </li>
-                @if (User.Identity.IsAuthenticated){ 
-                    <li class="nav-item">
-                        <a cd-route="Settings" cd-action="Index" class="nav-link text-dark">Einstellungen</a>
-                    </li>
-                }
-                @await RenderSectionAsync("TournamentLinks", required: false)
-            </ul>
-        </div>
-    </div>
-</nav>
 
-@*@if (ViewContext.RouteData.Values["tournamentId"] is object)
-{
-    <a>@ControllerHelper</a>
+    string tournamentName = (Model as TournamentViewModel)?.T.TournamentName ?? $"Turnier ID '{ViewContext.RouteData?.Values["tournamentId"]?.ToString()}'";
 }
-<a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Player">Teilnehmer</a>
-<a class="nav-link text-dark" asp-area="" asp-controller="Tournament" asp-action="Match">Matches</a>*@
+
+@section MainNavigationAdditions {
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            @tournamentName
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+            <li class="nav-item">
+                <a cd-route="Tournament" cd-action="Index" class="nav-link text-dark">Übersicht</a>
+            </li>
+            <li class="nav-item">
+                <a cd-route="Seed" cd-action="Index" class="nav-link text-dark">Teilnehmer</a>
+            </li>
+            @if (User.Identity.IsAuthenticated){ 
+                <li class="nav-item">
+                    <a cd-route="Settings" cd-action="Index" class="nav-link text-dark">Einstellungen</a>
+                </li>
+            }
+            @await RenderSectionAsync("TournamentNavigationAdditions", required: false)
+        </ul>
+    </li>
+}
+
 <br /><br />
 
 @RenderBody()

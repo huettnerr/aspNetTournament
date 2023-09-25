@@ -1,6 +1,6 @@
-﻿@model Round
+﻿@model RoundViewModel
 
-@foreach (var group in Model.Groups) {
+@foreach (var group in Model.R.Groups) {
     <h2 class="display-4">
         <a cd-route="Group" cd-action="Index" asp-route-groupId="@group.GroupId">
         Gruppe <b>@group.GroupName</b>

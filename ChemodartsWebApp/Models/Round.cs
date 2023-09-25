@@ -4,23 +4,24 @@ using System.Runtime.Serialization;
 
 namespace ChemodartsWebApp.Models
 {
+    public enum RoundModus
+    {
+        [Display(Name = "Gruppenphase")] RoundRobin,
+        [Display(Name = "Einfach KO")] SingleKo,
+        [Display(Name = "Doppel KO")] DoubleKo
+    }
+
+    public enum ScoreType
+    {
+        [Display(Name = "Default")] Default,
+        [Display(Name = "Sets | Legs")] SetsAndLegs,
+        [Display(Name = "Sets")] SetsOnly,
+        [Display(Name = "Legs")] LegsOnly
+    }
+
     [Table("rounds")]
     public class Round
     {
-        public enum RoundModus
-        {
-            [Display(Name = "Gruppenphase")] RoundRobin,
-            [Display(Name = "Einfach KO")] SingleKo,
-            [Display(Name = "Doppel KO")] DoubleKo
-        }
-
-        public enum ScoreType
-        {
-            [Display(Name = "Sets | Legs")] SetsAndLegs,
-            [Display(Name = "Sets")] SetsOnly,
-            [Display(Name = "Legs")] LegsOnly
-        }
-
         [Key][Display(Name = "ID")][Column("roundId")] public int RoundId { get; set; }
         [Display(Name = "Turnier")][Column("tournamentId")] public int TournamentId { get; set; }
         [Display(Name = "Name")][Column("name")] public string RoundName { get; set; }
@@ -37,21 +38,19 @@ namespace ChemodartsWebApp.Models
     public class RoundFactory
     {
         public string Name { get; set; }
-        public Round.RoundModus RoundModus { get; set; }
+        public RoundModus RoundModus { get; set; }
+        public ScoreType Scoring { get; set; }
 
-        public Round? CreateRound(int? tournamentId)
+        public Round? CreateRound(Tournament t)
         {
-            if (tournamentId is null) return null;
-            int tId = tournamentId ?? 0;
+            if (t is null) return null;
 
             Round r = new Round()
             {
                 RoundName = Name,
                 Modus = RoundModus,
-                Scoring = Round.ScoreType.LegsOnly,
-                TournamentId = tId,
-                //Groups = new List<Group>(),
-                //MappedVenues = new List<MapRoundVenue>(),
+                Scoring = Scoring.Equals(ScoreType.Default) ? ScoreType.LegsOnly : Scoring,
+                TournamentId = t.TournamentId
             };
 
             return r;

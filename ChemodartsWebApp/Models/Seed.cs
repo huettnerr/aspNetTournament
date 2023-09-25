@@ -57,8 +57,8 @@ namespace ChemodartsWebApp.Models
             { 
                 switch(scoreType)
                 {
-                    case Round.ScoreType.SetsOnly: return SetsWon;
-                    case Round.ScoreType.LegsOnly: return LegsWon;
+                    case ScoreType.SetsOnly: return SetsWon;
+                    case ScoreType.LegsOnly: return LegsWon;
                     default: return 0;
                 }
             } 
@@ -71,8 +71,8 @@ namespace ChemodartsWebApp.Models
             { 
                 switch(scoreType)
                 {
-                    case Round.ScoreType.SetsOnly: return SetsLost;
-                    case Round.ScoreType.LegsOnly: return LegsLost;
+                    case ScoreType.SetsOnly: return SetsLost;
+                    case ScoreType.LegsOnly: return LegsLost;
                     default: return 0;
                 }
             } 
@@ -85,16 +85,16 @@ namespace ChemodartsWebApp.Models
             {
                 switch (scoreType)
                 {
-                    case Round.ScoreType.SetsOnly: return SetsWon - SetsLost;
-                    case Round.ScoreType.LegsOnly: return LegsWon - LegsLost;
+                    case ScoreType.SetsOnly: return SetsWon - SetsLost;
+                    case ScoreType.LegsOnly: return LegsWon - LegsLost;
                     default: return 0;
                 }
             }
         }
 
-        private Round.ScoreType scoreType;  
+        private ScoreType scoreType;  
 
-        public SeedStatistics(Round.ScoreType scoring)
+        public SeedStatistics(ScoreType scoring)
         {
             scoreType = scoring;
 

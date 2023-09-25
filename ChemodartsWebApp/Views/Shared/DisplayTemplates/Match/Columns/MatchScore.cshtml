@@ -34,7 +34,7 @@
             }
             else
             {
-                @if(Model.Group.Round.Scoring != Round.ScoreType.SetsOnly) @Html.DisplayFor(modelItem => Model.Score.Legs)
+                @if(Model.Group.Round.Scoring != ScoreType.SetsOnly) @Html.DisplayFor(modelItem => Model.Score.Legs)
             }
         </td>
         break;

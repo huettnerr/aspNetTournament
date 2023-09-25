@@ -1,0 +1,19 @@
+﻿using ChemodartsWebApp.Models;
+
+namespace ChemodartsWebApp.ViewModel
+{
+    public class TournamentViewModel : MainViewModel
+    {
+        public Tournament? T { get; set; }
+        public TournamentFactory? TF { get; set; }
+
+        public TournamentViewModel(Tournament? t) : base()
+        {
+            T = t;
+        }
+        public TournamentViewModel(TournamentFactory? tf = null) : base()
+        {
+            TF = tf ?? new TournamentFactory();
+        }
+    }
+}

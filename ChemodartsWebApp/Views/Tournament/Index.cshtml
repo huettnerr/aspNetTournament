@@ -1,11 +1,10 @@
-﻿@model Tournament
+﻿@model TournamentViewModel
 
 @{
     ViewData["Title"] = "Home Page";
-    Round dummyRound = Model.Rounds.FirstOrDefault();
 }
 
-<h1>@Model.TournamentName</h1>
+<h1>@Model.T?.TournamentName</h1>
 
 @if (User.Identity.IsAuthenticated){ <a cd-route="Round" cd-action="Create">Runde hinzufügen</a>  <hr />}
 
@@ -16,10 +15,10 @@
                 @Html.DisplayNameFor(model => model.RoundId)
             </th>*@
             <th>
-                @Html.DisplayNameFor(model => dummyRound.RoundName)
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().RoundName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => dummyRound.Modus)
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
             </th>
             @if (User.Identity.IsAuthenticated)
             {
@@ -28,7 +27,7 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.Rounds) {
+@foreach (var item in Model.T?.Rounds) {
         <tr>
             @*<td>
                 @Html.DisplayFor(modelItem => item.RoundId)

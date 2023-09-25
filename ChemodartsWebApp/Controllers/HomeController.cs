@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -20,14 +21,15 @@ namespace ChemodartsWebApp.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index(int? id)
+        public IActionResult Index(int? id)
         {
-            return View();
+            return View(new HomeViewModel());
         }
         
         public async Task<IActionResult> Tournaments(int? id)
         {
-            return View(await _context.Tournaments.ToListAsync());
+            List<Tournament> ts = await _context.Tournaments.ToListAsync();
+            return View(new HomeViewModel(ts));
         }
     }
 }
