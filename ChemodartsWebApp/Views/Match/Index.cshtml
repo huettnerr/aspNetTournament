@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Match>
+﻿@model MatchViewModel
 
 @*<div>
     <form asp-action="StartNextMatch">
@@ -23,4 +23,4 @@
     }
 }
 
-@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model, new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }})
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Ms, new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }})

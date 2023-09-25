@@ -9,6 +9,7 @@ using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -40,7 +41,7 @@ namespace ChemodartsWebApp.Controllers
                 matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active).ToList();
             }
 
-            return View(matches.OrderBy(m => m.MatchOrderValue));
+            return View(new MatchViewModel(r, matches.OrderBy(m => m.MatchOrderValue)));
         }
 
         // GET: Players/Details/5
@@ -53,7 +54,12 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            return View(m);
+            List<Match>? matchesBetween = m.Seed1?.Player?.Matches?.Where(m => m.IsMatchOfPlayers(m.Seed1.Player, m.Seed2.Player))?.ToList();
+            Seed statsSeed = new Seed();
+            statsSeed.Statistics = new SeedStatistics(ScoreType.LegsOnly);
+            matchesBetween?.ForEach(m => m.UpdateSeedStat((m.Seed1.Player.Equals(m.Seed1.Player) ? m.Seed1 : m.Seed2), statsSeed.Statistics));
+
+            return View(new MatchViewModel(m));
         }
 
         [Authorize(Roles = "Administrator")]
