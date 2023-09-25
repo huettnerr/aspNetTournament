@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Runde";
     Layout = "~/Views/Shared/_TournamentLayout.cshtml";
+    GroupViewModel? gvm = Model as GroupViewModel;
     //ChemodartsWebApp.Controllers.ControllerHelper.QueryId(ViewContext.RouteData.Values["tournamentId"], )
 }
 @section TournamentNavigationAdditions {
@@ -14,6 +15,22 @@
         @*@Html.ActionLink("Matches", "Matches")*@
         <a cd-route="Venue" class="nav-link text-dark" cd-action="Index">Boards</a>
     </li>
+}
+
+@section TournamentHierarchyAdditions {
+    @{
+        if(Model.R is object)
+        {
+            <span> > </span>
+            <a cd-route="Round" cd-action="Index" cd-route-roundId="@Model.R.RoundId">Runde "@Model.R.RoundName"</a>
+
+            if (gvm is object)
+            {
+                <span> > </span>
+                <a cd-route="Group" cd-action="Index" cd-route-groupId="@gvm.G.GroupId">Gruppe "@gvm.G.GroupName"</a>
+            }
+        }
+    }
 }
 
 @RenderBody()

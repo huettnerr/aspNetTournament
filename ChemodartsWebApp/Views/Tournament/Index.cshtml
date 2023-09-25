@@ -3,8 +3,9 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-
-<h1>@Model.T?.TournamentName</h1>
+<div class="text-center">
+    <h1>@Model.T?.TournamentName</h1>
+<</div>
 
 @if (User.Identity.IsAuthenticated){ <a cd-route="Round" cd-action="Create">Runde hinzufügen</a>  <hr />}
 

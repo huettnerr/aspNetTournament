@@ -1,10 +1,10 @@
-﻿@model MainViewModel
+﻿@model TournamentViewModel
 
 @{
     ViewBag.Title = "Turnier";
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 
-    string tournamentName = (Model as TournamentViewModel)?.T.TournamentName ?? $"Turnier ID '{ViewContext.RouteData?.Values["tournamentId"]?.ToString()}'";
+    string tournamentName = Model.T?.TournamentName ?? $"Turnier ID '{ViewContext.RouteData?.Values["tournamentId"]?.ToString()}'";
 }
 
 @section MainNavigationAdditions {
@@ -29,7 +29,15 @@
     </li>
 }
 
-<br /><br />
+<span>
+    @if (Model.T is object)
+    {
+        <a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.T.TournamentId">Turnier "@Model.T.TournamentName"</a>
+        @await RenderSectionAsync("TournamentHierarchyAdditions", required: false)
+    }else{
+        <a cd-route="Home" cd-action="Tournaments">Back to List</a>
+    }
+</span>
 
 @RenderBody()
 
