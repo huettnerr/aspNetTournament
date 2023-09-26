@@ -7,13 +7,11 @@ namespace ChemodartsWebApp.ViewModel
         public Tournament? T { get; set; }
         public TournamentFactory? TF { get; set; }
 
-        public TournamentViewModel(Tournament? t) : base()
+        public TournamentViewModel(Tournament? t) : base() => T = t;
+        public TournamentViewModel(TournamentFactory? tf, Tournament? t) : base()
         {
+            TF = tf;
             T = t;
-        }
-        public TournamentViewModel(TournamentFactory? tf = null) : base()
-        {
-            TF = tf ?? new TournamentFactory();
         }
     }
 }

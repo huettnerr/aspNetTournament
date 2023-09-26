@@ -1,4 +1,4 @@
-﻿@model ChemodartsWebApp.Models.Player
+﻿@model PlayerViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -10,40 +10,6 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="PlayerName" class="control-label"></label>
-                <input asp-for="PlayerName" class="form-control" />
-                <span asp-validation-for="PlayerName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PlayerDartname" class="control-label"></label>
-                <input asp-for="PlayerDartname" class="form-control" />
-                <span asp-validation-for="PlayerDartname" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PlayerContactData" class="control-label"></label>
-                <input asp-for="PlayerContactData" class="form-control" />
-                <span asp-validation-for="PlayerContactData" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PlayerInterpret" class="control-label"></label>
-                <input asp-for="PlayerInterpret" class="form-control" />
-                <span asp-validation-for="PlayerInterpret" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="PlayerSong" class="control-label"></label>
-                <input asp-for="PlayerSong" class="form-control" />
-                <span asp-validation-for="PlayerSong" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        @await Html.PartialAsync("_factoryTemplate", Model.PF)
     </div>
 </div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}

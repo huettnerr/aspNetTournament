@@ -25,7 +25,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> Index(int? tournamentId, int? roundId)
         {
             //search for spezific tournament
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null)
             {
                 return NotFound();
@@ -40,7 +40,11 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create(int? tournamentId, int? roundId)
         {
-            return View(new RoundViewModel(await ControllerHelper.QueryId(tournamentId, _context.Tournaments), null));
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            if(t is null) return NotFound();
+
+            RoundFactory rf = new RoundFactory("Create", null);
+            return View(new RoundViewModel(t, rf));
         }
 
         // POST: Rounds/Create
@@ -49,31 +53,53 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Create(int? tournamentId, int? roundId, [Bind("Name,RoundModus")] RoundFactory roundFactory)
+        public async Task<IActionResult> Create(int? tournamentId, int? roundId, RoundFactory roundFactory)
         {
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
-            if (ModelState.IsValid )
+            roundFactory.T = t;
+            Round? r = await _context.Rounds.CreateWithFactory(ModelState, roundFactory);
+            if (r is object)
             {
-                Round? r = roundFactory.CreateRound(t);
-                if (r is null)
-                {
-                    return NotFound();
-                }
-
-                _context.Rounds.Add(r);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
+                return RedirectToRoute("Tournament", new { controller = "Tournament", tournamentId = tournamentId, action = "Index" });
+                //return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
             }
-            return View(new RoundViewModel(await ControllerHelper.QueryId(tournamentId, _context.Tournaments), roundFactory));
+
+            return View(new RoundViewModel(t, roundFactory));
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int? tournamentId, int? roundId)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
+            RoundFactory rf = new RoundFactory("Edit", r);
+            return View(new RoundViewModel(r.Tournament, rf));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int? tournamentId, int? roundId, RoundFactory roundFactory)
+        {
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            if (t is null) return NotFound();
+
+            if (await _context.Rounds.EditWithFactory(roundId, ModelState, roundFactory))
+            {
+                return RedirectToRoute("Tournament", new { controller = "Tournament", tournamentId = tournamentId, action = "Index" });
+                //return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
+            }
+
+            return View(new RoundViewModel(t, roundFactory));
         }
 
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? tournamentId, int? roundId)
         {
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             _context.Rounds.Remove(r);

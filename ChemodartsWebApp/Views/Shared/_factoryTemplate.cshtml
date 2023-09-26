@@ -1,0 +1,10 @@
+﻿@model ChemodartsWebApp.ModelHelper.FactoryBase
+
+@using (Html.BeginForm(Model.Action, Model.Controller, FormMethod.Post))
+{
+    @Html.ValidationSummary(true)
+
+    @Html.EditorForModel(Model)
+    @Html.HiddenFor(m => m.Action)
+    <button type="submit" class="btn btn-primary">@Model.Action</button>        
+}

@@ -24,7 +24,7 @@ namespace ChemodartsWebApp.Controllers
         public IActionResult Index(int? tournamentId, int? seedId)
         {
             //search for spezific tournament
-            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = _context.Tournaments.QueryId(tournamentId).Result;
             if (t is null) return NotFound();
 
             Seed? s = t.Seeds.Where(s => s.SeedId == seedId).FirstOrDefault();
@@ -41,7 +41,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? tournamentId, int? seedId)
         {
-            Seed? s = await ControllerHelper.QueryId(seedId, _context.Seeds);
+            Seed? s = await _context.Seeds.QueryId(seedId);
             if (s is null) return NotFound();
 
             s.Group.Seeds.Remove(s);
@@ -67,7 +67,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? seedId)
         {
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null)
             {
                 return NotFound();
@@ -84,7 +84,7 @@ namespace ChemodartsWebApp.Controllers
             ViewBag.YouSelected = form["Players"];
             string selectedValues = form["Players"];
 
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null)
             {
                 return NotFound();
@@ -130,9 +130,9 @@ namespace ChemodartsWebApp.Controllers
         #region CheckIn/Remove Player
 
         [Authorize(Roles = "Administrator")]
-        public IActionResult RemovePlayerFromSeed(int? tournamentId, int? seedId)
+        public async Task<IActionResult> RemovePlayerFromSeed(int? tournamentId, int? seedId)
         {
-            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == seedId).FirstOrDefault();
@@ -150,7 +150,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> CheckIn(int? tournamentId, int? seedId)
         {
-            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == seedId).FirstOrDefault();
@@ -193,7 +193,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ShuffleSeeds(int? tournamentId, int? seedId)
         {
-            Tournament? t = ControllerHelper.QueryId(tournamentId, _context.Tournaments).Result;
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             //Store all Players

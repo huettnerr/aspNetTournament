@@ -6,7 +6,7 @@ namespace ChemodartsWebApp.ViewModel
     {
         public IEnumerable<Tournament>? Ts { get; set; }
 
-        public HomeViewModel() : base() => Ts = null;
+        public HomeViewModel() : base() => Ts = new List<Tournament>();
         public HomeViewModel(IEnumerable<Tournament> ts) : base() => Ts = ts;
     }
 }

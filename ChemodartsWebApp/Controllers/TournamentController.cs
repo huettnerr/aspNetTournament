@@ -30,7 +30,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> Index(int? tournamentId)
         {
             //search for spezific tournament
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null)
             {
                 return NotFound();
@@ -43,7 +43,8 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public IActionResult Create(int? tournamentId)
         {
-            return View(new TournamentViewModel((TournamentFactory?)null));
+            TournamentFactory tf = new TournamentFactory("Create", null);
+            return View(new TournamentViewModel(tf, null));
         }
 
         // POST: Players/Create
@@ -52,25 +53,45 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Create([Bind("Name,StartTime")] TournamentFactory factory)
+        public async Task<IActionResult> Create(TournamentFactory factory)
         {
-            if (ModelState.IsValid)
+            Tournament? t = await _context.Tournaments.CreateWithFactory(ModelState, factory);
+            if (t is object)
             {
-                Tournament? t = factory.CreateTournament();
-                if(t is null) return NotFound();
-
-                 _context.Tournaments.Add(t);
-                await _context.SaveChangesAsync();
-
                 return RedirectToAction(nameof(Index), new { tournamentId = t.TournamentId });
             }
-            return View(new TournamentViewModel(factory));
+
+            return View(new TournamentViewModel(factory, null));
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int? tournamentId)
+        {
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            if (t is null) return NotFound();
+
+            TournamentFactory tf = new TournamentFactory("Edit", t);
+            return View(new TournamentViewModel(tf, t));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> Edit(int? tournamentId, TournamentFactory tournamentFactory)
+        {
+            if (await _context.Tournaments.EditWithFactory(tournamentId, ModelState, tournamentFactory))
+            {
+                return RedirectToRoute("default", new { controller = "Home", action = "Tournaments" });
+                return RedirectToAction(nameof(Index), new { tournamentId = tournamentId });
+            }
+
+            return View(new TournamentViewModel(tournamentFactory, await _context.Tournaments.QueryId(tournamentId)));
         }
 
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? tournamentId)
         {
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             _context.Tournaments.Remove(t);

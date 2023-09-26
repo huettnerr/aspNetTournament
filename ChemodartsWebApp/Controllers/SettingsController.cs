@@ -23,7 +23,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index(int? tournamentId)
         {
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             return View(t);
@@ -32,7 +32,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> SettingsUpdateSeeds(int? tournamentId, int selectedRoundId)
         {
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -51,7 +51,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> SettingsRecreateMatches(int? tournamentId, int selectedRoundId)
         {
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -80,7 +80,7 @@ namespace ChemodartsWebApp.Controllers
             //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } },
             //    new Group() { Matches = new List<Match>() { new Match(), new Match() } });
 
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             Round? r1 = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
@@ -110,7 +110,7 @@ namespace ChemodartsWebApp.Controllers
             //    return View("TournamentSettings", t);
             //}
 
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();

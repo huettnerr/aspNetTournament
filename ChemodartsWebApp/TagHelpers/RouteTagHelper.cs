@@ -80,7 +80,7 @@ namespace ChemodartsWebApp.TagHelpers
 
             ViewContext.RouteData.Values.ToList().ForEach(rd =>
             {
-                if (!ControllerHelper.IsRouteAttributeAllowed(RouteName, rd.Key)) return; 
+                if (!IsRouteAttributeAllowed(RouteName, rd.Key)) return; 
                 if (RouteValues.ContainsKey(rd.Key)) return;
 
                 RouteValues.Add(new KeyValuePair<string, string>(rd.Key.ToString(), rd.Value?.ToString() ?? ""));
@@ -107,6 +107,30 @@ namespace ChemodartsWebApp.TagHelpers
             {
                 Console.WriteLine(context.TagName);
             }
+        }
+
+
+        private static Dictionary<string, List<string>> ALLOWED_ROUTE_ATTRIBUTES = new Dictionary<string, List<string>>()
+        {
+            { "Players", new List<string>() { "action", "playerId" } },
+            { "Tournament", new List<string>() { "action", "tournamentId", "" } },
+            { "Round", new List<string>() { "action", "tournamentId", "roundId" } },
+            { "Seed", new List<string>() { "action", "tournamentId", "seedId" } },
+            { "Settings", new List<string>() { "action", "tournamentId", "id" } },
+            { "Group", new List<string>() { "action", "tournamentId", "roundId", "groupId" } },
+            { "Match", new List<string>() { "action", "tournamentId", "roundId", "matchId", "showAll", "editMatchId" } },
+            { "Venue", new List<string>() { "action", "tournamentId", "roundId", "venueId" } },
+        };
+
+        private static bool IsRouteAttributeAllowed(string routeName, string attributeName)
+        {
+            if (!ALLOWED_ROUTE_ATTRIBUTES.ContainsKey(routeName))
+            {
+                //Route has no restrictions 
+                return true;
+            }
+
+            return ALLOWED_ROUTE_ATTRIBUTES[routeName].Contains(attributeName);
         }
     }
 }

@@ -20,9 +20,9 @@ namespace ChemodartsWebApp.Controllers
             _context = context;
         }
 
-        public IActionResult Index(int? tournamentId, int? roundId, int? venueId)
+        public async Task<IActionResult> Index(int? tournamentId, int? roundId, int? venueId)
         {
-            Round? r = ControllerHelper.QueryId(roundId, _context.Rounds).Result;
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             IEnumerable<Venue>? venues = r.MappedVenues.Select(x => x.Venue);
@@ -38,7 +38,7 @@ namespace ChemodartsWebApp.Controllers
         // GET Detailansicht
         public async Task<IActionResult> Detail(int? tournamentId, int? roundId, int? venueId)
         {
-            Venue? v = await ControllerHelper.QueryId(venueId, _context.Venues);
+            Venue? v = await _context.Venues.QueryId(venueId);
             if (v is null) return NotFound();
 
             return View("Detail", v);
@@ -48,10 +48,10 @@ namespace ChemodartsWebApp.Controllers
         //[HttpPost]
         public async Task<IActionResult> Add(int? tournamentId, int? roundId, int? venueId)
         {
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            Venue? v = await ControllerHelper.QueryId(venueId, _context.Venues);
+            Venue? v = await _context.Venues.QueryId(venueId);
             if (v is null) return NotFound();
 
             try
@@ -75,7 +75,7 @@ namespace ChemodartsWebApp.Controllers
         // GET Detailansicht
         public async Task<IActionResult> Remove(int? tournamentId, int? roundId, int? venueId)
         {
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             MapRoundVenue? mrv = r.MappedVenues.Where(r => r.RVM_VenueId == venueId).FirstOrDefault();

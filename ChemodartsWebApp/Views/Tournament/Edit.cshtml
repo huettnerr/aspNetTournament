@@ -1,0 +1,15 @@
+﻿@model TournamentViewModel
+
+@{
+    ViewData["Title"] = "Edit Tournament";
+}
+
+<h1>Edit</h1>
+
+<h4>Tournament</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @await Html.PartialAsync("_factoryTemplate", Model.TF)
+    </div>
+</div>

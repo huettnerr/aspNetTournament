@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChemodartsWebApp.ModelHelper;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.Serialization;
 
@@ -35,25 +36,50 @@ namespace ChemodartsWebApp.Models
 
     }
 
-    public class RoundFactory
+    public class RoundFactory : FactoryBase<Round>
     {
+        public override string Controller { get; } = "Round";
+
         public string Name { get; set; }
         public RoundModus RoundModus { get; set; }
         public ScoreType Scoring { get; set; }
 
-        public Round? CreateRound(Tournament t)
-        {
-            if (t is null) return null;
+        [ScaffoldColumn(false)]
+        public Tournament? T { get; set; }
 
-            Round r = new Round()
+        public RoundFactory() { } //Needed for POST
+        public RoundFactory(string action, Round r) : base(action)
+        {
+            if (r is object)
             {
-                RoundName = Name,
-                Modus = RoundModus,
-                Scoring = Scoring.Equals(ScoreType.Default) ? ScoreType.LegsOnly : Scoring,
-                TournamentId = t.TournamentId
-            };
+                Name = r.RoundName;
+                RoundModus = r.Modus;
+                Scoring = r.Scoring;
+            }
+        }
+
+        //public RoundFactory(string action, Tournament t) : base(action)
+        //{
+        //    Name = String.Empty;
+        //    T = t;
+        //}
+
+        public override Round? Create()
+        {
+            if (T is null) return null;
+
+            Round r = new Round();
+            Update(ref r);
+            r.TournamentId = T.TournamentId;
 
             return r;
+        }
+
+        public override void Update(ref Round r)
+        {
+            r.RoundName = Name;
+            r.Modus = RoundModus;
+            r.Scoring = Scoring.Equals(ScoreType.Default) ? ScoreType.LegsOnly : Scoring;
         }
     }
 }

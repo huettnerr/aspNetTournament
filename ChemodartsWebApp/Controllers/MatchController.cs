@@ -26,7 +26,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> Index(int? tournamentId, int? roundId, int? matchId, string? showAll)
         {
             //search for spezific tournament
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null)
             {
                 return NotFound();
@@ -48,7 +48,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? matchId)
         {
             //search for spezific tournament
-            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
+            Match? m = await _context.Matches.QueryId(matchId);
             if (m is null)
             {
                 return NotFound();
@@ -65,7 +65,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Start(int? tournamentId, int? roundId, int? matchId)
         {
-            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
+            Match? m = await _context.Matches.QueryId(matchId);
             if (m is null) return NotFound();
 
             m.Status = Match.MatchStatus.Active;
@@ -83,10 +83,10 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> AssignBoard(int? tournamentId, int? roundId, int? matchId)
         {
-            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
+            Match? m = await _context.Matches.QueryId(matchId);
             if (m is null) return NotFound();
 
-            Tournament? t = await ControllerHelper.QueryId(tournamentId, _context.Tournaments);
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
             m.Venue = m.Group.Round.MappedVenues.Select(mv => mv.Venue).Where(v => v.Match is null).FirstOrDefault();
@@ -107,7 +107,7 @@ namespace ChemodartsWebApp.Controllers
         public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? matchId, int? seed1Legs, int? seed2Legs, Match.MatchStatus? newMatchStatus, int? newVenueId)
 
         {
-            Match? m = await ControllerHelper.QueryId(matchId, _context.Matches);
+            Match? m = await _context.Matches.QueryId(matchId);
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
             if (m is null) return NotFound();
 
@@ -120,7 +120,7 @@ namespace ChemodartsWebApp.Controllers
                 //else { m.Status = Match.MatchStatus.Finished; }
 
                 if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
-                m.Venue = await ControllerHelper.QueryId(newVenueId, _context.Venues);
+                m.Venue = await _context.Venues.QueryId(newVenueId);
 
                 m.HandleNewStatus(m.Status);
 

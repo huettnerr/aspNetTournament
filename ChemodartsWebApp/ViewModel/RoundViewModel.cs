@@ -12,9 +12,6 @@ namespace ChemodartsWebApp.ViewModel
             R = r;
         }
 
-        public RoundViewModel(Tournament? tournament, RoundFactory? rf) : base(tournament) 
-        {
-            RF = rf ?? new RoundFactory();
-        }
+        public RoundViewModel(Tournament tournament, RoundFactory rf) : base(tournament) => RF = rf;
     }
 }

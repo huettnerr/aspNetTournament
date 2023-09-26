@@ -41,7 +41,9 @@
                 @if (User.Identity.IsAuthenticated)
                 {
                     <td>
-                        <a cd-route="Tournament" cd-action="Delete" cd-route-tournamentId="@item.TournamentId" onclick="return confirm('Are you sure?')"> Delete </a>
+                        <a cd-route="Tournament" cd-action="Edit" cd-route-tournamentId="@item.TournamentId">Edit</a>
+                        <span> | </span>
+                        <a cd-route="Tournament" cd-action="Delete" cd-route-tournamentId="@item.TournamentId" onclick="return confirm('Are you sure?')">Delete</a>
                     </td>  
                 }
         </tr>

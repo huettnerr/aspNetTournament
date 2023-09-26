@@ -1,4 +1,4 @@
-﻿@model ChemodartsWebApp.Models.Player
+﻿@model PlayerViewModel
 
 @{
     ViewData["Title"] = "Delete";
@@ -12,39 +12,39 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PlayerName)
+            @Html.DisplayNameFor(model => model.P.PlayerName)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PlayerName)
+            @Html.DisplayFor(model => model.P.PlayerName)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PlayerDartname)
+            @Html.DisplayNameFor(model => model.P.PlayerDartname)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PlayerDartname)
+            @Html.DisplayFor(model => model.P.PlayerDartname)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PlayerContactData)
+            @Html.DisplayNameFor(model => model.P.PlayerContactData)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PlayerContactData)
+            @Html.DisplayFor(model => model.P.PlayerContactData)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PlayerInterpret)
+            @Html.DisplayNameFor(model => model.P.PlayerInterpret)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PlayerInterpret)
+            @Html.DisplayFor(model => model.P.PlayerInterpret)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PlayerSong)
+            @Html.DisplayNameFor(model => model.P.PlayerSong)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PlayerSong)
+            @Html.DisplayFor(model => model.P.PlayerSong)
         </dd>
     </dl>
     
     <form asp-action="Delete">
-        <input type="hidden" asp-for="PlayerId" />
+        <input type="hidden" asp-for="@Model.P.PlayerId" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
     </form>
 </div>

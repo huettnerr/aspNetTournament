@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -23,32 +24,24 @@ namespace ChemodartsWebApp.Controllers
         // GET: Players
         public async Task<IActionResult> Index(int? playerId)
         {
-              return View(await _context.Players.ToListAsync());
+              return View(new PlayerViewModel(await _context.Players.ToListAsync()));
         }
 
         // GET: Players/Details/5
         public async Task<IActionResult> Details(int? playerId)
         {
-            if (playerId == null || _context.Players == null)
-            {
-                return NotFound();
-            }
+            Player? p = await _context.Players.QueryId(playerId);
+            if (p is null) return NotFound();
 
-            var player = await _context.Players
-                .FirstOrDefaultAsync(m => m.PlayerId == playerId);
-            if (player == null)
-            {
-                return NotFound();
-            }
-
-            return View(player);
+            return View(new PlayerViewModel(p));
         }
 
         // GET: Players/Create
         [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
-            return View();
+            PlayerFactory pf = new PlayerFactory("Create", null);
+            return View(new PlayerViewModel(pf));
         }
 
         // POST: Players/Create
@@ -56,32 +49,26 @@ namespace ChemodartsWebApp.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("PlayerName,PlayerDartname,PlayerContactData,PlayerInterpret,PlayerSong")] Player player)
+        public async Task<IActionResult> Create(PlayerFactory playerFactory)
         {
-            if (ModelState.IsValid)
+            Player? p = await _context.Players.CreateWithFactory(ModelState, playerFactory);
+            if (p is object)
             {
-                _context.Add(player);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index), new { playerId = p.PlayerId });
             }
-            return View(player);
+
+            return View(new PlayerViewModel(playerFactory));
         }
 
         // GET: Players/Edit/5
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? playerId)
         {
-            if (playerId == null || _context.Players == null)
-            {
-                return NotFound();
-            }
+            Player? p = await _context.Players.QueryId(playerId);
+            if (p is null) return NotFound();
 
-            var player = await _context.Players.FindAsync(playerId);
-            if (player == null)
-            {
-                return NotFound();
-            }
-            return View(player);
+            PlayerFactory pf = new PlayerFactory("Edit", p);
+            return View(new PlayerViewModel(pf));
         }
 
         // POST: Players/Edit/5
@@ -90,54 +77,24 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Edit(int? playerId, [Bind("PlayerId,PlayerName,PlayerDartname,PlayerContactData,PlayerInterpret,PlayerSong")] Player player)
+        public async Task<IActionResult> Edit(int? playerId, PlayerFactory playerFactory)
         {
-            if (playerId != player.PlayerId)
+            if(await _context.Players.EditWithFactory(playerId, ModelState, playerFactory))
             {
-                return RedirectToAction(nameof(Create));
-                return NotFound();
+                return RedirectToAction(nameof(Index)/*, new { playerId = playerId }*/);
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(player);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PlayerExists(player.PlayerId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(player);
+            return View(new PlayerViewModel(playerFactory));
         }
 
         // GET: Players/Delete/5
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? playerId)
         {
-            if (playerId == null || _context.Players == null)
-            {
-                return NotFound();
-            }
+            Player? p = await _context.Players.QueryId(playerId);
+            if (p is null) return NotFound();
 
-            var player = await _context.Players
-                .FirstOrDefaultAsync(m => m.PlayerId == playerId);
-            if (player == null)
-            {
-                return NotFound();
-            }
-
-            return View(player);
+            return View(new PlayerViewModel(p));
         }
 
         // POST: Players/Delete/5
@@ -146,23 +103,13 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> DeleteConfirmed(int? playerId)
         {
-            if (_context.Players == null)
-            {
-                return Problem("Entity set 'ChemodartsContext.Player'  is null.");
-            }
-            var player = await _context.Players.FindAsync(playerId);
-            if (player != null)
-            {
-                _context.Players.Remove(player);
-            }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            Player? p = await _context.Players.QueryId(playerId);
+            if (p is null) return NotFound();
 
-        private bool PlayerExists(int? playerId)
-        {
-          return _context.Players.Any(e => e.PlayerId == playerId);
+            _context.Players.Remove(p);            
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

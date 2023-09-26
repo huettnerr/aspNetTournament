@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Player>
+﻿@model PlayerViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -13,4 +13,4 @@
     </p>
 }
 
-@await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerList", Model.OrderBy(p => p.PlayerName).ThenBy(p => p.PlayerDartname))
+@await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerList", Model.Ps?.OrderBy(p => p.PlayerName).ThenBy(p => p.PlayerDartname))

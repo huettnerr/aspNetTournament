@@ -1,0 +1,15 @@
+﻿@model RoundViewModel
+
+@{
+    ViewData["Title"] = "Edit Round";
+}
+
+<h1>Edit</h1>
+
+<h4>Round</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @await Html.PartialAsync("_factoryTemplate", Model.RF)
+    </div>
+</div>

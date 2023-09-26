@@ -24,7 +24,7 @@ namespace ChemodartsWebApp.Controllers
         // GET: Gruppenansicht
         public async Task<IActionResult> Index(int? tournamentId, int? roundId, int? groupId)
         {
-            Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
+            Group? g = await _context.Groups.QueryId(groupId);
             if (g is null)
             {
                 return NotFound();
@@ -39,7 +39,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Create(int? tournamentId, int? roundId, int? groupId)
         {
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             switch(r.Modus)
@@ -61,7 +61,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> CreateRR(int? tournamentId, int? roundId, int? groupId, [Bind("GroupName,PlayersPerGroup")] GroupFactoryRR rrFactory)
         {
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             if (ModelState.IsValid)
@@ -100,7 +100,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, [Bind("NumberOfRounds")] GroupFactoryKO koFactory)
         {
-            Round? r = await ControllerHelper.QueryId(roundId, _context.Rounds);
+            Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             if (ModelState.IsValid)
@@ -122,7 +122,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? tournamentId, int? roundId, int? groupId)
         {
-            Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
+            Group? g = await _context.Groups.QueryId(groupId);
             if (g is null) return NotFound();
 
             return View("CreateEdit", new GroupViewModel(g, GroupFactoryEdit.Create(g)));
@@ -138,7 +138,7 @@ namespace ChemodartsWebApp.Controllers
         {
             try
             {
-                Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
+                Group? g = await _context.Groups.QueryId(groupId);
                 if (g is null) return NotFound();
 
                 g.GroupName = editFactory.GroupName;
@@ -158,7 +158,7 @@ namespace ChemodartsWebApp.Controllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? tournamentId, int? roundId, int? groupId)
         {
-            Group? g = await ControllerHelper.QueryId(groupId, _context.Groups);
+            Group? g = await _context.Groups.QueryId(groupId);
             if (g is null) return NotFound();
 
             _context.Groups.Remove(g);
