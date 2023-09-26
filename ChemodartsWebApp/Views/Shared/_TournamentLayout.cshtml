@@ -6,7 +6,6 @@
 
     string tournamentName = Model.T?.TournamentName ?? $"Turnier ID '{ViewContext.RouteData?.Values["tournamentId"]?.ToString()}'";
 
-    SeedViewModel? svm = Model as SeedViewModel;
     SettingsViewModel? setvm = Model as SettingsViewModel;
 }
 
@@ -18,9 +17,6 @@
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li class="nav-item">
                 <a cd-route="Tournament" cd-action="Index" class="nav-link text-dark">Übersicht</a>
-            </li>
-            <li class="nav-item">
-                <a cd-route="Seed" cd-action="Index" class="nav-link text-dark">Teilnehmer</a>
             </li>
             @if (User.Identity.IsAuthenticated){ 
                 <li class="nav-item">
@@ -39,19 +35,7 @@
         <span> > </span>
         <a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.T.TournamentId">"@Model.T.TournamentName"</a>
 
-        if (svm is object)
-        {
-            <span> > </span>
-            <a cd-route="Seed" cd-action="Index">Seeds</a>
-
-            if(svm.S is object)
-            {
-                <span> > </span>
-                <a cd-route="Seed" cd-action="Details" cd-route-seedId="@svm.S?.SeedId">"@svm.S?.SeedName"</a>
-            }
-            
-        }
-        else if (setvm is object)
+        if (setvm is object)
         {
             <span> > </span>
             <a cd-route="Settings" cd-action="Index">Settings</a>

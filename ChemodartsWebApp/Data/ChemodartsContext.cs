@@ -19,12 +19,12 @@ namespace ChemodartsWebApp.Data
         public DbSet<Match> Matches { get; set; } = default!;
         public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<MapRoundVenue> MapperRV { get; set; } = default!;
-        public DbSet<MapTournamentSeedPlayer> MapperTP { get; set; } = default!;
+        public DbSet<MapRoundSeedPlayer> MapperRP { get; set; } = default!;
 
         public ChemodartsContext (DbContextOptions<ChemodartsContext> options)
             : base(options)
         {
-            createDebugTournament();
+            
         }
 
         //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -50,9 +50,9 @@ namespace ChemodartsWebApp.Data
 
             //Navigation Entries of mapped tables
 
-            modelBuilder.Entity<MapTournamentSeedPlayer>().HasOne<Tournament>(map => map.Tournament).WithMany(p => p.MappedSeedsPlayers).HasForeignKey(map => map.TSP_TournamentId);
-            modelBuilder.Entity<MapTournamentSeedPlayer>().HasOne<Player>(map => map.Player).WithMany(p => p.MappedTournaments).HasForeignKey(map => map.TSP_PlayerId);
-            modelBuilder.Entity<MapTournamentSeedPlayer>().HasOne<Seed>(map => map.Seed).WithOne(s => s.MappedTournamentPlayer).HasForeignKey<MapTournamentSeedPlayer>(map => map.TSP_SeedId);
+            modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedSeedsPlayers).HasForeignKey(map => map.TSP_RoundId);
+            modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Player>(map => map.Player).WithMany(p => p.MappedTournaments).HasForeignKey(map => map.TSP_PlayerId);
+            modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Seed>(map => map.Seed).WithOne(s => s.MappedRoundPlayer).HasForeignKey<MapRoundSeedPlayer>(map => map.TSP_SeedId);
 
             modelBuilder.Entity<MapRoundVenue>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedVenues).HasForeignKey(map => map.RVM_RoundId);
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);
@@ -69,69 +69,6 @@ namespace ChemodartsWebApp.Data
                     from => from.ToString(),
                     to => (T)Enum.Parse(typeof(T), to)
                 );
-        }
-
-        public Tournament DebugTournament = null;
-        private void createDebugTournament()
-        {
-            DebugPlayers = new List<Player>();
-            DebugTournament = new Tournament() { TournamentId = 1, TournamentName = "Test Turnier"};
-            DebugTournament.MappedSeedsPlayers = new List<MapTournamentSeedPlayer>() { 
-                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(1) },
-                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(2) },
-                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(3) },
-                new MapTournamentSeedPlayer() {Player = createRandomPlayer(), Seed = createSeed(4) }
-            };
-
-            DebugTournament.Rounds = new List<Round>()
-            {
-                createRount("Peter"),
-            };
-        }
-
-        private int playerId = 0;
-        public List<Player> DebugPlayers;
-        private Player createRandomPlayer()
-        {
-            Random random = new Random();
-            Player p = new Player() { PlayerId = playerId++, PlayerName = $"Player {random.Next(100)}" };
-            DebugPlayers.Add(p);
-            return p;
-        }
-
-        private int seedId = 0;
-        private Seed createSeed(int number)
-        {
-            return new Seed() { SeedId = seedId++, SeedNr = number };
-        }
-
-        private int roundId = 0;
-        private Round createRount(string name)
-        {
-            Round r = new Round() { RoundId = roundId++, RoundName = name, Modus = RoundModus.RoundRobin };
-            r.Groups = new List<Group>();
-            r.Groups.Add(createGroup("A"));
-
-            r.Groups.ElementAt(0).Matches = MatchFactory.CreateMatches(r);
-            int id = 0;
-            foreach(Match m in MatchFactory.CreateMatches(r))
-            {
-                m.MatchId = id++;
-                m.GroupId = r.Groups.ElementAt(0).GroupId;
-                r.Groups.ElementAt(0).Matches.Add(m);
-            }
-            return r;
-        }
-
-        private int groupId = 0;
-        private Group createGroup(string name)
-        {
-            Group g = new Group() { GroupId = groupId++, GroupName = name };
-            g.Seeds = new List<Seed>();
-            g.Seeds.Add(createSeed(11));
-            g.Seeds.Add(createSeed(12));
-            g.Seeds.Add(createSeed(13));
-            return g;
         }
     }
 }

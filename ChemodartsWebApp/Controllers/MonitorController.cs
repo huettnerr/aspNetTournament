@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ChemodartsWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Models;
+using System.Composition;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -30,15 +31,23 @@ namespace ChemodartsWebApp.Controllers
             return NotFound();
         }
 
-        public async Task<IActionResult> FaultSeeds()
-        {
-            List<Seed> s = await _context.Seeds.ToListAsync();
-            List<Group> g = await _context.Groups.ToListAsync();
+        //public async Task<IActionResult> MigrateRound()
+        //{
+        //    List<MapRoundSeedPlayer> tsp = await _context.MapperTP.ToListAsync();
+        //    tsp.ForEach(tsp => tsp.TSP_RoundId = tsp.Seed.Group.RoundId);
+        //    _context.SaveChangesAsync();
+        //    return NotFound();
+        //}
 
-            List<Seed> Wrong = s.Where(s => !g.Any(g => g.GroupId == s.GroupId)).ToList();
+        //public async Task<IActionResult> FaultSeeds()
+        //{
+        //    List<Seed> s = await _context.Seeds.ToListAsync();
+        //    List<Group> g = await _context.Groups.ToListAsync();
 
-            return NotFound();
-        }
+        //    List<Seed> Wrong = s.Where(s => !g.Any(g => g.GroupId == s.GroupId)).ToList();
+
+        //    return NotFound();
+        //}
 
         public IActionResult GetRoutes()
         {

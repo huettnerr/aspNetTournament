@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Runde";
     Layout = "~/Views/Shared/_TournamentLayout.cshtml";
+    SeedViewModel? svm = Model as SeedViewModel;
     GroupViewModel? gvm = Model as GroupViewModel;
     MatchViewModel? mvm = Model as MatchViewModel;
     VenueViewModel? vvm = Model as VenueViewModel;
@@ -10,12 +11,13 @@
 }
 @section TournamentNavigationAdditions {
     <li class="nav-item">
-        @*@Html.ActionLink("Matches", "Matches")*@
-        <a cd-route="Match" class="nav-link text-dark" cd-action="Index">Upcoming Matches</a>
+        <a cd-route="Seed" cd-action="Index" class="nav-link text-dark">Teilnehmer</a>
     </li>
     <li class="nav-item">
-        @*@Html.ActionLink("Matches", "Matches")*@
-        <a cd-route="Venue" class="nav-link text-dark" cd-action="Index">Boards</a>
+        <a cd-route="Match" cd-action="Index" class="nav-link text-dark">Upcoming Matches</a>
+    </li>
+    <li class="nav-item">
+        <a cd-route="Venue" cd-action="Index" class="nav-link text-dark">Boards</a>
     </li>
 }
 
@@ -29,7 +31,18 @@
             <span> > </span>
             <a cd-route="Round" cd-action="Index" cd-route-roundId="@Model.R.RoundId">Runde "@Model.R.RoundName"</a>
 
-            if (gvm is object)
+            if (svm is object)
+            {
+                <span> > </span>
+                <a cd-route="Seed" cd-action="Index">Seeds</a>
+
+                if(svm.S is object)
+                {
+                    <span> > </span>
+                    <a cd-route="Seed" cd-action="Details" cd-route-seedId="@svm.S?.SeedId">"@svm.S?.SeedName"</a>
+                }
+            }
+            else if (gvm is object)
             {
                 <span> > </span>
                 <a cd-route="Group" cd-action="Index" cd-route-groupId="@gvm.G?.GroupId">Gruppe "@gvm.G?.GroupName"</a>

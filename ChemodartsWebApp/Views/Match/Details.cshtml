@@ -31,6 +31,11 @@
             </tr>
         }
          <tr>
+            <td><a cd-route="Seed" cd-action="Details" cd-route-seedId="@Model.M.Seed1.SeedId">Seed #@Model.M.Seed1.SeedId</a></td>
+            <td>Seed</td>
+            <td><a cd-route="Seed" cd-action="Details" cd-route-seedId="@Model.M.Seed2.SeedId">Seed #@Model.M.Seed2.SeedId</a></td>
+        </tr>
+         <tr>
             <td><b>@Model.PC.StatsSeed.Statistics.MatchesWon</b> von @Model.PC.StatsSeed.Statistics.Matches</td>
             <td>Siege</td>
             <td><b>@(Model.PC.StatsSeed.Statistics.Matches - Model.PC.StatsSeed.Statistics.MatchesWon)</b> von @Model.PC.StatsSeed.Statistics.Matches</td>

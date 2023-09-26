@@ -116,17 +116,17 @@ namespace ChemodartsWebApp.Models
             allSeeds.ForEach(s => { s.SeedNr = seedNr; s.SeedName = $"Seed #{seedNr}"; seedNr++; });
         }
 
-        public List<MapTournamentSeedPlayer>? CreateMapping(int? tournamentId, List<Seed>? seeds)
+        public List<MapRoundSeedPlayer>? CreateMapping(Round? r, List<Seed>? seeds)
         {
-            if (tournamentId is null || seeds is null) return null;
+            if (r is null || seeds is null) return null;
 
-            List<MapTournamentSeedPlayer> mtsps = new List<MapTournamentSeedPlayer>();
+            List<MapRoundSeedPlayer> mtsps = new List<MapRoundSeedPlayer>();
             foreach (Seed seed in seeds)
             {
-                mtsps.Add(new MapTournamentSeedPlayer()
+                mtsps.Add(new MapRoundSeedPlayer()
                 {
                     TSP_SeedId = seed.SeedId,
-                    TSP_TournamentId = tournamentId ?? 0,
+                    TSP_RoundId = r.RoundId,
                     TSP_PlayerCheckedIn = false,
                     TSP_PlayerFixed = false,
                     Player = null

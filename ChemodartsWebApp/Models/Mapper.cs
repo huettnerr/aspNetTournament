@@ -3,19 +3,18 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChemodartsWebApp.Models
 {
-    [Table("map_tournament_seed_player")]
-    public class MapTournamentSeedPlayer
+    [Table("map_round_seed_player")]
+    public class MapRoundSeedPlayer
     {
         [Key][Column("tpMapId")] public int TSP_Id { get; set; }
-        [Column("tournamentId")] public int TSP_TournamentId { get; set; }
+        [Column("roundId")] public int TSP_RoundId { get; set; }
         [Display(Name = "Seed")][Column("seedId")] public int TSP_SeedId { get; set; }
         [Column("playerId")] public int? TSP_PlayerId { get; set; }
         [Display(Name = "Fixed?")][Column("playerFixed")] public bool TSP_PlayerFixed { get; set; }
         [Display(Name = "Checked In?")][Column("playerCheckedIn")] public bool TSP_PlayerCheckedIn { get; set; }
 
         //Navigation
-        //public virtual ICollection<Player> Players { get; set; }
-        [Display(Name = "ABC Gruppe")] public virtual Tournament Tournament { get; set; }
+        [Display(Name = "ABC Gruppe")] public virtual Round Round { get; set; }
         [Display(Name = "ABC Seed")] public virtual Seed Seed { get; set; }
         [Display(Name = "ABC Spieler")] public virtual Player? Player { get; set; }
     }

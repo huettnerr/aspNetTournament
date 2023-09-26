@@ -9,7 +9,7 @@
         break;
     case "Content":
         <td>
-            <a cd-route="Seed" cd-action="Delete" cd-route-tournamentId="@Model.Tournament.TournamentId" cd-route-seedId="@Model.SeedId"> Delete Seed </a>
+            <a cd-route="Seed" cd-action="Delete" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId"> Delete Seed </a>
         </td>
         break;
     default:

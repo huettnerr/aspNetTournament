@@ -2,17 +2,17 @@
 
 namespace ChemodartsWebApp.ViewModel
 {
-    public class SeedViewModel : TournamentViewModel
+    public class SeedViewModel : RoundViewModel
     {
         public Seed? S { get; set; }
         public IEnumerable<Seed>? Ss { get; set; }
 
-        public SeedViewModel(Seed? s, Tournament? t) : base(t)
+        public SeedViewModel(Seed? s, Round? r) : base(r)
         {
             S = s;
             Ss = new List<Seed>();
         }
 
-        public SeedViewModel(IEnumerable<Seed> ss, Tournament? t) : base(t) => Ss = ss;
+        public SeedViewModel(IEnumerable<Seed> ss, Round? r) : base(r) => Ss = ss;
     }
 }

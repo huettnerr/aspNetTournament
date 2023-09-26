@@ -14,7 +14,7 @@
         break;
     case "Content":
         <td>
-            <a cd-route="Seed" cd-action="Details" cd-route-tournamentId="@Model.Tournament.TournamentId" cd-route-seedId="@Model.SeedId">
+            <a cd-route="Seed" cd-action="Details" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId">
                 #@Model.SeedNr
             </a>
         </td>

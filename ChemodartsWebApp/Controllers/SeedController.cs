@@ -22,28 +22,30 @@ namespace ChemodartsWebApp.Controllers
         }
 
         // GET Spielerübersicht
-        public IActionResult Index(int? tournamentId, int? seedId)
+        public async Task<IActionResult> Index(int? tournamentId, int? roundId, int? seedId)
         {
-            //search for spezific tournament
-            Tournament? t = _context.Tournaments.QueryId(tournamentId).Result;
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
-            return View(new SeedViewModel(t.Seeds.OrderBy(s => s.SeedNr), t));
+            //var list = await _context.MapperRP.ToListAsync();
+            //var seedsInRound = list.Where(rsp => rsp.TSP_RoundId == roundId).ToList();
+
+            return View(new SeedViewModel(r.Seeds.OrderBy(s => s.SeedNr), r));
         }
 
-        public async Task<IActionResult> Details(int? tournamentId, int? seedId)
+        public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? seedId)
         {
-            Tournament? t = _context.Tournaments.QueryId(tournamentId).Result;
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
             Seed? s = await _context.Seeds.QueryId(seedId);
             if (s is null) return NotFound();
 
-            return View(new SeedViewModel(s, t));
+            return View(new SeedViewModel(s, r));
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Delete(int? tournamentId, int? seedId)
+        public async Task<IActionResult> Delete(int? tournamentId, int? roundId, int? seedId)
         {
             Seed? s = await _context.Seeds.QueryId(seedId);
             if (s is null) return NotFound();
@@ -56,12 +58,12 @@ namespace ChemodartsWebApp.Controllers
 
         #region Add Player
 
-        private async Task<MultiSelectList> getPlayersMultiSelectList(Tournament? t)
+        private async Task<MultiSelectList> getPlayersMultiSelectList(Round? r)
         {
             List<Player> Players = await _context.Players.ToListAsync();
 
             //Remove already subscribed Players
-            List<Player>? SubscribedPlayers = t?.MappedSeedsPlayers.Where(msp => msp.Seed.Player is object).Select(msp => msp.Seed.Player).ToList();
+            List<Player>? SubscribedPlayers = r?.MappedSeedsPlayers.Where(msp => msp.Seed.Player is object).Select(msp => msp.Seed.Player).ToList();
             SubscribedPlayers?.ForEach(p => Players.Remove(p));
 
             return new MultiSelectList(Players.OrderBy(p => p.PlayerName), "PlayerId", "CombinedName", null);
@@ -69,35 +71,29 @@ namespace ChemodartsWebApp.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? seedId)
+        public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? roundId, int? seedId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null)
-            {
-                return NotFound();
-            }
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
-            return View("Add", getPlayersMultiSelectList(t).Result);
+            return View("Add", await getPlayersMultiSelectList(r));
         }
 
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? seedId, IFormCollection form)
+        public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? roundId, int? seedId, IFormCollection form)
         {
             ViewBag.YouSelected = form["Players"];
             string selectedValues = form["Players"];
 
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null)
-            {
-                return NotFound();
-            }
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
             if (!selectedValues?.Equals(String.Empty) ?? false)
             {
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
-                List<MapTournamentSeedPlayer> availableMappedSeeds = t.MappedSeedsPlayers.Where(msp => msp.Seed.Player is null).ToList();
+                List<MapRoundSeedPlayer> availableMappedSeeds = r.MappedSeedsPlayers.Where(msp => msp.Seed.Player is null).ToList();
 
                 List<int> playerIds = selectedValues.Split(",").Select(sV => Convert.ToInt32(sV)).ToList();
 
@@ -110,7 +106,7 @@ namespace ChemodartsWebApp.Controllers
                         break;
                     }
 
-                    MapTournamentSeedPlayer? msp = availableMappedSeeds.FirstOrDefault();
+                    MapRoundSeedPlayer? msp = availableMappedSeeds.FirstOrDefault();
 
                     if (changeSeedPlayer(msp, playerId).Result)
                     {
@@ -126,7 +122,7 @@ namespace ChemodartsWebApp.Controllers
                 ViewBag.Message = sb.ToString();
             }
 
-            return View("Add", getPlayersMultiSelectList(t).Result);
+            return View("Add", await getPlayersMultiSelectList(r));
         }
 
         #endregion
@@ -134,12 +130,12 @@ namespace ChemodartsWebApp.Controllers
         #region CheckIn/Remove Player
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> RemovePlayerFromSeed(int? tournamentId, int? seedId)
+        public async Task<IActionResult> RemovePlayerFromSeed(int? tournamentId, int? roundId, int? seedId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
-            MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == seedId).FirstOrDefault();
+            MapRoundSeedPlayer? msp = r.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == seedId).FirstOrDefault();
 
             if (changeSeedPlayer(msp, null).Result)
             {
@@ -152,12 +148,12 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CheckIn(int? tournamentId, int? seedId)
+        public async Task<IActionResult> CheckIn(int? tournamentId, int? roundId, int? seedId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
-            MapTournamentSeedPlayer? msp = t.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == seedId).FirstOrDefault();
+            MapRoundSeedPlayer? msp = r.MappedSeedsPlayers.Where(msp => msp.Seed.SeedId == seedId).FirstOrDefault();
             if (msp is null) return NotFound();
 
             try
@@ -173,7 +169,7 @@ namespace ChemodartsWebApp.Controllers
             }
         }
 
-        private async Task<bool> changeSeedPlayer(MapTournamentSeedPlayer? msp, int? playerId)
+        private async Task<bool> changeSeedPlayer(MapRoundSeedPlayer? msp, int? playerId)
         {
             if (msp is null) return false;
 
@@ -195,16 +191,16 @@ namespace ChemodartsWebApp.Controllers
         #region Shuffle Seeds
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> ShuffleSeeds(int? tournamentId, int? seedId)
+        public async Task<IActionResult> ShuffleSeeds(int? tournamentId, int? roundId, int? seedId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
             //Store all Players
-            List<Player> players = t.MappedSeedsPlayers.Select(msp => msp.Player).OfType<Player>().ToList();
+            List<Player> players = r.MappedSeedsPlayers.Select(msp => msp.Player).OfType<Player>().ToList();
 
             //And clear old mapping
-            foreach (MapTournamentSeedPlayer mps in t.MappedSeedsPlayers)
+            foreach (MapRoundSeedPlayer mps in r.MappedSeedsPlayers)
             {
                 mps.TSP_PlayerId = null;
             }
@@ -215,7 +211,7 @@ namespace ChemodartsWebApp.Controllers
             while (players.Count > 0)
             {
                 Player randomPlayer = players.ElementAt(random.Next(players.Count));
-                t.MappedSeedsPlayers.ElementAt(iSeed++).TSP_PlayerId = randomPlayer.PlayerId;
+                r.MappedSeedsPlayers.ElementAt(iSeed++).TSP_PlayerId = randomPlayer.PlayerId;
                 players.Remove(randomPlayer);
             }
 

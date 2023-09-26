@@ -9,7 +9,7 @@
                 @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
                 </th>*@
             <th>
-                @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+                @Html.DisplayNameFor(model => model.MappedRoundPlayer.TSP_PlayerCheckedIn)
             </th>
             <th>
                 Spieler Aktion
@@ -18,7 +18,7 @@
         else
         {
             <th>
-                @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+                @Html.DisplayNameFor(model => model.MappedRoundPlayer.TSP_PlayerCheckedIn)
             </th>
         }
         break;
@@ -28,24 +28,24 @@
                 @Html.DisplayFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
                 </td>*@
             <td>
-                @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+                @if (!Model.MappedRoundPlayer.TSP_PlayerCheckedIn)
                 {
-                    <a cd-route="Seed" cd-action="CheckIn" cd-route-tournamentId="@Model.Tournament.TournamentId" cd-route-seedId="@Model.SeedId">@Html.Raw("&#10006;")</a>
+                    <a cd-route="Seed" cd-action="CheckIn" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId">@Html.Raw("&#10006;")</a>
                 }else{
-                    <a cd-route="Seed" cd-action="CheckIn" cd-route-tournamentId="@Model.Tournament.TournamentId" cd-route-seedId="@Model.SeedId"> @Html.Raw("&#10004;")</a>
+                    <a cd-route="Seed" cd-action="CheckIn" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId"> @Html.Raw("&#10004;")</a>
                 }
             </td>
             <td>
-                @if (Model.MappedTournamentPlayer.Player is object)
+                @if (Model.MappedRoundPlayer.Player is object)
                 {
-                    <a cd-route="Seed" cd-action="RemovePlayerFromSeed" cd-route-tournamentId="@Model.Tournament.TournamentId" cd-route-seedId="@Model.SeedId">Entfernen</a>
+                    <a cd-route="Seed" cd-action="RemovePlayerFromSeed" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId">Entfernen</a>
                 }
             </td>
         }
         else
         {
             <td>
-                @if (!Model.MappedTournamentPlayer.TSP_PlayerCheckedIn)
+                @if (!Model.MappedRoundPlayer.TSP_PlayerCheckedIn)
                 {
                     <p>@Html.Raw("&#10006;")</p>
                 }else{

@@ -73,17 +73,17 @@ app.MapControllerRoute(
     pattern: "Tournament/{tournamentId}/Round/{action}/{roundId:int?}",
     defaults: new { controller = "Round", action = "Index"});
 
-//Seed Controller
-app.MapControllerRoute(
-    name: "Seed",
-    pattern: "Tournament/{tournamentId}/Seed/{action}/{seedId:int?}",
-    defaults: new { controller = "Seed", action = "Index"});
-
 //Settings Controller
 app.MapControllerRoute(
     name: "Settings",
     pattern: "Tournament/{tournamentId}/Settings/{action}/{id:int?}",
     defaults: new { controller = "Settings", action = "Index" });
+
+//Seed Controller
+app.MapControllerRoute(
+    name: "Seed",
+    pattern: "Tournament/{tournamentId}/Round/{roundId}/Seed/{action}/{seedId:int?}",
+    defaults: new { controller = "Seed", action = "Index"});
 
 //Group Controller
 app.MapControllerRoute(

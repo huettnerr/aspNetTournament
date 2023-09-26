@@ -59,7 +59,7 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateRR(int? tournamentId, int? roundId, int? groupId, [Bind("GroupName,PlayersPerGroup")] GroupFactoryRR rrFactory)
+        public async Task<IActionResult> CreateRR(int? tournamentId, int? roundId, int? groupId, GroupFactoryRR rrFactory)
         {
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
@@ -81,10 +81,10 @@ namespace ChemodartsWebApp.Controllers
                 await _context.SaveChangesAsync();
 
                 //Map the seeds to the tournament
-                List<MapTournamentSeedPlayer>? mappers = rrFactory.CreateMapping(tournamentId, seeds);
+                List<MapRoundSeedPlayer>? mappers = rrFactory.CreateMapping(r, seeds);
                 if (mappers is null) return NotFound();
 
-                _context.MapperTP.AddRange(mappers);
+                _context.MapperRP.AddRange(mappers);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction(nameof(Index), new { groupId = g.GroupId });

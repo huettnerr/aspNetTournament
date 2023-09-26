@@ -94,12 +94,12 @@
     </div>
 
     <h2>Gespielte Turniere</h2>
-    @foreach (var seed in Model.Seeds.OrderBy(s => s.Tournament.TournamentId))
+    @foreach (var seed in Model.Seeds.OrderBy(s => s.Round.Tournament.TournamentId))
     {
         //@Html.DisplayFor(m => seed, "Tournament/SeedResult")
         <h3>
-            <a cd-route="Seed" cd-action="Details" cd-route-tournamentId=@seed.Tournament.TournamentId cd-route-seedId=@seed.SeedId>
-                @seed.Tournament.TournamentName
+            <a cd-route="Seed" cd-action="Details" cd-route-tournamentId=@seed.Round.Tournament.TournamentId cd-route-seedId=@seed.SeedId>
+                @seed.Round.Tournament.TournamentName
             </a>
         </h3>
         <br />

@@ -16,7 +16,7 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Einlaufsong")][Column("song")] public string? PlayerSong { get; set; }
 
         //Navigation
-        public virtual ICollection<MapTournamentSeedPlayer>? MappedTournaments { get; set; }
+        public virtual ICollection<MapRoundSeedPlayer>? MappedTournaments { get; set; }
         [NotMapped] public virtual ICollection<Seed>? Seeds { get => MappedTournaments?.Select(mtp => mtp.Seed).ToList(); }
         [NotMapped] public virtual ICollection<Match>? Matches { get => Seeds?.SelectMany(s => s.Matches).Distinct().ToList(); } 
     }
