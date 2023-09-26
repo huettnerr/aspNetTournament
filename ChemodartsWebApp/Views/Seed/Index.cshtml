@@ -1,7 +1,8 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Seed>
+﻿@model SeedViewModel
 
 @if (User.Identity.IsAuthenticated)
 {
+    <hr />
     <div>
         <a cd-route="Seed" cd-action="AddPlayersToSeed">Add Players</a>
        |
@@ -10,5 +11,4 @@
     <hr />
 }
 
-@*@Html.DisplayFor(m => Model, "Seed/SeedPlayersList", new { ShowStats = "false", ShowTournamentStatus = "true" } )*@
-@Html.DisplayFor(m => Model, "Seed/SeedPlayersList")
+@Html.DisplayFor(m => Model.Ss, "Seed/SeedPlayersList")

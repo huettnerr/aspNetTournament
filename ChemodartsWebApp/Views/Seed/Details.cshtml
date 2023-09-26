@@ -1,9 +1,9 @@
-﻿@model Seed
+﻿@model SeedViewModel
 
-<h2>Details von Seed #@Model.SeedNr</h2>
+<h2>Details von Seed #@Model.S.SeedNr</h2>
 
-@if(Model.Player is object) {
-    @await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerInfo", Model.Player, new ViewDataDictionary(ViewData) { { "ShowHistory", "false" }})
+@if(Model.S.Player is object) {
+    @await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerInfo", Model.S.Player, new ViewDataDictionary(ViewData) { { "ShowHistory", "false" }})
 }
 else
 {
@@ -11,5 +11,5 @@ else
 }
 
 <br />
-<h2>Matches im Turnier "@Model.Tournament.TournamentName"</h2>
-@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Matches)
+<h2>Matches im Turnier "@Model.S.Tournament.TournamentName"</h2>
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.S.Matches)

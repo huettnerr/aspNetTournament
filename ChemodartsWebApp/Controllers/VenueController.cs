@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
+using System.Numerics;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -32,16 +34,19 @@ namespace ChemodartsWebApp.Controllers
                 .Where(v => !v.MappedRounds.Any(mr => mr.RVM_RoundId == roundId)).ToList();
             ViewBag.UnmappedVenueList = allUnmappedVenues;
 
-            return View(venues);
+            return View(new VenueViewModel(venues, allUnmappedVenues, r));
         }
 
         // GET Detailansicht
-        public async Task<IActionResult> Detail(int? tournamentId, int? roundId, int? venueId)
+        public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? venueId)
         {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
             Venue? v = await _context.Venues.QueryId(venueId);
             if (v is null) return NotFound();
 
-            return View("Detail", v);
+            return View(new VenueViewModel(v, r));
         }
 
         [Authorize(Roles = "Administrator")]

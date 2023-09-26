@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -26,7 +27,7 @@ namespace ChemodartsWebApp.Controllers
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
-            return View(t);
+            return View(new SettingsViewModel(t));
         }
 
         [Authorize(Roles = "Administrator")]

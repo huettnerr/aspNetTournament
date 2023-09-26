@@ -5,6 +5,9 @@
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 
     string tournamentName = Model.T?.TournamentName ?? $"Turnier ID '{ViewContext.RouteData?.Values["tournamentId"]?.ToString()}'";
+
+    SeedViewModel? svm = Model as SeedViewModel;
+    SettingsViewModel? setvm = Model as SettingsViewModel;
 }
 
 @section MainNavigationAdditions {
@@ -30,12 +33,31 @@
 }
 
 <span>
+    <a cd-route="Home" cd-action="Tournaments">Turniere</a>
     @if (Model.T is object)
     {
-        <a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.T.TournamentId">Turnier "@Model.T.TournamentName"</a>
+        <span> > </span>
+        <a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.T.TournamentId">"@Model.T.TournamentName"</a>
+
+        if (svm is object)
+        {
+            <span> > </span>
+            <a cd-route="Seed" cd-action="Index">Seeds</a>
+
+            if(svm.S is object)
+            {
+                <span> > </span>
+                <a cd-route="Seed" cd-action="Details" cd-route-seedId="@svm.S?.SeedId">"@svm.S?.SeedName"</a>
+            }
+            
+        }
+        else if (setvm is object)
+        {
+            <span> > </span>
+            <a cd-route="Settings" cd-action="Index">Settings</a>
+        }
+
         @await RenderSectionAsync("TournamentHierarchyAdditions", required: false)
-    }else{
-        <a cd-route="Home" cd-action="Tournaments">Back to List</a>
     }
 </span>
 

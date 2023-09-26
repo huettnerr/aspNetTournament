@@ -1,5 +1,4 @@
-﻿@model IEnumerable<ChemodartsWebApp.Models.Venue>
-
+﻿@model VenueViewModel
 @{
     int? venueId = null;
 }
@@ -8,11 +7,11 @@
 {
    <div>
         <form asp-action="Add">
-            @Html.DropDownListFor(m => venueId, new SelectList(ViewBag.UnmappedVenueList, "VenueId", "VenueName"))
-            <button type="submit">Add Venue to RoundId @Context.Request.Query["roundId"]</button>
+            @Html.DropDownListFor(m => venueId, new SelectList(Model.UnmappedVs, "VenueId", "VenueName"))
+            <button type="submit">Add Venue to Round "@Model.R.RoundName"</button>
         </form>
     </div>
     <hr />
 }
 
-@Html.DisplayFor(m => Model, "Venue/VenueList")
+@Html.DisplayFor(m => Model.Vs, "Venue/VenueList")

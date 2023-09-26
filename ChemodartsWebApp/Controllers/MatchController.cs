@@ -54,11 +54,6 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            List<Match>? matchesBetween = m.Seed1?.Player?.Matches?.Where(m => m.IsMatchOfPlayers(m.Seed1.Player, m.Seed2.Player))?.ToList();
-            Seed statsSeed = new Seed();
-            statsSeed.Statistics = new SeedStatistics(ScoreType.LegsOnly);
-            matchesBetween?.ForEach(m => m.UpdateSeedStat((m.Seed1.Player.Equals(m.Seed1.Player) ? m.Seed1 : m.Seed2), statsSeed.Statistics));
-
             return View(new MatchViewModel(m));
         }
 

@@ -23,7 +23,7 @@
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
                         @Html.DisplayFor(model => model.M.Seed1.Group.GroupName)
                 </a></td>
-                @Html.DisplayFor(m => m, "Match/Columns/MatchGroup", new { RenderType = "Header"})
+                @Html.DisplayFor(m => Model.M, "Match/Columns/MatchGroup", new { RenderType = "Header"})
                 <td>
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
                         @Html.DisplayFor(model => model.M.Seed2.Group.GroupName)

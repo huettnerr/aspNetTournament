@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using ChemodartsWebApp.ViewModel;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -27,15 +28,18 @@ namespace ChemodartsWebApp.Controllers
             Tournament? t = _context.Tournaments.QueryId(tournamentId).Result;
             if (t is null) return NotFound();
 
-            Seed? s = t.Seeds.Where(s => s.SeedId == seedId).FirstOrDefault();
-            if (s is null)
-            {
-                return View(t.Seeds.OrderBy(s => s.SeedNr));
-            }
-            else
-            {
-                return View("Details", s);
-            }  
+            return View(new SeedViewModel(t.Seeds.OrderBy(s => s.SeedNr), t));
+        }
+
+        public async Task<IActionResult> Details(int? tournamentId, int? seedId)
+        {
+            Tournament? t = _context.Tournaments.QueryId(tournamentId).Result;
+            if (t is null) return NotFound();
+
+            Seed? s = await _context.Seeds.QueryId(seedId);
+            if (s is null) return NotFound();
+
+            return View(new SeedViewModel(s, t));
         }
 
         [Authorize(Roles = "Administrator")]

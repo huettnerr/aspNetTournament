@@ -25,7 +25,7 @@
             }else{
                 <td colspan="4">Derzeit kein Match</td>
             }
-            @if (User.Identity.IsAuthenticated) @Html.DisplayFor(m => dummyVenue, "Venue/Columns/VenueAdmin", new { RenderType = "Content" })
+            @if (User.Identity.IsAuthenticated) @Html.DisplayFor(m => item, "Venue/Columns/VenueAdmin", new { RenderType = "Content" })
         </tr>
     }
     </tbody>
