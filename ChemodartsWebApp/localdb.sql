@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:52827
--- Generation Time: Sep 19, 2023 at 05:38 AM
+-- Generation Time: Sep 26, 2023 at 06:07 AM
 -- Server version: 5.7.9-log
 -- PHP Version: 5.6.40
 
@@ -647,7 +647,8 @@ INSERT INTO `rounds` (`roundId`, `tournamentId`, `name`, `modus`, `scoring`) VAL
 (14, 5, 'Verortung', 'RoundRobin', 'LegsOnly'),
 (15, 5, 'On Stage!', 'SingleKo', 'LegsOnly'),
 (16, 2, 'Vorrunde', 'RoundRobin', 'LegsOnly'),
-(17, 2, 'On Stage!', 'SingleKo', 'LegsOnly');
+(17, 2, 'On Stage!', 'SingleKo', 'LegsOnly'),
+(18, 6, 'Group', 'RoundRobin', 'LegsOnly');
 
 -- --------------------------------------------------------
 
@@ -1023,8 +1024,6 @@ INSERT INTO `seeds` (`seedId`, `groupId`, `seedNr`, `seedName`, `ancestorMatchId
 (322, 81, 26, 'The Lightning', NULL),
 (323, 81, 27, 'Seed #27', NULL),
 (324, 81, 28, 'Ronny McHammergeil', NULL),
-(338, 84, 0, 'Please Run Script', NULL),
-(339, 84, 0, 'Please Run Script', NULL),
 (490, 105, 0, 'Please Run Script', NULL),
 (491, 105, 1, 'Please Run Script', NULL),
 (492, 105, 2, 'Please Run Script', NULL),
@@ -1174,7 +1173,8 @@ INSERT INTO `tournaments` (`tournamentId`, `name`, `starttime`) VALUES
 (2, 'Chemodarts Vol. 1', NULL),
 (3, 'Chemodarts Vol. 2', '2022-11-27 14:00:00'),
 (4, 'Chemodarts Vol. 3', '2023-04-02 12:00:00'),
-(5, 'Chemodarts Vol. 4', '2023-09-17 12:00:00');
+(5, 'Chemodarts Vol. 4', '2023-09-17 12:00:00'),
+(6, 'Boardbau Gutz', '2023-09-22 20:21:00');
 
 -- --------------------------------------------------------
 
@@ -1315,7 +1315,7 @@ ALTER TABLE `players`
 -- AUTO_INCREMENT for table `rounds`
 --
 ALTER TABLE `rounds`
-  MODIFY `roundId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `roundId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 --
 -- AUTO_INCREMENT for table `scores`
 --
@@ -1330,7 +1330,7 @@ ALTER TABLE `seeds`
 -- AUTO_INCREMENT for table `tournaments`
 --
 ALTER TABLE `tournaments`
-  MODIFY `tournamentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `tournamentId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT for table `venues`
 --
@@ -1357,9 +1357,9 @@ ALTER TABLE `map_round_venue`
 -- Constraints for table `map_tournament_seed_player`
 --
 ALTER TABLE `map_tournament_seed_player`
-  ADD CONSTRAINT `map_tp_pId` FOREIGN KEY (`playerId`) REFERENCES `players` (`playerId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `map_tp_tId` FOREIGN KEY (`tournamentId`) REFERENCES `tournaments` (`tournamentId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `map_ts_sId` FOREIGN KEY (`seedId`) REFERENCES `seeds` (`seedId`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `map_tp_pId` FOREIGN KEY (`playerId`) REFERENCES `players` (`playerId`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `map_tp_sId` FOREIGN KEY (`seedId`) REFERENCES `seeds` (`seedId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `map_tp_tId` FOREIGN KEY (`tournamentId`) REFERENCES `tournaments` (`tournamentId`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `matches`
