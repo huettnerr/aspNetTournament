@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Data;
+using ChemodartsWebApp.Data.Factory;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using ChemodartsWebApp.ViewModel;

@@ -1,4 +1,4 @@
-﻿using ChemodartsWebApp.ModelHelper;
+﻿using ChemodartsWebApp.Data.Factory;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;

@@ -1,9 +1,0 @@
-﻿@model ChemodartsWebApp.Models.TournamentFactory
-
-@using (Html.BeginForm("Create", "Tournament", FormMethod.Post))
-{
-    @Html.ValidationSummary(true)
-
-    @Html.EditorForModel(Model)
-    <button type="submit" class="btn btn-primary">Create</button>        
-}

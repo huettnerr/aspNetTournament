@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ChemodartsWebApp.ModelHelper
+namespace ChemodartsWebApp.Data.Factory
 {
     public abstract class FactoryBase
     {
@@ -16,7 +16,7 @@ namespace ChemodartsWebApp.ModelHelper
     {
         public override string Action { get; set; }
 
-        
+
         public FactoryBase() { } //Needed for POST
 
         public FactoryBase(string action)
