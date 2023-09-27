@@ -27,10 +27,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            //var list = await _context.MapperRP.ToListAsync();
-            //var seedsInRound = list.Where(rsp => rsp.TSP_RoundId == roundId).ToList();
-
-            return View(new SeedViewModel(r.Seeds.OrderBy(s => s.SeedNr), r));
+            return View(new SeedViewModel(r) {  Ss = r.Seeds.OrderBy(s => s.SeedNr) });
         }
 
         public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? seedId)
@@ -41,7 +38,7 @@ namespace ChemodartsWebApp.Controllers
             Seed? s = await _context.Seeds.QueryId(seedId);
             if (s is null) return NotFound();
 
-            return View(new SeedViewModel(s, r));
+            return View(new SeedViewModel(r) { S = s });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -58,51 +55,51 @@ namespace ChemodartsWebApp.Controllers
 
         #region Add Player
 
-        private async Task<MultiSelectList> getPlayersMultiSelectList(Round? r)
+        private async Task<MultiSelectList?> getPlayersList(Round r)
         {
+            if (r is null) return null;
+
+            //Get all Players
             List<Player> Players = await _context.Players.ToListAsync();
 
             //Remove already subscribed Players
-            List<Player>? SubscribedPlayers = r?.MappedSeedsPlayers.Where(msp => msp.Seed.Player is object).Select(msp => msp.Seed.Player).ToList();
+            List<Player?> SubscribedPlayers = r.MappedSeedsPlayers.Where(msp => msp.Seed.Player is object).Select(msp => msp.Seed.Player).ToList();
             SubscribedPlayers?.ForEach(p => Players.Remove(p));
 
+            //Create the List
             return new MultiSelectList(Players.OrderBy(p => p.PlayerName), "PlayerId", "CombinedName", null);
         }
 
         [HttpGet]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? roundId, int? seedId)
+        public async Task<IActionResult> AddPlayers(int? tournamentId, int? roundId, int? seedId)
         {
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            return View("Add", await getPlayersMultiSelectList(r));
+            //Return the View
+            return View(new SeedViewModel(r) { Players = await getPlayersList(r), SelectedPlayerIds = new List<int>() });
         }
-
 
         [HttpPost]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> AddPlayersToSeed(int? tournamentId, int? roundId, int? seedId, IFormCollection form)
+        public async Task<ActionResult> AddPlayers(int? tournamentId, int? roundId, int? seedId, SeedViewModel viewModel)
         {
-            ViewBag.YouSelected = form["Players"];
-            string selectedValues = form["Players"];
-
-            Round? r = await _context.Rounds.QueryId(roundId);
-            if (r is null) return NotFound();
-
-            if (!selectedValues?.Equals(String.Empty) ?? false)
+            // Handle the selected player IDs (viewModel.SelectedPlayerIds)
+            if (viewModel.SelectedPlayerIds != null && viewModel.SelectedPlayerIds.Any())
             {
+                Round? r = await _context.Rounds.QueryId(roundId);
+                if (r is null) return NotFound();
+
                 System.Text.StringBuilder sb = new System.Text.StringBuilder();
                 List<MapRoundSeedPlayer> availableMappedSeeds = r.MappedSeedsPlayers.Where(msp => msp.Seed.Player is null).ToList();
 
-                List<int> playerIds = selectedValues.Split(",").Select(sV => Convert.ToInt32(sV)).ToList();
-
                 //Update Seeds
-                foreach (int playerId in playerIds)
+                foreach (int playerId in viewModel.SelectedPlayerIds)
                 {
                     if (availableMappedSeeds.Count == 0)
                     {
-                        sb.Append("Keine freien Seeds (mehr) gefunden\n");
+                        sb.Append("Keine freien Seeds\n");
                         break;
                     }
 
@@ -111,7 +108,7 @@ namespace ChemodartsWebApp.Controllers
                     if (changeSeedPlayer(msp, playerId).Result)
                     {
                         availableMappedSeeds.Remove(msp);
-                        sb.Append($"Spieler '{_context.Players.Single(p => p.PlayerId == playerId).CombinedName}' hat Seed #{msp.Seed.SeedNr}");
+                        sb.Append($"Spieler '{_context.Players.Single(p => p.PlayerId == playerId).CombinedName}' hat Seed #{msp.Seed.SeedNr}\n");
                     }
                     else
                     {
@@ -120,9 +117,11 @@ namespace ChemodartsWebApp.Controllers
                 }
 
                 ViewBag.Message = sb.ToString();
+                return View(new SeedViewModel(r) { Players = await getPlayersList(r), SelectedPlayerIds = new List<int>() });
             }
 
-            return View("Add", await getPlayersMultiSelectList(r));
+            // Redirect or return a view as needed
+            return RedirectToAction(nameof(AddPlayers));
         }
 
         #endregion

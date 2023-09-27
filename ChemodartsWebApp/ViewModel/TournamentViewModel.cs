@@ -8,6 +8,7 @@ namespace ChemodartsWebApp.ViewModel
         public Tournament? T { get; set; }
         public TournamentFactory? TF { get; set; }
 
+        public TournamentViewModel() { } //Needed for POST
         public TournamentViewModel(Tournament? t) : base() => T = t;
         public TournamentViewModel(TournamentFactory? tf, Tournament? t) : base()
         {

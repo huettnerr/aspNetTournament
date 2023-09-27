@@ -26,10 +26,11 @@
             @await RenderSectionAsync("TournamentNavigationAdditions", required: false)
         </ul>
     </li>
+    <br />
 }
 
 <span>
-    <a cd-route="Home" cd-action="Tournaments">Turniere</a>
+    <a asp-controller="Home" asp-action="Tournaments">Turniere</a>
     @if (Model.T is object)
     {
         <span> > </span>

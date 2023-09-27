@@ -1,0 +1,33 @@
+﻿@model SeedViewModel
+@{
+    ViewBag.Title = "MultiSelect Player";
+}
+
+@*https://learn.microsoft.com/en-us/aspnet/mvc/overview/older-versions/working-with-the-dropdownlist-box-and-jquery/using-the-dropdownlist-helper-with-aspnet-mvc*@
+
+<hr />
+<a asp-controller="Players" asp-action="Create" target="_blank">Create Player</a>
+<hr />
+
+@if (ViewBag.YouSelected is object) {
+    <div> You Selected:  @ViewBag.YouSelected</div>
+}
+
+@if (ViewBag.Message is object) {
+    <h3>@ViewBag.Message</h3>
+}
+
+@using (Html.BeginForm("AddPlayers", "Seed", FormMethod.Post))
+{
+    <input type="text" id="playerSearch" placeholder="Search players">
+    <button type="submit">Submit Selection</button>
+    @Html.ListBoxFor(model => model.SelectedPlayerIds, Model.Players, new { id = "playerList", size=20 }) //id is needed for javascript
+}
+
+@section Scripts {
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include your JavaScript file -->
+    <script src="/js/playerSearch.js"></script>
+}
