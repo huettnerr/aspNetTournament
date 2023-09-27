@@ -22,8 +22,8 @@ namespace ChemodartsWebApp.Models
 
         [NotMapped] public ICollection<Match> Matches { get { return MatchesAsS1.Concat(MatchesAsS2).ToList(); } }
         //[NotMapped][Display(Name = "Turnier")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Tournament Tournament { get => MappedTournamentPlayer.Round.Tournament; }
-        [NotMapped][Display(Name = "Runde")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Round Round { get => MappedRoundSeedPlayer.Round; }
-        [NotMapped][Display(Name = "Spieler")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Player? Player { get => MappedRoundSeedPlayer.Player; }
+        [NotMapped][Display(Name = "Runde")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Round Round { get => MappedRoundSeedPlayer?.Round; }
+        [NotMapped][Display(Name = "Spieler")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Player? Player { get => MappedRoundSeedPlayer?.Player; }
         [NotMapped][Display(Name = "Stats")][DisplayFormat(NullDisplayText = "n. A.")] public virtual SeedStatistics Statistics { get; set; }
 
         public void UpdateSeedStatistics(int roundId)

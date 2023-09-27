@@ -4,6 +4,7 @@ using ChemodartsWebApp.Data;
 using Microsoft.EntityFrameworkCore;
 using ChemodartsWebApp.Models;
 using System.Composition;
+using Castle.DynamicProxy.Contributors;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -30,6 +31,20 @@ namespace ChemodartsWebApp.Controllers
         {
             return NotFound();
         }
+
+        //public async Task<IActionResult> UpdateWinnerSeeds()
+        //{
+        //    List<Match> matches = await _context.Matches.ToListAsync();
+        //    foreach(Match match in matches)
+        //    {
+        //        if (match.Status != Match.MatchStatus.Finished) continue;
+        //        match.WinnerSeedId = match.HasSeedWon(match.Seed1) ? match.Seed1Id : match.Seed2Id;
+        //        _context.Update(match);
+        //    }
+
+        //    _context.SaveChangesAsync();
+        //    return NotFound();
+        //}
 
         //public async Task<IActionResult> MigrateRound()
         //{

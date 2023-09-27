@@ -1,0 +1,15 @@
+﻿@model GroupViewModel
+
+@{
+    ViewData["Title"] = "Create Group";
+}
+
+<h1>Edit</h1>
+
+<h4>Group</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @await Html.PartialAsync("_factoryTemplate", Model.GF)
+    </div>
+</div>

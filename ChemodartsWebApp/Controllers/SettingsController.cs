@@ -9,6 +9,7 @@ using ChemodartsWebApp.Data;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using ChemodartsWebApp.ViewModel;
+using ChemodartsWebApp.Data.Factory;
 
 namespace ChemodartsWebApp.Controllers
 {

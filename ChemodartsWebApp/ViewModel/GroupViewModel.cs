@@ -1,4 +1,5 @@
-﻿using ChemodartsWebApp.Models;
+﻿using ChemodartsWebApp.Data.Factory;
+using ChemodartsWebApp.Models;
 
 namespace ChemodartsWebApp.ViewModel
 {

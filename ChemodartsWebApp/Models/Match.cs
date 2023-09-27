@@ -22,6 +22,7 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "GroupId")][Column("groupId")] public int GroupId { get; set; }
         [Column("seed1Id")] public int Seed1Id { get; set; }
         [Column("seed2Id")] public int Seed2Id { get; set; }
+        [Column("winnerSeedId")] public int? WinnerSeedId { get; set; }
         [Display(Name = "Status")][Column("status")] public MatchStatus? Status {get; set; }
         [Column("venueId")] public int? VenueId {get; set; }
 
@@ -38,15 +39,9 @@ namespace ChemodartsWebApp.Models
         public virtual Seed Seed1 { get; set; }
         [Display(Name = "Gast")] 
         public virtual Seed Seed2 { get; set; }
+        public virtual Seed? WinnerSeed { get; set; }
         public virtual Score? Score { get; set; }
         public virtual Seed? WinnerSeedFollowUp { get; set; }
-        [NotMapped] public Seed? WinnerSeed { 
-            get {
-                if (HasSeedWon(Seed1)) return Seed1;
-                else if (HasSeedWon(Seed2)) return Seed2;
-                else return null;
-            } 
-        }
 
         //Helpers
         [NotMapped]
@@ -82,12 +77,21 @@ namespace ChemodartsWebApp.Models
 
         public void HandleNewStatus(MatchStatus? newStatus)
         {
-            if (newStatus == MatchStatus.Created) Score = null;
-            else if (newStatus == MatchStatus.Finished) Venue = null;
-            //else if (newStatus == MatchStatus.Finished)
-            //{
-            //    if(WinnerSeedFollowUp is object) WinnerSeedFollowUp.M
-            //}
+            switch(newStatus)
+            {
+                case MatchStatus.Created:
+                    Score = null;
+                    break;
+                case MatchStatus.Finished: 
+                    Venue = null;
+                    WinnerSeedId = HasSeedWon(Seed1) ? Seed1Id : Seed2Id;
+                    break;
+            }
+
+            if(newStatus != MatchStatus.Finished)
+            {
+                WinnerSeedId = null;
+            }
         }
 
         public bool UpdateSeedStat(Seed s, SeedStatistics stat)
@@ -120,7 +124,7 @@ namespace ChemodartsWebApp.Models
 
             //Update Winning Stat
             stat.Matches++;
-            if (HasSeedWon(s))
+            if (s.Equals(WinnerSeed))
             {
                 stat.MatchesWon++;
             }
