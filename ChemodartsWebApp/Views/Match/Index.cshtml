@@ -23,4 +23,16 @@
     }
 }
 
+<div class="form-outline">
+    <input type="search" id="matchesSearch" placeholder="Matches filtern" class="form-control" aria-label="Search">
+</div>
+
 @await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.Ms, new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }})
+
+@section Scripts {
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include your JavaScript file -->
+    <script src="/js/search.js"></script>
+}

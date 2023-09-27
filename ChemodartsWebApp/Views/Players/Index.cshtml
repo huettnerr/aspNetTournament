@@ -4,13 +4,22 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1>Spieler</h1>
 
 @if (User.Identity.IsAuthenticated)
 {
-    <p>
-        <a cd-route="Players" cd-action="Create">Create New</a>
-    </p>
+    <div class="form-outline"><a cd-route="Players" cd-action="Create">Create New</a></div>
 }
+<div class="form-outline">
+    <input type="search" id="playerSearch" placeholder="Search players, interpreter & song" class="form-control" aria-label="Search">
+</div>
 
 @await Html.PartialAsync("../Shared/DisplayTemplates/Player/PlayerList", Model.Ps?.OrderBy(p => p.PlayerName).ThenBy(p => p.PlayerDartname))
+
+@section Scripts {
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Include your JavaScript file -->
+    <script src="/js/search.js"></script>
+}

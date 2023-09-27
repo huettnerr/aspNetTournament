@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <None Include="wwwroot\css\BracketStyle.css" />
-    <None Include="wwwroot\js\playerSearch.js" />
+    <None Include="wwwroot\js\search.js" />
   </ItemGroup>
 
   <ItemGroup>

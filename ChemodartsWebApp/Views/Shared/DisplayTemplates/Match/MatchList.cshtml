@@ -9,7 +9,7 @@
     if (ViewData["ShowTournament"]?.Equals("true") ?? false) showTournament = true;
 }
 
-<table class="table">
+<table id="matchesTable" class="table">
     <thead>
         <tr>
             @if (showTournament) {

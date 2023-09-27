@@ -3,7 +3,7 @@
     var dummyPlayer = Model.FirstOrDefault();
 }
 
-<table class="table">
+<table class="table" id="playerTable">
     <thead>
         <tr>
             @Html.DisplayFor(m => dummyPlayer, "Player/Columns/PlayerName", new { RenderType = "Header"})
