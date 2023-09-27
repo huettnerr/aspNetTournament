@@ -27,7 +27,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            return View(new SeedViewModel(r) {  Ss = r.Seeds.OrderBy(s => s.SeedNr) });
+            return View(new SeedViewModel(r) {  Ss = r.Seeds });
         }
 
         public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? seedId)
@@ -168,6 +168,10 @@ namespace ChemodartsWebApp.Controllers
             }
         }
 
+        #endregion
+
+        #region Reorder and Shuffle Seeds
+
         private async Task<bool> changeSeedPlayer(MapRoundSeedPlayer? msp, int? playerId)
         {
             if (msp is null) return false;
@@ -185,9 +189,26 @@ namespace ChemodartsWebApp.Controllers
             }
         }
 
-        #endregion
+        [HttpPost] //Kommt von Ajax
+        [Authorize(Roles = "Administrator")]
+        public async Task<ActionResult> ReordedSeeds(int? tournamentId, int? roundId, int? seedId, List<int> itemOrder)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
-        #region Shuffle Seeds
+            int i = 0;
+            foreach(Seed s in r.Seeds)
+            {
+                s.MappedRoundSeedPlayer.TSP_PlayerId = itemOrder[i];
+                _context.Update(s.MappedRoundSeedPlayer);
+                i++;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var redirectUrl = Url.Action(nameof(Index));
+            return Json(new { redirect = redirectUrl });
+        }
 
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> ShuffleSeeds(int? tournamentId, int? roundId, int? seedId)

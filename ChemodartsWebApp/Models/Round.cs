@@ -35,7 +35,7 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<MapRoundVenue> MappedVenues { get; set; }
         public virtual ICollection<MapRoundSeedPlayer> MappedSeedsPlayers { get; set; }
 
-        [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedSeedsPlayers.Select(msp => msp.Seed).ToList(); }
+        [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedSeedsPlayers.Select(msp => msp.Seed).OrderBy(s => s.SeedNr).ToList(); }
 
     }
 }

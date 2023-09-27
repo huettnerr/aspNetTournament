@@ -9,7 +9,7 @@
                 @Html.DisplayNameFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
                 </th>*@
             <th>
-                @Html.DisplayNameFor(model => model.MappedRoundPlayer.TSP_PlayerCheckedIn)
+                @Html.DisplayNameFor(model => model.MappedRoundSeedPlayer.TSP_PlayerCheckedIn)
             </th>
             <th>
                 Spieler Aktion
@@ -18,7 +18,7 @@
         else
         {
             <th>
-                @Html.DisplayNameFor(model => model.MappedRoundPlayer.TSP_PlayerCheckedIn)
+                @Html.DisplayNameFor(model => model.MappedRoundSeedPlayer.TSP_PlayerCheckedIn)
             </th>
         }
         break;
@@ -28,7 +28,7 @@
                 @Html.DisplayFor(model => model.MappedTournamentPlayer.TSP_PlayerFixed)
                 </td>*@
             <td>
-                @if (!Model.MappedRoundPlayer.TSP_PlayerCheckedIn)
+                @if (!Model.MappedRoundSeedPlayer.TSP_PlayerCheckedIn)
                 {
                     <a cd-route="Seed" cd-action="CheckIn" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId">@Html.Raw("&#10006;")</a>
                 }else{
@@ -36,7 +36,7 @@
                 }
             </td>
             <td>
-                @if (Model.MappedRoundPlayer.Player is object)
+                @if (Model.MappedRoundSeedPlayer.Player is object)
                 {
                     <a cd-route="Seed" cd-action="RemovePlayerFromSeed" cd-route-tournamentId="@Model.Round.Tournament.TournamentId" cd-route-roundId="@Model.Round.RoundId" cd-route-seedId="@Model.SeedId">Entfernen</a>
                 }
@@ -45,7 +45,7 @@
         else
         {
             <td>
-                @if (!Model.MappedRoundPlayer.TSP_PlayerCheckedIn)
+                @if (!Model.MappedRoundSeedPlayer.TSP_PlayerCheckedIn)
                 {
                     <p>@Html.Raw("&#10006;")</p>
                 }else{

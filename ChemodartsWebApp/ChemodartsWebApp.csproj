@@ -8,10 +8,12 @@
 
   <ItemGroup>
     <Content Remove="wwwroot\css\BracketStyle.css" />
+    <Content Remove="wwwroot\js\drag.js" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="wwwroot\css\BracketStyle.css" />
+    <None Include="wwwroot\js\drag.js" />
     <None Include="wwwroot\js\search.js" />
   </ItemGroup>
 

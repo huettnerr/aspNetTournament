@@ -12,3 +12,19 @@
 }
 
 @Html.DisplayFor(m => Model.Ss, "Seed/SeedPlayersList")
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <!-- Define a JavaScript variable to hold the URL -->
+    <script>
+        @{
+            var ctrlUrl = Url.RouteUrl("Seed", new { tournamentId = Model.T.TournamentId, roundId = Model.R.RoundId, action = "ReorderedSeeds" });
+            var ctrlUrl2 = Url.Action("ReordedSeeds", "Seed");
+            var ctrlUrl4 = Url.Action("ReordedSeeds", "Seed");
+        }
+        var controllerUrl = "@Url.Action("ReordedSeeds", "Seed")"
+    </script>
+    <script src="/js/drag.js"></script>
+}

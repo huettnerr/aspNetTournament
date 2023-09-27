@@ -3,22 +3,58 @@
     var dummySeed = Model.FirstOrDefault();
 }
 
-<table class="table">
-    <thead>
-        <tr>
-            @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedPlayer", new { RenderType = "Header"})
-            @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedTournamentStatus", new { RenderType = "Header" })
-            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedAdmin", new { RenderType = "Header" })
-        </tr>
-    </thead>
-    <tbody>
-    @{int rank = 0;}
-    @foreach (var item in Model) {
-        <tr>
-            @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
-            @Html.DisplayFor(m => item, "Seed/Columns/SeedTournamentStatus", new { RenderType = "Content" })
-            @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Seed/Columns/SeedAdmin", new { RenderType = "Content" })
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="container">
+    <div class="row">
+        <div class="col-md-auto right-border">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(model => model.SeedNr)</th>
+                        <th>@Html.DisplayNameFor(model => model.Group.GroupName)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>
+                                <a cd-route="Seed" cd-action="Details" cd-route-tournamentId="@item.Round.Tournament.TournamentId" cd-route-roundId="@item.Round.RoundId" cd-route-seedId="@item.SeedId">
+                                    #@item.SeedNr
+                                </a>
+                            </td>
+                            <td>
+                                <a cd-route="Group" cd-action="Details" cd-route-tournamentId="@item.Round.Tournament.TournamentId" cd-route-roundId="@item.Round.RoundId" cd-route-groupId="@item.Group.GroupId">
+                                    @item.Group.GroupName
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+@*        <div class="col-md-auto">
+            <hr class="my-0">
+        </div>*@
+        <div class="col">
+            <table id="seedsTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedPlayer", new { RenderType = "Header"})
+                        @Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedTournamentStatus", new { RenderType = "Header" })
+                        @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => dummySeed, "Seed/Columns/SeedAdmin", new { RenderType = "Header" })
+                    </tr>
+                </thead>
+                <tbody>
+                @{int rank = 0;}
+                @foreach (var item in Model) {
+                    <tr data-id="@item.Player.PlayerId">
+                        @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
+                        @Html.DisplayFor(m => item, "Seed/Columns/SeedTournamentStatus", new { RenderType = "Content" })
+                        @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Seed/Columns/SeedAdmin", new { RenderType = "Content" })
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

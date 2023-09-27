@@ -52,7 +52,7 @@ namespace ChemodartsWebApp.Data
 
             modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedSeedsPlayers).HasForeignKey(map => map.TSP_RoundId);
             modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Player>(map => map.Player).WithMany(p => p.MappedTournaments).HasForeignKey(map => map.TSP_PlayerId);
-            modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Seed>(map => map.Seed).WithOne(s => s.MappedRoundPlayer).HasForeignKey<MapRoundSeedPlayer>(map => map.TSP_SeedId);
+            modelBuilder.Entity<MapRoundSeedPlayer>().HasOne<Seed>(map => map.Seed).WithOne(s => s.MappedRoundSeedPlayer).HasForeignKey<MapRoundSeedPlayer>(map => map.TSP_SeedId);
 
             modelBuilder.Entity<MapRoundVenue>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedVenues).HasForeignKey(map => map.RVM_RoundId);
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);

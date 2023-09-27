@@ -33,6 +33,15 @@ body {
   margin-bottom: 60px;
 }
 
+.right-border {
+    border-right: 1px solid #ccc; /* Adjust the border style and color as needed */
+}
+
+#seedsTable tr[draggable="true"] {
+    cursor: move;
+    background: green;
+}
+
 /*
  *  Flex Layout Specifics
 */
