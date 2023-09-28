@@ -15,7 +15,7 @@ namespace ChemodartsWebApp.Models
 
         //Navigation
         [Display(Name = "Gruppe")] public virtual Group Group { get; set; }
-        [Display(Name = "Stats")][DisplayFormat(NullDisplayText = "n. A.")] public virtual SeedStatistics? SeedStatistics { get; set; }
+        [Display(Name = "Stats")][DisplayFormat(NullDisplayText = "n. A.")] public virtual SeedStatistics? SeedStatistics { get; set; } 
         public virtual MapRoundSeedPlayer MappedRoundSeedPlayer { get; set; }
         public virtual Match? AncestorMatch { get; set; }
         public virtual ICollection<Match> MatchesAsS1 { get; set; } = new List<Match>();
@@ -25,5 +25,10 @@ namespace ChemodartsWebApp.Models
         //[NotMapped][Display(Name = "Turnier")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Tournament Tournament { get => MappedTournamentPlayer.Round.Tournament; }
         [NotMapped][Display(Name = "Runde")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Round Round { get => MappedRoundSeedPlayer?.Round; }
         [NotMapped][Display(Name = "Spieler")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Player? Player { get => MappedRoundSeedPlayer?.Player; }
+
+        public override string ToString()
+        {
+            return $"[{SeedId}] Seed #{SeedNr}: {SeedName} ({Player?.PlayerName})";
+        }
     }
 }

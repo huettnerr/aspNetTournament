@@ -10,6 +10,7 @@ using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using ChemodartsWebApp.ViewModel;
 using ChemodartsWebApp.Data.Factory;
+using ChemodartsWebApp.ModelHelper;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -65,24 +66,8 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            rrFactory.R = r;
-            Group? g = await _context.Groups.CreateWithFactory(ModelState, rrFactory);
-            if (r is object)
+            if (await RoundRobinLogic.CreateGroup(_context, rrFactory, r, ModelState))
             {
-                //Create the seeds
-                List<Seed>? seeds = rrFactory.CreateSeeds(g);
-                if (seeds is null) return NotFound();
-
-                _context.Seeds.AddRange(seeds);
-                await _context.SaveChangesAsync();
-
-                //Map the seeds to the tournament
-                List<MapRoundSeedPlayer>? mappers = rrFactory.CreateMapping(r, seeds);
-                if (mappers is null) return NotFound();
-
-                _context.MapperRP.AddRange(mappers);
-                await _context.SaveChangesAsync();
-
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }
             return View("Create", new GroupViewModel(r, rrFactory));

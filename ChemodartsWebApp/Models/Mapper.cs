@@ -17,6 +17,11 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "ABC Gruppe")] public virtual Round Round { get; set; }
         [Display(Name = "ABC Seed")] public virtual Seed Seed { get; set; }
         [Display(Name = "ABC Spieler")] public virtual Player? Player { get; set; }
+
+        public override string ToString()
+        {
+            return $"[{TSP_Id}] {Seed.ToString()} mit {Player?.ToString()}";
+        }
     }
 
     [Table("map_round_venue")]

@@ -191,15 +191,30 @@ namespace ChemodartsWebApp.Controllers
 
         [HttpPost] //Kommt von Ajax
         [Authorize(Roles = "Administrator")]
-        public async Task<ActionResult> ReordedSeeds(int? tournamentId, int? roundId, int? seedId, List<int> itemOrder)
+        public async Task<ActionResult> ReordedSeeds(int? tournamentId, int? roundId, int? seedId, List<int> newSeedNrs)
         {
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
+            List<MapRoundSeedPlayer> oldMapping = r.MappedSeedsPlayers
+                .Select(m => new MapRoundSeedPlayer
+                {
+                    TSP_PlayerId = m.TSP_PlayerId,
+                    TSP_PlayerCheckedIn = m.TSP_PlayerCheckedIn,
+                    TSP_PlayerFixed = m.TSP_PlayerFixed,
+                    Seed = new Seed{ SeedName = m.Seed.SeedName, SeedNr = m.Seed.SeedNr }
+                }).ToList();
+
             int i = 0;
             foreach(Seed s in r.Seeds)
             {
-                s.MappedRoundSeedPlayer.TSP_PlayerId = itemOrder[i];
+                MapRoundSeedPlayer? oldMap = oldMapping.Find(m => m.Seed.SeedNr == newSeedNrs[i]);
+                if (oldMap is null) continue;
+
+                s.MappedRoundSeedPlayer.TSP_PlayerId = oldMap.TSP_PlayerId;
+                s.MappedRoundSeedPlayer.TSP_PlayerCheckedIn = oldMap.TSP_PlayerCheckedIn;
+                s.MappedRoundSeedPlayer.TSP_PlayerFixed = oldMap.TSP_PlayerFixed;
+                s.SeedName = oldMap.Seed.SeedName;
                 _context.Update(s.MappedRoundSeedPlayer);
                 i++;
             }

@@ -10,6 +10,7 @@ using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using ChemodartsWebApp.ViewModel;
 using ChemodartsWebApp.Data.Factory;
+using ChemodartsWebApp.ModelHelper;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -44,7 +45,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index), t);
             }
 
-            GroupFactoryRR.UpdateSeeds(r.Groups);
+            RoundRobinLogic.UpdateSeedsInRound(r);
             await _context.SaveChangesAsync();
 
             return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
@@ -63,13 +64,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index), t);
             }
 
-            //Delete all old matches
-            IEnumerable<Match> oldMatches = await _context.Matches.Where(m => m.Group.Round.TournamentId == tournamentId).ToListAsync();
-            _context.Matches.RemoveRange(oldMatches);
-
-            List<Match> newMatches = MatchFactory.CreateMatches(r);
-            _context.Matches.AddRange(newMatches);
-            await _context.SaveChangesAsync();
+            await RoundRobinLogic.RecreateAllMatches(_context, r);
 
             return RedirectToRoute("Match", new { controller = "Match", tournamentId = tournamentId, action = "Index", roundId = selectedRoundId });
         }

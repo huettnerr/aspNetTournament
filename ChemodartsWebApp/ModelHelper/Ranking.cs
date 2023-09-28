@@ -67,7 +67,7 @@ namespace ChemodartsWebApp.ModelHelper
                 if (m.Score == null) continue;
 
                 //Update Set/Leg Stat
-                if (m.Seed1.Player.Equals(p))
+                if (m.Seed1.Player?.Equals(p) ?? false)
                 {
                     //Won
                     stats.SetsWon += m.Score.P1Sets;
@@ -77,7 +77,7 @@ namespace ChemodartsWebApp.ModelHelper
                     stats.SetsLost += m.Score.P2Sets;
                     stats.LegsLost += m.Score.P2Legs;
                 }
-                else if (m.Seed2.Player.Equals(p))
+                else if (m.Seed2.Player?.Equals(p) ?? false)
                 {
                     //Won
                     stats.SetsWon += m.Score.P2Sets;
@@ -108,7 +108,7 @@ namespace ChemodartsWebApp.ModelHelper
             return;
         }
 
-        public static void UpdateSeedRanking(Group g)
+        public static void UpdateGroupRanking(Group g)
         {
             //Update Statistics
             g.Seeds.ToList().ForEach(s => CalculateSeedStatistics(s, g));

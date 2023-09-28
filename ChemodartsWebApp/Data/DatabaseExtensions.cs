@@ -21,9 +21,9 @@ namespace ChemodartsWebApp.Data
             return dbSet.FindAsync(id);
         }
 
-        public static async Task<T?> CreateWithFactory<T>(this DbSet<T> dbSet, ModelStateDictionary modelState, FactoryBase<T> factory) where T : class
+        public static async Task<T?> CreateWithFactory<T>(this DbSet<T> dbSet, ModelStateDictionary? modelState, FactoryBase<T> factory) where T : class
         {
-            if (!modelState.IsValid) return null;
+            if (!modelState?.IsValid ?? false) return null;
 
             T? created = factory.Create();
             if (created is null) return null;
@@ -34,10 +34,10 @@ namespace ChemodartsWebApp.Data
             return created;
         }
 
-        public static async Task<bool> EditWithFactory<T>(this DbSet<T> dbSet, int? id, ModelStateDictionary modelState, FactoryBase<T> factory) where T : class
+        public static async Task<bool> EditWithFactory<T>(this DbSet<T> dbSet, int? id, ModelStateDictionary? modelState, FactoryBase<T> factory) where T : class
         {
             //Check model state
-            if (!modelState.IsValid) return false;
+            if (!modelState?.IsValid ?? false) return false;
 
             //query database entry and try to update the values
             T? obj = await dbSet.QueryId(id);

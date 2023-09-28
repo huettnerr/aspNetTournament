@@ -52,53 +52,6 @@ namespace ChemodartsWebApp.Data.Factory
         {
             PlayersPerGroup = 0;
         }
-
-        public List<Seed>? CreateSeeds(Group? g)
-        {
-            if (g is null) return null;
-
-            List<Seed> seeds = new List<Seed>();
-            for (int i = 0; i < PlayersPerGroup; i++)
-            {
-                seeds.Add(new Seed()
-                {
-                    SeedNr = 0,
-                    SeedName = "Seed #0",
-                    GroupId = g.GroupId,
-                });
-            }
-
-            return seeds;
-        }
-
-        public static void UpdateSeeds(ICollection<Group> groups)
-        {
-            List<Seed> allSeeds = new List<Seed>();
-            groups.ToList().ForEach(g => allSeeds.AddRange(g.Seeds));
-
-            int seedNr = 1;
-            allSeeds.ForEach(s => { s.SeedNr = seedNr; s.SeedName = $"Seed #{seedNr}"; seedNr++; });
-        }
-
-        public List<MapRoundSeedPlayer>? CreateMapping(Round? r, List<Seed>? seeds)
-        {
-            if (r is null || seeds is null) return null;
-
-            List<MapRoundSeedPlayer> mtsps = new List<MapRoundSeedPlayer>();
-            foreach (Seed seed in seeds)
-            {
-                mtsps.Add(new MapRoundSeedPlayer()
-                {
-                    TSP_SeedId = seed.SeedId,
-                    TSP_RoundId = r.RoundId,
-                    TSP_PlayerCheckedIn = false,
-                    TSP_PlayerFixed = false,
-                    Player = null
-                }); ;
-            }
-
-            return mtsps;
-        }
     }
 
     public class GroupFactoryKO : GroupFactory

@@ -37,7 +37,7 @@ namespace ChemodartsWebApp.Controllers
             List<Match> matches = await _context.Matches.ToListAsync();
             foreach (Match match in matches)
             {
-                match.HandleNewStatus(match.Status);
+                match.SetNewStatus(match.Status);
             }
 
             _context.SaveChangesAsync();

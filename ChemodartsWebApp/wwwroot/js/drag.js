@@ -3,11 +3,11 @@
         handle: "td:not(.non-draggable)", // Specify the drag handles
         update: function (event, ui) {
             // Get the reordered item IDs and update the server
-            var itemOrder = $(this).sortable("toArray", { attribute: "data-id" });
+            var newSeedNrs = $(this).sortable("toArray", { attribute: "seed-nr" });
             $.ajax({
                 url: controllerUrl, // Adjust the URL
                 method: "POST",
-                data: { itemOrder: itemOrder },
+                data: { newSeedNrs: newSeedNrs },
                 success: function (response) {
                     if (response.redirect) {
                         // Handle the redirect
