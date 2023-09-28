@@ -11,45 +11,54 @@
 
 <h2>Direkter Vergleich</h2>
 <div>
-    <table class="table">
-        <tr>
-            <th><b>@Model.M.Seed1?.Player.CombinedName</b></th>
-            <th>vs.</th>
-            <th><b>@Model.M.Seed2?.Player.CombinedName</b></th>
-        </tr>
+    <table class="table table-center">
+        <colgroup>
+            <col style="width: 50%;">
+            <col style="width: auto;">
+            <col style="width: 50%;">
+        </colgroup>
+        <thead>
+            <tr>
+                <th><b>@Model.M.Seed1?.Player.CombinedName</b></th>
+                <th>vs.</th>
+                <th><b>@Model.M.Seed2?.Player.CombinedName</b></th>
+            </tr>
+        </thead>
+        <tbody>
         @if (Model.M.Group.Round.Modus != RoundModus.RoundRobin) {
             <tr>
                 <td>
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
-                        @Html.DisplayFor(model => model.M.Seed1.Group.GroupName)
+                        @Html.DisplayFor(model => model.M.Seed1.Group.GroupName) (<span>@Model.M.Seed1.SeedRank</span>. Platz)
                 </a></td>
                 @Html.DisplayFor(m => Model.M, "Match/Columns/MatchGroup", new { RenderType = "Header"})
                 <td>
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
-                        @Html.DisplayFor(model => model.M.Seed2.Group.GroupName)
+                        @Html.DisplayFor(model => model.M.Seed2.Group.GroupName) (<span>@Model.M.Seed2.SeedRank</span>. Platz)
                 </a></td>
             </tr>
         }
-         <tr>
-            <td><a cd-route="Seed" cd-action="Details" cd-route-seedId="@Model.M.Seed1.SeedId">Seed #@Model.M.Seed1.SeedId</a></td>
-            <td>Seed</td>
-            <td><a cd-route="Seed" cd-action="Details" cd-route-seedId="@Model.M.Seed2.SeedId">Seed #@Model.M.Seed2.SeedId</a></td>
-        </tr>
-         <tr>
-            <td><b>@Model.PC.StatsSeed.Statistics.MatchesWon</b> von @Model.PC.StatsSeed.Statistics.Matches</td>
-            <td>Siege</td>
-            <td><b>@(Model.PC.StatsSeed.Statistics.Matches - Model.PC.StatsSeed.Statistics.MatchesWon)</b> von @Model.PC.StatsSeed.Statistics.Matches</td>
-        </tr>
-         <tr>
-            <td><b>@Model.PC.StatsSeed.Statistics.PointsFor</b> von @(Model.PC.StatsSeed.Statistics.PointsFor + Model.PC.StatsSeed.Statistics.PointsAgainst)</td>
-            <td>Legs</td>
-            <td><b>@Model.PC.StatsSeed.Statistics.PointsAgainst</b> von @(Model.PC.StatsSeed.Statistics.PointsFor + Model.PC.StatsSeed.Statistics.PointsAgainst)</td>
-        </tr>
-         <tr>
-            <td><b>@Model.PC.StatsSeed.Statistics.PointsDiff</b></td>
-            <td>Leg Differenz</td>
-            <td><b>@(-Model.PC.StatsSeed.Statistics.PointsDiff)</b></td>
-        </tr>
+             <tr>
+                <td><a cd-route="Seed" cd-action="Details" cd-route-seedId="@Model.M.Seed1.SeedId">Seed #@Model.M.Seed1.SeedNr</a></td>
+                <td><b>Seed</b></td>
+                <td><a cd-route="Seed" cd-action="Details" cd-route-seedId="@Model.M.Seed2.SeedId">Seed #@Model.M.Seed2.SeedNr</a></td>
+            </tr>
+             <tr>
+                <td><b>@Model.PC.Statistics.MatchesWon</b> von @Model.PC.Statistics.Matches</td>
+                <td><b>Siege</b></td>
+                <td><b>@(Model.PC.Statistics.Matches - Model.PC.Statistics.MatchesWon)</b> von @Model.PC.Statistics.Matches</td>
+            </tr>
+             <tr>
+                <td><b>@Model.PC.Statistics.PointsFor</b> von @(Model.PC.Statistics.PointsFor + Model.PC.Statistics.PointsAgainst)</td>
+                <td><b>Legs</b></td>
+                <td><b>@Model.PC.Statistics.PointsAgainst</b> von @(Model.PC.Statistics.PointsFor + Model.PC.Statistics.PointsAgainst)</td>
+            </tr>
+             <tr>
+                <td><b>@Model.PC.Statistics.PointsDiff</b></td>
+                <td><b>Leg Differenz</b></td>
+                <td><b>@(-Model.PC.Statistics.PointsDiff)</b></td>
+            </tr>
+        </tbody>
     </table>
 </div>
 

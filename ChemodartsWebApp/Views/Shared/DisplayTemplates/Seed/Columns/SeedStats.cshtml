@@ -1,45 +1,45 @@
-﻿@model Seed
+﻿@model SeedStatistics
 
 @switch (ViewData["RenderType"])
 {
     case "Header":
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.Matches)
+            @Html.DisplayNameFor(model => model.Matches)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.MatchesWon)
+            @Html.DisplayNameFor(model => model.MatchesWon)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.MatchesLost)
+            @Html.DisplayNameFor(model => model.MatchesLost)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.PointsDiff)
+            @Html.DisplayNameFor(model => model.PointsDiff)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.PointsFor)
+            @Html.DisplayNameFor(model => model.PointsFor)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Statistics.PointsAgainst)
+            @Html.DisplayNameFor(model => model.PointsAgainst)
         </th>
         break;
     case "Content":
         <td>
-            @Html.DisplayFor(model => model.Statistics.Matches)
+            @Html.DisplayFor(model => model.Matches)
         </td> 
         <td>
-            @Html.DisplayFor(model => model.Statistics.MatchesWon)
+            @Html.DisplayFor(model => model.MatchesWon)
         </td>
         <td>
-            @Html.DisplayFor(model => model.Statistics.MatchesLost)
+            @Html.DisplayFor(model => model.MatchesLost)
         </td>
         <td>
-            @Html.DisplayFor(model => model.Statistics.PointsDiff)
+            @Html.DisplayFor(model => model.PointsDiff)
         </td>
         <td>
-            @Html.DisplayFor(model => model.Statistics.PointsFor)
+            @Html.DisplayFor(model => model.PointsFor)
         </td>
         <td>
-            @Html.DisplayFor(model => model.Statistics.PointsAgainst)
+            @Html.DisplayFor(model => model.PointsAgainst)
         </td>
         break;
     default:

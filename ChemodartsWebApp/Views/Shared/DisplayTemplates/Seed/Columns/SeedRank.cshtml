@@ -1,0 +1,17 @@
+﻿@model Seed
+
+@switch(ViewData["RenderType"])
+{
+    case "Header":
+        <th>
+            @Html.DisplayNameFor(model => model.SeedRank)
+        </th>
+        break;
+    case "Content":
+        <td>
+            <span>@Model.SeedRank</span>
+        </td>
+        break;
+    default:
+        goto case "Content";
+}

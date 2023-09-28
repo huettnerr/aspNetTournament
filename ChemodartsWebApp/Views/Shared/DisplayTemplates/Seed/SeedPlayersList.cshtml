@@ -47,7 +47,7 @@
                 <tbody>
                 @{int rank = 0;}
                 @foreach (var item in Model) {
-                    <tr data-id="@item.Player.PlayerId">
+                    <tr data-id="@item.Player?.PlayerId">
                         @Html.DisplayFor(m => item, "Seed/Columns/SeedPlayer", new { RenderType = "Content"})
                         @Html.DisplayFor(m => item, "Seed/Columns/SeedTournamentStatus", new { RenderType = "Content" })
                         @if (User.Identity.IsAuthenticated)@Html.DisplayFor(m => item, "Seed/Columns/SeedAdmin", new { RenderType = "Content" })

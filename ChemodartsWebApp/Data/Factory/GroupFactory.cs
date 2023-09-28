@@ -7,6 +7,7 @@ namespace ChemodartsWebApp.Data.Factory
     {
         public override string Controller { get; } = "Group";
         public string Name { get; set; }
+        public bool HasRematch { get; set; }
 
         [ScaffoldColumn(false)]
         public Round? R { get; set; }
@@ -17,6 +18,7 @@ namespace ChemodartsWebApp.Data.Factory
             if (g is object)
             {
                 Name = g.GroupName;
+                HasRematch = g.GroupHasRematch;
             }
             else
             {

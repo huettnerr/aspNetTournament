@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using ChemodartsWebApp.Data;
+using ChemodartsWebApp.ModelHelper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -60,20 +62,9 @@ namespace ChemodartsWebApp.Models
                 return res;
             }
         }
-
-        //[NotMapped]
-        //public SelectList AvailableVenues
-        //{
-        //    get => new SelectList(Group?.Round?.MappedVenues?.Select(mv => mv.Venue).Where(v => v?.Match is null), "VenueId", "VenueName", Venue is object ? "No Venue" : "Select Venue");
-        //}
-
         [NotMapped]
         [BindProperty]
         public MatchStatus? NewStatus { get; set; }
-
-
-        //[NotMapped][Display(Name = "Heim")] public virtual Player? Player1 { get => Seed1.Player; }
-        //[NotMapped][Display(Name = "Gast")] public virtual Player? Player2 { get => Seed2.Player; }
 
         public void HandleNewStatus(MatchStatus? newStatus)
         {
@@ -84,93 +75,11 @@ namespace ChemodartsWebApp.Models
                     break;
                 case MatchStatus.Finished: 
                     Venue = null;
-                    WinnerSeedId = HasSeedWon(Seed1) ? Seed1Id : Seed2Id;
                     break;
             }
 
-            if(newStatus != MatchStatus.Finished)
-            {
-                WinnerSeedId = null;
-            }
-        }
-
-        public bool UpdateSeedStat(Seed s, SeedStatistics stat)
-        {
-            if (this.Status != MatchStatus.Finished) return false;
-            if (this.Score == null) return false;
-
-            //Update Set/Leg Stat
-            if (this.Seed1.Equals(s))
-            {
-                //Won
-                stat.SetsWon += this.Score.P1Sets;
-                stat.LegsWon += this.Score.P1Legs;
-
-                //Lost
-                stat.SetsLost += this.Score.P2Sets;
-                stat.LegsLost += this.Score.P2Legs;
-            } 
-            else if (this.Seed2.Equals(s))
-            {
-                //Won
-                stat.SetsWon += this.Score.P2Sets;
-                stat.LegsWon += this.Score.P2Legs;
-
-                //Lost
-                stat.SetsLost += this.Score.P1Sets;
-                stat.LegsLost += this.Score.P1Legs;
-            } 
-            else return false;
-
-            //Update Winning Stat
-            stat.Matches++;
-            if (s.Equals(WinnerSeed))
-            {
-                stat.MatchesWon++;
-            }
-            else
-            {
-                stat.MatchesLost++;
-            }
-            return true;
-        }
-
-        public bool HasSeedWon(Seed s)
-        {
-            if (this.Status != MatchStatus.Finished) return false;
-
-            if(this.Score == null) return false;
-
-            if(this.Group.Round.Scoring == ScoreType.LegsOnly)
-            {
-                //Check for Legs
-                if (this.Score.P1Legs > this.Score.P2Legs)
-                {
-                    //Seed 1 won
-                    return s.Equals(this.Seed1) ? true : false;
-                }
-                else if (this.Score.P1Legs < this.Score.P2Legs)
-                {
-                    //Seed 2 won
-                    return s.Equals(this.Seed2) ? true : false;
-                }
-                return false;
-            }
-            else
-            {
-                //Check for Sets
-                if (this.Score.P1Sets > this.Score.P2Sets)
-                {
-                    //Player 1 won
-                    return s.Equals(this.Seed1) ? true : false;
-                }
-                else if (this.Score.P1Sets < this.Score.P2Sets)
-                {
-                    //Player 2 won
-                    return s.Equals(this.Seed2) ? true : false;
-                }
-                return false;
-            }
+            WinnerSeedId = Ranking.GetWinnerSeed(this)?.SeedId;
+            Ranking.UpdateSeedRanking(Group);
         }
 
         public bool IsMatchOfSeeds(Seed s1, Seed s2)

@@ -1,4 +1,5 @@
 ﻿@model ChemodartsWebApp.Models.Player
+@using ChemodartsWebApp.ModelHelper
 
 @{
     ViewData["Title"] = "Details";
@@ -57,17 +58,20 @@
         @{
             var dummySeed = Model.Seeds?.FirstOrDefault();
 
-            Seed seedAllMatches = new Seed();
-            seedAllMatches.Statistics = new SeedStatistics(ScoreType.LegsOnly);
-            Model.Seeds.ToList().ForEach(s => s.Matches.ToList().ForEach(m => m.UpdateSeedStat(s, seedAllMatches.Statistics)));
+            List<Match> matchesAll = new List<Match>();
+            Model.Seeds?.ToList().ForEach(s => matchesAll.AddRange(s.Matches));
+            SeedStatistics statsAll = new SeedStatistics();
+            statsAll.CalculateCombinedMatchStatistic(matchesAll, Model);
 
-            Seed seedRR = new Seed();
-            seedRR.Statistics = new SeedStatistics(ScoreType.LegsOnly);
-            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus == RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedRR.Statistics)));
+            List<Match> matchesRR = new List<Match>();
+            Model.Seeds?.ToList().ForEach(s => matchesRR.AddRange(s.Matches.Where(m => m.Group.Round.Modus == RoundModus.RoundRobin)));
+            SeedStatistics statsRR = new SeedStatistics();
+            statsRR.CalculateCombinedMatchStatistic(matchesAll, Model);
 
-            Seed seedKO = new Seed();
-            seedKO.Statistics = new SeedStatistics(ScoreType.LegsOnly);
-            Model.Seeds.ToList().ForEach(s => s.Matches.Where(m => m.Group.Round.Modus != RoundModus.RoundRobin).ToList().ForEach(m => m.UpdateSeedStat(s, seedKO.Statistics)));
+            List<Match> matchesKO = new List<Match>();
+            Model.Seeds?.ToList().ForEach(s => matchesKO.AddRange(s.Matches.Where(m => m.Group.Round.Modus != RoundModus.RoundRobin)));
+            SeedStatistics statsKO = new SeedStatistics();
+            statsKO.CalculateCombinedMatchStatistic(matchesAll, Model);
         }
         <table class="table">
             <thead>
@@ -79,15 +83,15 @@
             <tbody>
                 <tr>
                     <td>Alle Matches</td>
-                    @Html.DisplayFor(m => seedAllMatches, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+                    @Html.DisplayFor(m => statsAll, "Seed/Columns/SeedStats", new { RenderType = "Content" })
                 </tr>
                 <tr>
                     <td>Gruppenphase</td>
-                    @Html.DisplayFor(m => seedRR, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+                    @Html.DisplayFor(m => statsRR, "Seed/Columns/SeedStats", new { RenderType = "Content" })
                 </tr>
                 <tr>
                     <td>KO-Phase</td>
-                    @Html.DisplayFor(m => seedKO, "Seed/Columns/SeedStats", new { RenderType = "Content" })
+                    @Html.DisplayFor(m => statsKO, "Seed/Columns/SeedStats", new { RenderType = "Content" })
                 </tr>
             </tbody>
         </table>

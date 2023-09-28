@@ -47,6 +47,7 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<Match>().HasOne<Score>(m => m.Score).WithOne(s => s.Match).HasForeignKey<Score>(s => s.MatchId);
             modelBuilder.Entity<Match>().HasOne<Venue>(v => v.Venue).WithOne(m => m.Match).HasForeignKey<Match>(v => v.VenueId);
             modelBuilder.Entity<Seed>().HasOne<Match>(s => s.AncestorMatch).WithOne(m => m.WinnerSeedFollowUp).HasForeignKey<Seed>(s => s.AncestorMatchId);
+            modelBuilder.Entity<Seed>().HasOne<SeedStatistics>(s => s.SeedStatistics).WithOne(ss => ss.Seed).HasForeignKey<SeedStatistics>(ss => ss.SeedId);
 
             //Navigation Entries of mapped tables
 
