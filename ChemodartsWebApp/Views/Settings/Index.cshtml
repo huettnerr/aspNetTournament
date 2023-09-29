@@ -6,28 +6,53 @@
     int selectedRound2Id = 0;
 }
 
+<div style="color:red;">@ViewBag.UpdateMessage</div>
+
+<br />
+<br />
+
+
 <div>
-    <form asp-action="SettingsUpdateSeeds">
+    <form asp-action="StartRound">
+        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
+        <button type="submit">Start Round</button>
+    </form>
+</div>
+
+<br />
+<br />
+
+
+<div>
+    <form asp-action="FinishRound">
+        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
+        <button type="submit">Finish Round</button>
+    </form>
+</div>
+
+<br />
+<br />
+
+<div>
+    <form asp-action="UpdateSeeds">
         @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
         <button type="submit">Update Seeds of Round</button>
     </form>
-    <div style="color:red;">@ViewBag.UpdateSeedsMessage</div>
 </div>
 
 <br /><br />
 
 <div>
-    <form asp-action="SettingsRecreateMatches">
+    <form asp-action="RecreateMatches">
         @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
         <button type="submit">Recreate Matches of Round</button>
     </form>
-    <div style="color:red;">@ViewBag.RecreateMatchesMessage</div>
 </div>
 
 <br /><br />
 
 <div>
-    <form asp-action="SettingsUpdateKoFirstRound">
+    <form asp-action="UpdateKoFirstRound">
         @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select First Round")
         @Html.DropDownListFor(m => selectedRound2Id, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Second Round")
         <button type="submit">Update Second from First Round</button>
@@ -38,7 +63,7 @@
 <br /><br />
 
 <div>
-    <form asp-action="SettingsUpdateKoRound">
+    <form asp-action="UpdateKoRound">
         @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
         <button type="submit">Update KO Round</button>
     </form>

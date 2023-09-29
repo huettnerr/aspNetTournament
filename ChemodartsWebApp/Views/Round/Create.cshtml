@@ -11,6 +11,5 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        @await Html.PartialAsync("_factoryTemplate", Model.RF)
-    </div>
+        @Html.EditorFor(m => m.RF, "RoundFactory", "", ViewContext)
 </div>

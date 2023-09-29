@@ -21,7 +21,7 @@ namespace ChemodartsWebApp.ModelHelper
             List<Group> groups = new List<Group>();
             for (int roundNr = 0; roundNr <= factory.NumberOfRounds; roundNr++)
             {
-
+                //Make Groups
                 int playersInRound = 2 * getMatchesPerRound(factory.NumberOfRounds - roundNr);
                 Group g = new Group()
                 {

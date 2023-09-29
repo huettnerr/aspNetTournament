@@ -44,7 +44,7 @@ namespace ChemodartsWebApp.Controllers
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if(t is null) return NotFound();
 
-            RoundFactory rf = new RoundFactory("Create", null);
+            RoundFactory rf = new RoundFactory("Create", t, null);
             return View(new RoundViewModel(t, rf));
         }
 
@@ -76,7 +76,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            RoundFactory rf = new RoundFactory("Edit", r);
+            RoundFactory rf = new RoundFactory("Edit", r.Tournament, r);
             return View(new RoundViewModel(r.Tournament, rf));
         }
 

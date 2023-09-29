@@ -12,22 +12,26 @@ namespace ChemodartsWebApp.Data.Factory
         public ScoreType Scoring { get; set; }
         //public bool IsStarted { get; set; }
         //public bool IsFinished { get; set; }
+        public int? PreviousRoundId { get; set; }
 
 
         [ScaffoldColumn(false)]
         public Tournament? T { get; set; }
 
         public RoundFactory() { } //Needed for POST
-        public RoundFactory(string action, Round r) : base(action)
+        public RoundFactory(string action, Tournament t, Round? r) : base(action)
         {
+            T = t;
             if (r is object)
             {
                 Name = r.RoundName;
                 RoundModus = r.Modus;
                 Scoring = r.Scoring;
+                PreviousRoundId = r.PreviousRoundId;
                 //IsStarted = r.IsRoundStarted;
                 //IsFinished = r.IsRoundFinished;
             }
+            PreviousRoundId = 0;
         }
 
         public override Round? Create()
@@ -46,6 +50,7 @@ namespace ChemodartsWebApp.Data.Factory
             r.RoundName = Name;
             r.Modus = RoundModus;
             r.Scoring = Scoring.Equals(ScoreType.Default) ? ScoreType.LegsOnly : Scoring;
+            r.PreviousRoundId = PreviousRoundId;
             //r.IsRoundStarted = IsStarted;
             //r.IsRoundFinished = IsFinished;
         }

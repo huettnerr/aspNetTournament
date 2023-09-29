@@ -30,12 +30,15 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Typ")][Column("scoring")] public ScoreType Scoring { get; set; }
         [Display(Name = "Gestartet?")][Column("isStarted")] public bool IsRoundStarted { get; set; }
         [Display(Name = "Beendet?")][Column("isFinished")] public bool IsRoundFinished { get; set; }
+        [Display(Name = "Basiert auf")][Column("previousRoundId")] public int? PreviousRoundId { get; set; }
 
         //Navigation
         public virtual Tournament Tournament { get; set; }
         public virtual ICollection<Group> Groups { get; set; }
         public virtual ICollection<MapRoundVenue> MappedVenues { get; set; }
         public virtual ICollection<MapRoundSeedPlayer> MappedSeedsPlayers { get; set; }
+        public virtual Round? PreviousRound { get; set; }
+        public virtual Round? FollowingRound { get; set; }
 
         [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedSeedsPlayers.Select(msp => msp.Seed).OrderBy(s => s.SeedNr).ToList(); }
 

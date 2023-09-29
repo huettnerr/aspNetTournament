@@ -33,7 +33,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> SettingsUpdateSeeds(int? tournamentId, int selectedRoundId)
+        public async Task<IActionResult> StartRound(int? tournamentId, int selectedRoundId)
         {
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
@@ -41,7 +41,55 @@ namespace ChemodartsWebApp.Controllers
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
             if (r is null)
             {
-                ViewBag.UpdateSeedsMessage = "RoundId ungültig";
+                ViewBag.UpdateMessage = "RoundId ungültig";
+                return View(nameof(Index), new SettingsViewModel(t));
+            }
+
+            r.IsRoundStarted = true;
+            r.IsRoundFinished = false;
+            _context.Rounds.Update(r);
+
+            if (r.Modus == RoundModus.RoundRobin)
+            {
+                RoundRobinLogic.UpdateSeedsInRound(r);
+                RoundRobinLogic.UpdateMatchOrderInRound(r);
+            }
+            await _context.SaveChangesAsync();
+
+            return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> FinishRound(int? tournamentId, int selectedRoundId)
+        {
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            if (t is null) return NotFound();
+
+            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+            if (r is null)
+            {
+                ViewBag.UpdateMessage = "RoundId ungültig";
+                return View(nameof(Index), new SettingsViewModel(t));
+            }
+
+            r.IsRoundStarted = true;
+            r.IsRoundFinished = true;
+            _context.Rounds.Update(r);
+            await _context.SaveChangesAsync();
+
+            return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+        }
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> UpdateSeeds(int? tournamentId, int selectedRoundId)
+        {
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            if (t is null) return NotFound();
+
+            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+            if (r is null)
+            {
+                ViewBag.UpdateMessage = "RoundId ungültig";
                 return RedirectToAction(nameof(Index), t);
             }
 
@@ -53,7 +101,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> SettingsRecreateMatches(int? tournamentId, int selectedRoundId)
+        public async Task<IActionResult> RecreateMatches(int? tournamentId, int selectedRoundId)
         {
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
@@ -61,7 +109,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
             if (r is null)
             {
-                ViewBag.UpdateSeedsMessage = $"RoundId {selectedRoundId} ungültig";
+                ViewBag.UpdateMessage = $"RoundId {selectedRoundId} ungültig";
                 return RedirectToAction(nameof(Index), t);
             }
 
@@ -71,7 +119,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> SettingsUpdateKoFirstRound(int? tournamentId, int selectedRoundId, int selectedRound2Id)
+        public async Task<IActionResult> UpdateKoFirstRound(int? tournamentId, int selectedRoundId, int selectedRound2Id)
         {
             //KoFactory.UpdateFirstRoundSeeds(
             //    _context,
@@ -95,7 +143,7 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> SettingsUpdateKoRound(int? tournamentId, int selectedRoundId)
+        public async Task<IActionResult> UpdateKoRound(int? tournamentId, int selectedRoundId)
         {
             //Tournament? t = await queryId(tournamentId, _context.Tournaments);
             //if (t is null) return NotFound();
