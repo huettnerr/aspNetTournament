@@ -37,8 +37,8 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<Group> Groups { get; set; }
         public virtual ICollection<MapRoundVenue> MappedVenues { get; set; }
         public virtual ICollection<MapRoundSeedPlayer> MappedSeedsPlayers { get; set; }
-        public virtual Round? PreviousRound { get; set; }
-        public virtual Round? FollowingRound { get; set; }
+        [Display(Name = "Vorgänger")][DisplayFormat(NullDisplayText = "Keine")] public virtual Round? PreviousRound { get; set; }
+        public virtual ICollection<Round>? FollowingRounds { get; set; }
 
         [NotMapped] public virtual ICollection<Seed> Seeds { get => MappedSeedsPlayers.Select(msp => msp.Seed).OrderBy(s => s.SeedNr).ToList(); }
 

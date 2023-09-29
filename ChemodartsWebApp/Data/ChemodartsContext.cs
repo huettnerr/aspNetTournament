@@ -40,7 +40,7 @@ namespace ChemodartsWebApp.Data
             //Navigation for Database
             modelBuilder.Entity<Tournament>().HasMany<Round>(t => t.Rounds).WithOne(r => r.Tournament).HasForeignKey(r => r.TournamentId);
             modelBuilder.Entity<Round>().HasMany<Group>(r => r.Groups).WithOne(g => g.Round).HasForeignKey(g => g.RoundId);
-            modelBuilder.Entity<Round>().HasOne<Round>(r => r.PreviousRound).WithOne(r => r.FollowingRound).HasForeignKey<Round>(r => r.PreviousRoundId);
+            modelBuilder.Entity<Round>().HasOne<Round>(r => r.PreviousRound).WithMany(r => r.FollowingRounds).HasForeignKey(r => r.PreviousRoundId);
             modelBuilder.Entity<Group>().HasMany<Match>(g => g.Matches).WithOne(m => m.Group).HasForeignKey(m => m.GroupId);
             modelBuilder.Entity<Group>().HasMany<Seed>(g => g.Seeds).WithOne(s => s.Group).HasForeignKey(s => s.GroupId);
             modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed1).WithMany(p => p.MatchesAsS1).HasForeignKey(m => m.Seed1Id);

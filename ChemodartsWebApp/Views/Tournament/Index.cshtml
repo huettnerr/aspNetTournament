@@ -22,10 +22,10 @@
                 @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().IsRoundStarted)
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().PreviousRound)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().IsRoundFinished)
+                Status
             </th>
             @if (User.Identity.IsAuthenticated)
             {
@@ -48,10 +48,12 @@
                 @Html.DisplayFor(modelItem => item.Modus)
             </td>
             <td>
-                @(item.IsRoundStarted ? "Yes" : "No")
+                <a cd-route="Round" cd-route-roundId="@item.PreviousRound?.RoundId">
+                    @Html.DisplayFor(modelItem => item.PreviousRound.RoundName)
+                </a>
             </td>
             <td>
-                @(item.IsRoundFinished ? "Yes" : "No")
+                @(item.IsRoundFinished ? "Beendet" : item.IsRoundStarted ? "Läuft" : "Erstellt")
             </td>
             @if (User.Identity.IsAuthenticated)
             {
