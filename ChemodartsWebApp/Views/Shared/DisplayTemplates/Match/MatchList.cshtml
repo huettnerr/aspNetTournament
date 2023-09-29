@@ -20,6 +20,8 @@
                 @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchGroup", new { RenderType = "Header"})
             }
 
+            @if(User.Identity.IsAuthenticated) { <th>Order / Stage</th> }
+
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchPlayer", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchScore", new { RenderType = "Header"})
             @Html.DisplayFor(m => dummyMatch, "Match/Columns/MatchVenue", new { RenderType = "Header"})
@@ -35,7 +37,8 @@
         <tr id="Match_@item.MatchId">
             @if (showTournament) @Html.DisplayFor(m => item, "Match/Columns/MatchTournament", new { RenderType = "Content"})
             @if (showGroup) @Html.DisplayFor(m => item, "Match/Columns/MatchGroup", new { RenderType = "Content"})
-                    @if (User.Identity.IsAuthenticated && Context.Request.Query["editMatchId"].Equals(item.MatchId.ToString()))
+            @if(User.Identity.IsAuthenticated) { <th>@item.MatchOrderValue / @item.MatchStage</th> }
+            @if (User.Identity.IsAuthenticated && Context.Request.Query["editMatchId"].Equals(item.MatchId.ToString()))
             {
                     <form cd-route="Match" cd-action="Edit" cd-route-tournamentId="@item.Group.Round.TournamentId" cd-route-roundId="@item.Group.RoundId" cd-route-matchId="@item.MatchId">
                     @Html.DisplayFor(m => item, "Match/Columns/MatchPlayer", new { RenderType = "Content"})

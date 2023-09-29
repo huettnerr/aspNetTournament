@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using NuGet.Protocol.Plugins;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ChemodartsWebApp.Models
@@ -19,5 +20,10 @@ namespace ChemodartsWebApp.Models
 
         [NotMapped] public virtual ICollection<Seed> RankedSeeds {  get => Seeds.OrderBy(s => s.SeedRank).ToList(); }
         [NotMapped] public virtual ICollection<Match> OrderedMatches { get => Matches.OrderBy(m => m.MatchOrderValue).ToList(); }
+
+        public override string ToString()
+        {
+            return $"[{GroupId}] \"{GroupName}\"";
+        }
     }
 }

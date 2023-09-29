@@ -84,13 +84,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            koFactory.R = r;
-
-            _context.Groups.RemoveRange(r.Groups);
-            await _context.SaveChangesAsync();
-
-            //Create Groups
-            if (koFactory.CreateSystem(_context))
+            if (await RoundKoLogic.CreateSystem(_context, koFactory, r, ModelState))
             {
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }

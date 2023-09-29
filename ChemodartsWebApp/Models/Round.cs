@@ -26,8 +26,10 @@ namespace ChemodartsWebApp.Models
         [Key][Display(Name = "ID")][Column("roundId")] public int RoundId { get; set; }
         [Display(Name = "Turnier")][Column("tournamentId")] public int TournamentId { get; set; }
         [Display(Name = "Name")][Column("name")] public string RoundName { get; set; }
-        [Display(Name = "Typ")][Column("modus")] public RoundModus Modus { get; set; }
+        [Display(Name = "Modus")][Column("modus")] public RoundModus Modus { get; set; }
         [Display(Name = "Typ")][Column("scoring")] public ScoreType Scoring { get; set; }
+        [Display(Name = "Gestartet?")][Column("isStarted")] public bool IsRoundStarted { get; set; }
+        [Display(Name = "Beendet?")][Column("isFinished")] public bool IsRoundFinished { get; set; }
 
         //Navigation
         public virtual Tournament Tournament { get; set; }

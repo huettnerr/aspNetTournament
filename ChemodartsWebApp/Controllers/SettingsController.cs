@@ -46,6 +46,7 @@ namespace ChemodartsWebApp.Controllers
             }
 
             RoundRobinLogic.UpdateSeedsInRound(r);
+            RoundRobinLogic.UpdateMatchOrderInRound(r); 
             await _context.SaveChangesAsync();
 
             return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
@@ -88,7 +89,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index), t);
             }
 
-            GroupFactoryKO.UpdateFirstRoundSeeds(_context, r1, r2.Groups.ElementAt(0));
+            RoundKoLogic.UpdateFirstRoundSeeds(_context, r1, r2.Groups.ElementAt(0));
 
             return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r2.RoundId });
         }
@@ -113,7 +114,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
             if (r is null) return NotFound();
 
-            GroupFactoryKO.UpdateKoRoundSeeds(_context, r);
+            RoundKoLogic.UpdateKoRoundSeeds(_context, r);
 
             return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
         }

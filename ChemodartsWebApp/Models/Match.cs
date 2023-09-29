@@ -21,6 +21,7 @@ namespace ChemodartsWebApp.Models
 
         [Key][Display(Name = "ID")][Column("matchId")] public int MatchId { get; set; }
         [Column("matchOrderValue")] public int? MatchOrderValue { get; set; }
+        [Column("matchStage")] public int? MatchStage { get; set; } // Defines the
         [Display(Name = "GroupId")][Column("groupId")] public int GroupId { get; set; }
         [Column("seed1Id")] public int Seed1Id { get; set; }
         [Column("seed2Id")] public int Seed2Id { get; set; }
@@ -100,6 +101,11 @@ namespace ChemodartsWebApp.Models
             }
 
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"[{MatchStage}|{MatchOrderValue}] {Seed1.ToString()} vs. {Seed2.ToString()}";
         }
     }
 }

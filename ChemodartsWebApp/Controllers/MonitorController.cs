@@ -32,12 +32,13 @@ namespace ChemodartsWebApp.Controllers
             return NotFound();
         }
 
-        public async Task<IActionResult> UpdateStats()
+        public async Task<IActionResult> FinishRounds()
         {
-            List<Match> matches = await _context.Matches.ToListAsync();
-            foreach (Match match in matches)
+            List<Round> rounds = await _context.Rounds.ToListAsync();
+            foreach (Round round in rounds)
             {
-                match.SetNewStatus(match.Status);
+                round.IsRoundFinished= true;
+                round.IsRoundStarted= true;
             }
 
             _context.SaveChangesAsync();

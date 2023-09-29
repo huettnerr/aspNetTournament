@@ -10,6 +10,9 @@ namespace ChemodartsWebApp.Data.Factory
         public string Name { get; set; }
         public RoundModus RoundModus { get; set; }
         public ScoreType Scoring { get; set; }
+        //public bool IsStarted { get; set; }
+        //public bool IsFinished { get; set; }
+
 
         [ScaffoldColumn(false)]
         public Tournament? T { get; set; }
@@ -22,6 +25,8 @@ namespace ChemodartsWebApp.Data.Factory
                 Name = r.RoundName;
                 RoundModus = r.Modus;
                 Scoring = r.Scoring;
+                //IsStarted = r.IsRoundStarted;
+                //IsFinished = r.IsRoundFinished;
             }
         }
 
@@ -41,6 +46,8 @@ namespace ChemodartsWebApp.Data.Factory
             r.RoundName = Name;
             r.Modus = RoundModus;
             r.Scoring = Scoring.Equals(ScoreType.Default) ? ScoreType.LegsOnly : Scoring;
+            //r.IsRoundStarted = IsStarted;
+            //r.IsRoundFinished = IsFinished;
         }
     }
 }

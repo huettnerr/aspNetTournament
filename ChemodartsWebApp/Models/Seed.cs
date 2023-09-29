@@ -28,7 +28,7 @@ namespace ChemodartsWebApp.Models
 
         public override string ToString()
         {
-            return $"[{SeedId}] Seed #{SeedNr}: {SeedName} ({Player?.PlayerName})";
+            return $"[{SeedId}] \"{SeedName}\" ({Player?.ToString()})";
         }
     }
 }

@@ -21,6 +21,12 @@
             <th>
                 @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
             </th>
+            <th>
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().IsRoundStarted)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().IsRoundFinished)
+            </th>
             @if (User.Identity.IsAuthenticated)
             {
                 <th>Aktion</th>
@@ -40,6 +46,12 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Modus)
+            </td>
+            <td>
+                @(item.IsRoundStarted ? "Yes" : "No")
+            </td>
+            <td>
+                @(item.IsRoundFinished ? "Yes" : "No")
             </td>
             @if (User.Identity.IsAuthenticated)
             {
