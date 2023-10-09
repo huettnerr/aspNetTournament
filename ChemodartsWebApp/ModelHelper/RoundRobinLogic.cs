@@ -261,21 +261,23 @@ namespace ChemodartsWebApp.ModelHelper
         {
             List<Match> matches = new List<Match>();
 
-            List<Match> tmpList = GenerateRoundRobinMatchesCircleMethod(g.Seeds.ToList(), g.GroupHasRematch);
+            List<Match> tmpList = GenerateRoundRobinMatchesCircleMethod(g);
 
             tmpList.ForEach(m => {
                 m.GroupId = g.GroupId;
-                m.Status = Match.MatchStatus.Created;
             });
             matches.AddRange(tmpList);
 
             return matches;
         }
 
-        static List<Match> GenerateRoundRobinMatchesCircleMethod(List<Seed> seeds, bool allowRematches)
+        static List<Match> GenerateRoundRobinMatchesCircleMethod(Group? g)
         {
             List<Match> matches = new List<Match>();
 
+            if(g is null) return matches;
+
+            List<Seed> seeds = g.Seeds.ToList();
             int numTeams = seeds.Count % 2 == 0 ? seeds.Count : seeds.Count + 1; 
             int totalStages = numTeams - 1;
             int halfTeams = numTeams / 2;
@@ -292,7 +294,12 @@ namespace ChemodartsWebApp.ModelHelper
 
                     if (seed1Id >= 0 && seed2Id >= 0)
                     {
-                        matches.Add(new Match() { Seed1Id = seed1Id, Seed2Id = seed2Id, MatchStage = stage });
+                        matches.Add(new Match() { 
+                            GroupId = g.GroupId, 
+                            Seed1Id = seed1Id, 
+                            Seed2Id = seed2Id, 
+                            MatchStage = stage
+                        });
                     }
                 }
 
@@ -305,12 +312,17 @@ namespace ChemodartsWebApp.ModelHelper
                 seedIds[1] = temp;
             }
 
-            if (allowRematches)
+            if (g.GroupHasRematch)
             {
                 int matchCount = matches.Count;
                 for (int i = 0; i < matchCount; i++)
                 {
-                    matches.Add(new Match() { Seed1Id = matches[i].Seed2Id, Seed2Id = matches[i].Seed1Id, MatchStage = matches[i].MatchStage + totalStages });
+                    matches.Add(new Match() { 
+                        GroupId = g.GroupId,
+                        Seed1Id = matches[i].Seed2Id, 
+                        Seed2Id = matches[i].Seed1Id, 
+                        MatchStage = matches[i].MatchStage + totalStages
+                    });
                 }
             }
 

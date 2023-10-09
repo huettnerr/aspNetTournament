@@ -1,12 +1,18 @@
 ﻿@model Seed
 
-@if (Model.Player is object)
+@if (Model?.Player is object)
 {
     @Html.DisplayFor(m => Model.Player, "Player/Columns/PlayerName", new { RenderType = "Content", bold = ViewData["boldSeed"]})
 }
-else
+else if (Model is object)
 {
     <td>
-        @Model.SeedName
+        @Model?.SeedName
+    </td>
+}
+else 
+{
+    <td>
+        N/A
     </td>
 }

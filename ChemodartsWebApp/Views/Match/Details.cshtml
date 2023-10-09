@@ -19,9 +19,9 @@
         </colgroup>
         <thead>
             <tr>
-                <th><b>@Model.M.Seed1?.Player.CombinedName</b></th>
+                <th><b>@Model.M.Seed1?.Player?.CombinedName</b></th>
                 <th>vs.</th>
-                <th><b>@Model.M.Seed2?.Player.CombinedName</b></th>
+                <th><b>@Model.M.Seed2?.Player?.CombinedName</b></th>
             </tr>
         </thead>
         <tbody>
@@ -30,12 +30,14 @@
                 <td>
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
                         @Html.DisplayFor(model => model.M.Seed1.Group.GroupName) (<span>@Model.M.Seed1.SeedRank</span>. Platz)
-                </a></td>
+                    </a>
+                </td>
                 @Html.DisplayFor(m => Model.M, "Match/Columns/MatchGroup", new { RenderType = "Header"})
                 <td>
                     <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
                         @Html.DisplayFor(model => model.M.Seed2.Group.GroupName) (<span>@Model.M.Seed2.SeedRank</span>. Platz)
-                </a></td>
+                    </a>
+                </td>
             </tr>
         }
              <tr>
@@ -63,4 +65,7 @@
 </div>
 
 <h2>Historie</h2>
-@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", Model.PC?.MatchesBetween?.OrderBy(m => m.MatchId), new ViewDataDictionary(ViewData) { { "ShowTournament", "true" }, { "ShowGroup", "true" }})
+@{
+    IEnumerable<Match> orderedMatches = Model.PC?.MatchesBetween?.OrderBy(m => m.MatchId).ToList() ?? new List<Match>();
+}
+@await Html.PartialAsync("../Shared/DisplayTemplates/Match/MatchList", orderedMatches, new ViewDataDictionary(ViewData) { { "ShowTournament", "true" }, { "ShowGroup", "true" }})

@@ -58,10 +58,21 @@ namespace ChemodartsWebApp.Data.Factory
 
     public class GroupFactoryKO : GroupFactory
     {
-        public int NumberOfRounds { get; set; }
+        public int NumberOfPlayers { get; set; }
 
         public GroupFactoryKO() { } //Needed for POST
         public GroupFactoryKO(string action) : base(action, null)
+        {
+            NumberOfPlayers = 0;
+        }
+    }
+
+    public class OldGroupFactoryKO : GroupFactory
+    {
+        public int NumberOfRounds { get; set; }
+
+        public OldGroupFactoryKO() { } //Needed for POST
+        public OldGroupFactoryKO(string action) : base(action, null)
         {
             NumberOfRounds = 0;
         }

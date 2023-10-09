@@ -49,7 +49,8 @@ namespace ChemodartsWebApp.Controllers
                 case RoundModus.RoundRobin:
                     return View(new GroupViewModel(r, new GroupFactoryRR("CreateRR")));
                 case RoundModus.SingleKo:
-                    return View(new GroupViewModel(r, new GroupFactoryKO("CreateKO")));
+                    //return View(new GroupViewModel(r, new OldGroupFactoryKO("CreateKO")));
+                    return View(new GroupViewModel(r, new GroupFactoryKO("CreateKONew")));
                 default:
                     return NotFound();
             }
@@ -79,7 +80,26 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, GroupFactoryKO koFactory)
+        public async Task<IActionResult> CreateKONew(int? tournamentId, int? roundId, int? groupId, GroupFactoryKO koFactory)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
+            if (await RoundKoLogic.CreateSystemNew(_context, koFactory, r, ModelState))
+            {
+                return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+            }
+
+            return View("Create", new GroupViewModel(r, koFactory));
+        }
+
+        // POST: Players/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, OldGroupFactoryKO koFactory)
         {
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();

@@ -9,6 +9,7 @@ namespace ChemodartsWebApp.Models
     {
         [Key][Display(Name = "ID")][Column("groupId")] public int GroupId { get; set; }
         [Display(Name = "RoundID")][Column("roundId")] public int RoundId { get; set; }
+        [Column("groupOrderValue")] public int? GroupOrderValue { get; set; }
         [Required][Display(Name = "Gruppe")][Column("name")] public string GroupName { get; set; }
         [Display(Name = "Rückspiel")][Column("hasRematch")] public bool GroupHasRematch { get; set; }
 

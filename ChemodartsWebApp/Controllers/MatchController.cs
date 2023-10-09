@@ -63,7 +63,7 @@ namespace ChemodartsWebApp.Controllers
             Match? m = await _context.Matches.QueryId(matchId);
             if (m is null) return NotFound();
 
-            m.Status = Match.MatchStatus.Active;
+            m.SetNewStatus(Match.MatchStatus.Active);
             if (m.Score is null)
             {
                 Score score = ScoreFactory.CreateScore(m);
@@ -111,13 +111,13 @@ namespace ChemodartsWebApp.Controllers
                 m.Score.P1Legs = seed1Legs ?? 0;
                 m.Score.P2Legs = seed2Legs ?? 0;
 
-                if (newMatchStatus is object) { m.Status = newMatchStatus; }
-                //else { m.Status = Match.MatchStatus.Finished; }
+                if (newMatchStatus is object) 
+                {
+                    m.SetNewStatus(newMatchStatus.Value);
+                }
 
                 if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
                 m.Venue = await _context.Venues.QueryId(newVenueId);
-
-                m.SetNewStatus(m.Status);
 
                 await _context.SaveChangesAsync();
             }

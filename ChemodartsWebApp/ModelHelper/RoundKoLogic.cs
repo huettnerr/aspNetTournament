@@ -8,7 +8,127 @@ namespace ChemodartsWebApp.ModelHelper
 {
     public static class RoundKoLogic
     {
-        public static async Task<bool> CreateSystem(ChemodartsContext context, GroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
+        public static async Task<bool> CreateSystemNew(ChemodartsContext context, GroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
+        {
+            if (r is null || r.Modus != RoundModus.SingleKo || factory.NumberOfPlayers < 2) return false;
+
+            //Remove old system
+            context.Groups.RemoveRange(r.Groups);
+            await context.SaveChangesAsync();
+
+            //2P -> 1; 4P -> 2, 8P -> 3, ...
+            int numberOfStages = (int)Math.Ceiling(Math.Log2(factory.NumberOfPlayers));
+
+            //Stage 1 is the final, stage 2 the semi and so on
+            List<Match>? prevStageMatches = null;
+            int matchNr = 0;
+            for (int stageNr = numberOfStages; stageNr > 0; stageNr--) 
+            {
+                int numberOfPlayersInStage = getPlayersPerStage(stageNr);
+
+                //Make Group
+                Group g = new Group()
+                {
+                    RoundId = r.RoundId,
+                    GroupOrderValue = numberOfStages - stageNr,
+                    GroupName = $"{getGroupName(numberOfPlayersInStage)} of \"{r.RoundName}\"",
+                };
+                context.Groups.Add(g);
+                await context.SaveChangesAsync();
+
+                //Make Matches
+                int numberOfMatchesInStage = numberOfPlayersInStage / 2;
+                List<Match> matches = new List<Match>();
+                for (int matchStageNr = 0; matchStageNr < numberOfMatchesInStage; matchStageNr++)
+                {
+                    Match m = new Match()
+                    {
+                        GroupId = g.GroupId,
+                        MatchStage = stageNr,
+                        MatchOrderValue = ++matchNr,
+                    };
+                    matches.Add(m);
+                }
+                context.Matches.AddRange(matches);
+                await context.SaveChangesAsync(); //save to get matchIds
+
+                //register as follow up if not base stage
+                if (prevStageMatches is object && prevStageMatches.Count == 2 * matches.Count)
+                {
+                    for(int i=0; i<matches.Count;i++)
+                    {
+                        prevStageMatches[2*i].FollowUpMatchId = matches[i].MatchId;
+                        prevStageMatches[2*i + 1].FollowUpMatchId = matches[i].MatchId;
+                    }
+                    await context.SaveChangesAsync();
+                }
+
+                //store matches for next round
+                prevStageMatches = matches;
+
+                //Make seeds if neccesary
+                if (r.PreviousRound is null && stageNr == numberOfStages)
+                {
+                    List<Seed> seeds = new List<Seed>();
+                    for (int seedNr = 0; seedNr < factory.NumberOfPlayers; seedNr++)
+                    {
+                        Seed s = new Seed()
+                        {
+                            SeedName = $"KO-Seed #{seedNr}",
+                            GroupId = g.GroupId,
+                        };
+                        seeds.Add(s);
+                    }
+
+                    context.Seeds.AddRange(seeds);
+                    await context.SaveChangesAsync();
+
+                    Seed randomSeed;
+                    Random random = new Random();
+
+                    //Randomize 1st seed
+                    foreach(Match m in matches)
+                    {
+                        //Set seed 1
+                        randomSeed = seeds.ElementAt(random.Next(seeds.Count));
+                        m.Seed1Id = randomSeed.SeedId;
+                        seeds.Remove(randomSeed);
+                    }
+
+                    //Fill with bye's if necessary
+                    Seed byeSeed = new Seed() { SeedName = "Bye" };
+                    while (seeds.Count < numberOfMatchesInStage) seeds.Add(byeSeed);
+
+                    //Randomize 2nd seed
+                    foreach(Match m in matches)
+                    {
+                        //set seed 2
+                        randomSeed = seeds.ElementAt(random.Next(seeds.Count));
+                        seeds.Remove(randomSeed);
+
+                        //Handle bye seeds
+                        if (!randomSeed.Equals(byeSeed))
+                        {
+                            m.Seed2Id = randomSeed.SeedId;
+                        }
+                        else
+                        {
+                            m.SetNewStatus(Match.MatchStatus.Finished);
+                        }
+                    }
+
+                    await context.SaveChangesAsync();
+                }
+            }
+
+            //After creating this list should contain only the final. Updating it will recursivly update all matches
+            prevStageMatches?.FirstOrDefault()?.UpdateSeedsFromAcestors();
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public static async Task<bool> CreateSystem(ChemodartsContext context, OldGroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
         {
             if (r is null || r.Modus != RoundModus.SingleKo) return false;
 
@@ -22,7 +142,7 @@ namespace ChemodartsWebApp.ModelHelper
             for (int roundNr = 0; roundNr <= factory.NumberOfRounds; roundNr++)
             {
                 //Make Groups
-                int playersInRound = 2 * getMatchesPerRound(factory.NumberOfRounds - roundNr);
+                int playersInRound = 2 * getPlayersPerStage(factory.NumberOfRounds - roundNr);
                 Group g = new Group()
                 {
                     GroupName = getGroupName(playersInRound),
@@ -61,7 +181,7 @@ namespace ChemodartsWebApp.ModelHelper
 
                 //Make Matches
                 List<Match> matches = new List<Match>();
-                for (var iMatch = 0; iMatch < getMatchesPerRound(factory.NumberOfRounds - roundNr); iMatch++)
+                for (var iMatch = 0; iMatch < getPlayersPerStage(factory.NumberOfRounds - roundNr); iMatch++)
                 {
                     Match m = new Match()
                     {
@@ -69,7 +189,6 @@ namespace ChemodartsWebApp.ModelHelper
                         Seed2Id = seeds.ElementAt(2 * iMatch + 1).SeedId,
                         MatchOrderValue = iMatch,
                         GroupId = g.GroupId,
-                        Status = Match.MatchStatus.Created,
                     };
                     g.Matches.Add(m);
                     matches.Add(m);
@@ -120,27 +239,19 @@ namespace ChemodartsWebApp.ModelHelper
 
         public static void UpdateKoRoundSeeds(Data.ChemodartsContext context, Round r)
         {
-            for (int i = 1; i < r.Groups.Count; i++)
+            foreach(Group g in r.Groups)
             {
-                int matchNr = 0;
-                foreach (Match m in r.Groups.ElementAt(i).Matches)
+                foreach(Match m in g.Matches)
                 {
-                    Match mForS1 = r.Groups.ElementAt(i - 1).Matches.ElementAt(2 * matchNr);
-                    if (mForS1.WinnerSeed is object) m.Seed1Id = mForS1.WinnerSeed.SeedId;
-                    else m.Seed1.SeedName = $"{mForS1.Seed1.Player?.PlayerDartname ?? mForS1.Seed1.SeedName} | {mForS1.Seed2.Player?.PlayerDartname ?? mForS1.Seed2.SeedName}";
-
-                    Match mForS2 = r.Groups.ElementAt(i - 1).Matches.ElementAt(2 * matchNr + 1);
-                    if (mForS2.WinnerSeed is object) m.Seed2Id = mForS2.WinnerSeed.SeedId;
-                    else m.Seed2.SeedName = $"{mForS2.Seed1.Player?.PlayerDartname ?? mForS2.Seed1.SeedName} | {mForS2.Seed2.Player?.PlayerDartname ?? mForS2.Seed2.SeedName}";
-
-                    matchNr++;
+                    m.UpdateSeedsFromAcestors();
                 }
             }
 
             context.SaveChanges();
         }
 
-        private static int getMatchesPerRound(int depth)
+        // Gets the number of matches per stage (stage 1 is final, stage 2 is semi and so on)
+        private static int getPlayersPerStage(int depth)
         {
             return Convert.ToInt32(Math.Pow(2, depth));
         }

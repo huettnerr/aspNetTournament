@@ -11,8 +11,8 @@
         </th>
         break;
     case "Content":
-        @Html.DisplayFor(m => Model.Seed1, "Seed/Columns/SeedPlayerName", new { boldSeed = Model.Seed1.Equals(Model.WinnerSeed) ? "true" : null})
-        @Html.DisplayFor(m => Model.Seed2, "Seed/Columns/SeedPlayerName", new { boldSeed = Model.Seed2.Equals(Model.WinnerSeed) ? "true" : null})
+        @Html.DisplayFor(m => Model.Seed1, "Seed/Columns/SeedPlayerName", new { boldSeed = Model.IsWinnerSeed(Model.Seed1) ? "true" : null})
+        @Html.DisplayFor(m => Model.Seed2, "Seed/Columns/SeedPlayerName", new { boldSeed = Model.IsWinnerSeed(Model.Seed2) ? "true" : null})
         break;
     default:
         goto case "Content";

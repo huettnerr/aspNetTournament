@@ -46,7 +46,8 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed1).WithMany(p => p.MatchesAsS1).HasForeignKey(m => m.Seed1Id);
             modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed2).WithMany(p => p.MatchesAsS2).HasForeignKey(m => m.Seed2Id);
             modelBuilder.Entity<Match>().HasOne<Score>(m => m.Score).WithOne(s => s.Match).HasForeignKey<Score>(s => s.MatchId);
-            modelBuilder.Entity<Match>().HasOne<Venue>(v => v.Venue).WithOne(m => m.Match).HasForeignKey<Match>(v => v.VenueId);
+            modelBuilder.Entity<Match>().HasOne<Venue>(m => m.Venue).WithOne(m => m.Match).HasForeignKey<Match>(v => v.VenueId);
+            modelBuilder.Entity<Match>().HasOne<Match>(m => m.FollowUpMatch).WithMany(m => m.AncestorMatches).HasForeignKey(m => m.FollowUpMatchId);
             modelBuilder.Entity<Seed>().HasOne<Match>(s => s.AncestorMatch).WithOne(m => m.WinnerSeedFollowUp).HasForeignKey<Seed>(s => s.AncestorMatchId);
             modelBuilder.Entity<Seed>().HasOne<SeedStatistics>(s => s.SeedStatistics).WithOne(ss => ss.Seed).HasForeignKey<SeedStatistics>(ss => ss.SeedId);
 
