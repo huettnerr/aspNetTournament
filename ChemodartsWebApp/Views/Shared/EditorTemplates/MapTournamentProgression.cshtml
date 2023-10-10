@@ -1,0 +1,19 @@
+﻿@model MapTournamentProgression
+
+<div class="col-md-1">
+    <div class="row">
+        <label asp-for="@Model.ProgressionType"></label>
+        @Html.EditorFor(m => m.ProgressionType)
+    </div>
+    <div class="row">
+        <label asp-for="@Model.AdvanceCount"></label>
+        <input asp-for="@Model.AdvanceCount" />
+    </div>
+    <div class="row">
+        <label asp-for="@Model.ByeRoundCount"></label>
+        <input asp-for="@Model.ByeRoundCount" />
+    </div>
+    <input type="hidden" asp-for="@Model.TP_TournamentId" />
+    <input type="hidden" asp-for="@Model.TP_RoundId" />
+</div>
+

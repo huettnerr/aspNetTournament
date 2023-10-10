@@ -33,6 +33,19 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
+        [HttpGet]
+        public async Task<IActionResult> Progress(int? tournamentId, int? roundId)
+        {
+            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            if (t is null) return NotFound();
+
+            MapTournamentProgression ps = t.ProgressionRules?.FirstOrDefault();
+            if (ps is null) ps = new MapTournamentProgression();
+
+            return View(new TournamentProgressViewModel() { T = t, ProgressionSetting = ps });
+        }
+
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> StartRound(int? tournamentId, int selectedRoundId)
         {
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);

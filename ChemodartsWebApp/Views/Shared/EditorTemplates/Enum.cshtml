@@ -1,6 +1,8 @@
 ﻿@model Enum
 
-<div class="editor-field">
-    @Html.DropDownListFor(m => m, new SelectList(Enum.GetValues(Model.GetType())))
-    @Html.ValidationMessageFor(m => m)
-</div>
+@if(Model is object) {
+    <div class="editor-field">
+        @Html.DropDownListFor(m => m, new SelectList(Enum.GetValues(Model.GetType())))
+        @Html.ValidationMessageFor(m => m)
+    </div>
+}

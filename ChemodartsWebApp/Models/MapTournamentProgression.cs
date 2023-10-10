@@ -16,8 +16,8 @@ namespace ChemodartsWebApp.Models
         [Key][Column("tournamentId")] public int TP_TournamentId { get; set; }
         [Key][Column("roundId")] public int TP_RoundId { get; set; }
         [Display(Name = "Modus")][Column("progressionType")] public TournamentProgressionType ProgressionType { get; set; }
-        [Display(Name = "Qualifizierende Plätze")][Column("advanceCount")] public int AdvanceCount { get; set; }
-        [Display(Name = "Plätze mit Bye")][Column("byeRoundCount")] public int ByeRoundCount { get; set; }
+        [Display(Name = "Qualifikanten pro Gruppe")][Column("advanceCount")] public int AdvanceCount { get; set; } = 0;
+        [Display(Name = "Plätze mit Bye")][Column("byeRoundCount")] public int ByeRoundCount { get; set; } = 0;
 
         //Navigation
         public virtual Tournament Tournament { get; set; }
