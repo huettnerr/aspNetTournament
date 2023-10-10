@@ -12,7 +12,7 @@ namespace ChemodartsWebApp.Data.Factory
         public ScoreType Scoring { get; set; }
         //public bool IsStarted { get; set; }
         //public bool IsFinished { get; set; }
-        public int? PreviousRoundId { get; set; }
+        [Display(Name = "Folgerunde:")] public int? FollowUpRoundId { get; set; }
 
 
         [ScaffoldColumn(false)]
@@ -27,11 +27,11 @@ namespace ChemodartsWebApp.Data.Factory
                 Name = r.RoundName;
                 RoundModus = r.Modus;
                 Scoring = r.Scoring;
-                PreviousRoundId = r.PreviousRoundId;
+                FollowUpRoundId = r.FollowUpRoundId;
                 //IsStarted = r.IsRoundStarted;
                 //IsFinished = r.IsRoundFinished;
             }
-            PreviousRoundId = 0;
+            FollowUpRoundId = 0;
         }
 
         public override Round? Create()
@@ -50,7 +50,7 @@ namespace ChemodartsWebApp.Data.Factory
             r.RoundName = Name;
             r.Modus = RoundModus;
             r.Scoring = Scoring.Equals(ScoreType.Default) ? ScoreType.LegsOnly : Scoring;
-            r.PreviousRoundId = PreviousRoundId;
+            r.FollowUpRoundId = FollowUpRoundId;
             //r.IsRoundStarted = IsStarted;
             //r.IsRoundFinished = IsFinished;
         }

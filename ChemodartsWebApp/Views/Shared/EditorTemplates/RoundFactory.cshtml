@@ -10,13 +10,6 @@
     @Html.ValidationSummary(true)
 
     <div class="form-group">
-        @Html.LabelFor(m => m.PreviousRoundId)
-        @Html.DropDownListFor(m => m.PreviousRoundId, list, "Select Round")
-    </div>
-
-    <br />
-
-    <div class="form-group">
         @Html.LabelFor(m => m.Name)
         @Html.TextBoxFor(m => m.Name)
     </div>
@@ -29,6 +22,13 @@
     <div class="form-group">
         @Html.LabelFor(m => m.Scoring)
         @Html.EditorFor(m => m.Scoring)
+    </div>
+
+    //<br />
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.FollowUpRoundId)
+        @Html.DropDownListFor(m => m.FollowUpRoundId, list, "Select Round")
     </div>
 
     @Html.HiddenFor(m => m.Action)

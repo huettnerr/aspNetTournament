@@ -22,7 +22,7 @@
                 @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().PreviousRound)
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().FollowUpRound)
             </th>
             <th>
                 Status
@@ -48,8 +48,8 @@
                 @Html.DisplayFor(modelItem => item.Modus)
             </td>
             <td>
-                <a cd-route="Round" cd-route-roundId="@item.PreviousRound?.RoundId">
-                    @Html.DisplayFor(modelItem => item.PreviousRound.RoundName)
+                <a cd-route="Round" cd-route-roundId="@item.FollowUpRound?.RoundId">
+                    @Html.DisplayFor(modelItem => item.FollowUpRound.RoundName)
                 </a>
             </td>
             <td>

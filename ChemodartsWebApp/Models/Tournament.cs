@@ -12,6 +12,7 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Turnierbeginn")][DisplayFormat(NullDisplayText = "Nicht festgelegt")][DataType(DataType.DateTime)][Column("starttime")] public DateTime? TournamentStart { get; set; }
 
         //Navigation
-        public virtual ICollection<Round> Rounds { get; set; }
+        public virtual ICollection<Round>? Rounds { get; set; }
+        public virtual ICollection<MapTournamentProgression>? ProgressionRules { get; set; }
     }
 }

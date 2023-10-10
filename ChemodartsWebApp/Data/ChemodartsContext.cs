@@ -40,14 +40,15 @@ namespace ChemodartsWebApp.Data
             //Navigation for Database
             modelBuilder.Entity<Tournament>().HasMany<Round>(t => t.Rounds).WithOne(r => r.Tournament).HasForeignKey(r => r.TournamentId);
             modelBuilder.Entity<Round>().HasMany<Group>(r => r.Groups).WithOne(g => g.Round).HasForeignKey(g => g.RoundId);
-            modelBuilder.Entity<Round>().HasOne<Round>(r => r.PreviousRound).WithMany(r => r.FollowingRounds).HasForeignKey(r => r.PreviousRoundId);
+            modelBuilder.Entity<Round>().HasOne<Round>(r => r.FollowUpRound).WithMany(r => r.PreviousRounds).HasForeignKey(r => r.FollowUpRoundId);
             modelBuilder.Entity<Group>().HasMany<Match>(g => g.Matches).WithOne(m => m.Group).HasForeignKey(m => m.GroupId);
             modelBuilder.Entity<Group>().HasMany<Seed>(g => g.Seeds).WithOne(s => s.Group).HasForeignKey(s => s.GroupId);
             modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed1).WithMany(p => p.MatchesAsS1).HasForeignKey(m => m.Seed1Id);
             modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed2).WithMany(p => p.MatchesAsS2).HasForeignKey(m => m.Seed2Id);
             modelBuilder.Entity<Match>().HasOne<Score>(m => m.Score).WithOne(s => s.Match).HasForeignKey<Score>(s => s.MatchId);
             modelBuilder.Entity<Match>().HasOne<Venue>(m => m.Venue).WithOne(m => m.Match).HasForeignKey<Match>(v => v.VenueId);
-            modelBuilder.Entity<Match>().HasOne<Match>(m => m.FollowUpMatch).WithMany(m => m.AncestorMatches).HasForeignKey(m => m.FollowUpMatchId);
+            modelBuilder.Entity<Match>().HasOne<Match>(m => m.WinnerFollowUpMatch).WithMany(m => m.AncestorMatchesWinner).HasForeignKey(m => m.WinnerFollowUpMatchId);
+            modelBuilder.Entity<Match>().HasOne<Match>(m => m.LoserFollowUpMatch).WithMany(m => m.AncestorMatchesLoser).HasForeignKey(m => m.LoserFollowUpMatchId);
             modelBuilder.Entity<Seed>().HasOne<Match>(s => s.AncestorMatch).WithOne(m => m.WinnerSeedFollowUp).HasForeignKey<Seed>(s => s.AncestorMatchId);
             modelBuilder.Entity<Seed>().HasOne<SeedStatistics>(s => s.SeedStatistics).WithOne(ss => ss.Seed).HasForeignKey<SeedStatistics>(ss => ss.SeedId);
 
@@ -60,10 +61,15 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<MapRoundVenue>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedVenues).HasForeignKey(map => map.RVM_RoundId);
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);
 
+            modelBuilder.Entity<MapTournamentProgression>().HasKey(map => new { map.TP_TournamentId, map.TP_RoundId });
+            modelBuilder.Entity<MapTournamentProgression>().HasOne<Tournament>(map => map.Tournament).WithMany(t => t.ProgressionRules).HasForeignKey(map => map.TP_TournamentId);
+            modelBuilder.Entity<MapTournamentProgression>().HasOne<Round>(map => map.Round).WithOne(r => r.ProgressionRule).HasForeignKey<MapTournamentProgression>(map => map.TP_RoundId);
+
             //Converter for enums
             modelBuilder.Entity<Round>().Property(e => e.Modus).HasConversion(createValueConverter<RoundModus>());  
             modelBuilder.Entity<Round>().Property(e => e.Scoring).HasConversion(createValueConverter<ScoreType>());  
             modelBuilder.Entity<Match>().Property(e => e.Status).HasConversion(createValueConverter<Match.MatchStatus>());  
+            modelBuilder.Entity<MapTournamentProgression>().Property(e => e.ProgressionType).HasConversion(createValueConverter<MapTournamentProgression.TournamentProgressionType>());  
         }
 
         private ValueConverter createValueConverter<T>()

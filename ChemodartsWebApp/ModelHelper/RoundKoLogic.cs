@@ -8,7 +8,7 @@ namespace ChemodartsWebApp.ModelHelper
 {
     public static class RoundKoLogic
     {
-        public static async Task<bool> CreateSystemNew(ChemodartsContext context, GroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
+        public static async Task<bool> CreateSystemSingleKO(ChemodartsContext context, GroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
         {
             if (r is null || r.Modus != RoundModus.SingleKo || factory.NumberOfPlayers < 2) return false;
 
@@ -57,8 +57,8 @@ namespace ChemodartsWebApp.ModelHelper
                 {
                     for(int i=0; i<matches.Count;i++)
                     {
-                        prevStageMatches[2*i].FollowUpMatchId = matches[i].MatchId;
-                        prevStageMatches[2*i + 1].FollowUpMatchId = matches[i].MatchId;
+                        prevStageMatches[2*i].WinnerFollowUpMatchId = matches[i].MatchId;
+                        prevStageMatches[2*i + 1].WinnerFollowUpMatchId = matches[i].MatchId;
                     }
                     await context.SaveChangesAsync();
                 }
@@ -67,7 +67,7 @@ namespace ChemodartsWebApp.ModelHelper
                 prevStageMatches = matches;
 
                 //Make seeds if neccesary
-                if (r.PreviousRound is null && stageNr == numberOfStages)
+                if (r.FollowUpRound is null && stageNr == numberOfStages)
                 {
                     List<Seed> seeds = new List<Seed>();
                     for (int seedNr = 0; seedNr < factory.NumberOfPlayers; seedNr++)

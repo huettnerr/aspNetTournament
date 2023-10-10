@@ -35,7 +35,8 @@ namespace ChemodartsWebApp.Models
 
         [Display(Name = "Endzeit")][Column("time_finished")][DataType(DataType.DateTime)]
         public DateTime? TimeFinished { get; set; }
-        [Column("followUpMatchId")] public int? FollowUpMatchId { get; set; }
+        [Column("winnerFollowUpMatchId")] public int? WinnerFollowUpMatchId { get; set; }
+        [Column("loserFollowUpMatchId")] public int? LoserFollowUpMatchId { get; set; }
 
         //Navigation
         public virtual Venue? Venue { get; set; }
@@ -47,8 +48,12 @@ namespace ChemodartsWebApp.Models
         public virtual Seed? WinnerSeed { get; set; }
         public virtual Score? Score { get; set; }
         public virtual Seed? WinnerSeedFollowUp { get; set; }
-        public virtual Match? FollowUpMatch { get; set; }
-        public virtual ICollection<Match>? AncestorMatches { get; set; }
+
+        public virtual Match? WinnerFollowUpMatch { get; set; }
+        public virtual Match? LoserFollowUpMatch { get; set; }
+        public virtual ICollection<Match>? AncestorMatchesWinner { get; set; } = new List<Match>(); 
+        public virtual ICollection<Match>? AncestorMatchesLoser { get; set; } = new List<Match>();
+        [NotMapped] public ICollection<Match>? AncestorMatches { get { return AncestorMatchesWinner?.Concat(AncestorMatchesLoser)?.ToList(); } }
 
         //Helpers
         [NotMapped]
@@ -95,17 +100,17 @@ namespace ChemodartsWebApp.Models
 
         public void UpdateTopTierFollowUp()
         {
-            if(FollowUpMatch?.FollowUpMatch is object)
+            if(WinnerFollowUpMatch?.WinnerFollowUpMatch is object)
             {
                 //Follow Up is not the top tier
-                FollowUpMatch.UpdateTopTierFollowUp();
+                WinnerFollowUpMatch.UpdateTopTierFollowUp();
             }
             else
             {
-                if(FollowUpMatch is object)
+                if(WinnerFollowUpMatch is object)
                 {
                     //FollowUp os the top tier
-                    FollowUpMatch.UpdateSeedsFromAcestors();
+                    WinnerFollowUpMatch.UpdateSeedsFromAcestors();
                 }
                 else
                 {
@@ -118,13 +123,13 @@ namespace ChemodartsWebApp.Models
         //Recursivly updates from their ancestor matches
         public void UpdateSeedsFromAcestors()
         {
-            if (AncestorMatches?.Count == 2)
+            if (AncestorMatchesWinner?.Count == 2)
             {
-                Match am1 = AncestorMatches.OrderBy(m => m.MatchOrderValue).ElementAt(0);
+                Match am1 = AncestorMatchesWinner.OrderBy(m => m.MatchOrderValue).ElementAt(0);
                 this.updateSeedFromAncestor(this, am1, this.Seed1, out Seed s1New);
                 this.Seed1 = s1New;
 
-                Match am2 = AncestorMatches.OrderBy(m => m.MatchOrderValue).ElementAt(1);
+                Match am2 = AncestorMatchesWinner.OrderBy(m => m.MatchOrderValue).ElementAt(1);
                 this.updateSeedFromAncestor(this, am2, this.Seed2, out Seed s2New);
                 this.Seed2 = s2New;
             }
