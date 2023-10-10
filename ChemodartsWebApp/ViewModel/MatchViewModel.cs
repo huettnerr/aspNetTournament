@@ -3,37 +3,27 @@ using ChemodartsWebApp.Models;
 
 namespace ChemodartsWebApp.ViewModel
 {
-    public class MatchViewModel : RoundViewModel
+    public class MatchViewModel : GroupViewModel
     {
         private Match? _m;
         public Match? M {
             get => _m;
             set
             {
-                _m= value;
-                updateComparison(value);
+                _m = value;
+                if (_m is object) base.G = _m.Group;
+
+                updateComparison();
             } 
         }
         public IEnumerable<Match> Ms { get; set; }
         public PlayerComparison? PC { get; private set; }
 
-        public MatchViewModel(Match? m) : base(m?.Group.Round)
+        private void updateComparison()
         {
-            M = m;
-            Ms = new List<Match>();
-        }
-
-        public MatchViewModel(Round? round, IEnumerable<Match> matches, Match? m = null) : base(round)
-        {
-            M = m;  
-            Ms = matches;
-        }
-
-        private void updateComparison(Match? m)
-        {
-            if(m is object)
+            if(_m is object)
             {
-                PC = new PlayerComparison(m.Seed1.Player, m.Seed2.Player);
+                PC = new PlayerComparison(_m.Seed1?.Player, _m.Seed2?.Player);
             }
         }
     }

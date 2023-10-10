@@ -34,7 +34,7 @@ namespace ChemodartsWebApp.Controllers
                 .Where(v => !v.MappedRounds.Any(mr => mr.RVM_RoundId == roundId)).ToList();
             ViewBag.UnmappedVenueList = allUnmappedVenues;
 
-            return View(new VenueViewModel(venues, allUnmappedVenues, r));
+            return View(new VenueViewModel() { R = r, Vs = venues, UnmappedVs = allUnmappedVenues });
         }
 
         // GET Detailansicht
@@ -46,7 +46,7 @@ namespace ChemodartsWebApp.Controllers
             Venue? v = await _context.Venues.QueryId(venueId);
             if (v is null) return NotFound();
 
-            return View(new VenueViewModel(v, r));
+            return View(new VenueViewModel() { R = r, V = v});
         }
 
         [Authorize(Roles = "Administrator")]

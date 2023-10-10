@@ -27,7 +27,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            return View(new SeedViewModel(r) {  Ss = r.Seeds });
+            return View(new SeedViewModel() { R = r, Ss = r.Seeds });
         }
 
         public async Task<IActionResult> Details(int? tournamentId, int? roundId, int? seedId)
@@ -38,7 +38,7 @@ namespace ChemodartsWebApp.Controllers
             Seed? s = await _context.Seeds.QueryId(seedId);
             if (s is null) return NotFound();
 
-            return View(new SeedViewModel(r) { S = s });
+            return View(new SeedViewModel() { S = s });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -78,7 +78,7 @@ namespace ChemodartsWebApp.Controllers
             if (r is null) return NotFound();
 
             //Return the View
-            return View(new SeedViewModel(r) { Players = await getPlayersList(r), SelectedPlayerIds = new List<int>() });
+            return View(new SeedViewModel() { R = r, Players = await getPlayersList(r), SelectedPlayerIds = new List<int>() });
         }
 
         [HttpPost]
@@ -117,7 +117,7 @@ namespace ChemodartsWebApp.Controllers
                 }
 
                 ViewBag.Message = sb.ToString();
-                return View(new SeedViewModel(r) { Players = await getPlayersList(r), SelectedPlayerIds = new List<int>() });
+                return View(new SeedViewModel() { R = r, Players = await getPlayersList(r), SelectedPlayerIds = new List<int>() });
             }
 
             // Redirect or return a view as needed

@@ -25,11 +25,5 @@ namespace ChemodartsWebApp.Controllers
         {
             return View(new HomeViewModel());
         }
-        
-        public async Task<IActionResult> Tournaments(int? id)
-        {
-            List<Tournament> ts = await _context.Tournaments.ToListAsync();
-            return View(new HomeViewModel(ts));
-        }
     }
 }

@@ -32,12 +32,15 @@ namespace ChemodartsWebApp.Controllers
         {
             //search for spezific tournament
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null)
+            if (t is object)
             {
-                return NotFound();
+                return View("Details", new TournamentViewModel() { T = t });
             }
-
-            return View(new TournamentViewModel(t));
+            else
+            {
+                List<Tournament> ts = await _context.Tournaments.ToListAsync();
+                return View(new TournamentViewModel() { Ts = ts });
+            }
         }
 
         // GET: Tournament/Create
@@ -45,7 +48,7 @@ namespace ChemodartsWebApp.Controllers
         public IActionResult Create(int? tournamentId)
         {
             TournamentFactory tf = new TournamentFactory("Create", null);
-            return View(new TournamentViewModel(tf, null));
+            return View(new TournamentViewModel() {  TF = tf });
         }
 
         // POST: Players/Create
@@ -62,7 +65,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index), new { tournamentId = t.TournamentId });
             }
 
-            return View(new TournamentViewModel(factory, null));
+            return View(new TournamentViewModel() { TF = factory });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -72,7 +75,7 @@ namespace ChemodartsWebApp.Controllers
             if (t is null) return NotFound();
 
             TournamentFactory tf = new TournamentFactory("Edit", t);
-            return View(new TournamentViewModel(tf, t));
+            return View(new TournamentViewModel() { T = t, TF = tf });
         }
 
         [HttpPost]
@@ -86,7 +89,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index), new { tournamentId = tournamentId });
             }
 
-            return View(new TournamentViewModel(tournamentFactory, await _context.Tournaments.QueryId(tournamentId)));
+            return View(new TournamentViewModel() { T = await _context.Tournaments.QueryId(tournamentId), TF = tournamentFactory });
         }
 
         [Authorize(Roles = "Administrator")]

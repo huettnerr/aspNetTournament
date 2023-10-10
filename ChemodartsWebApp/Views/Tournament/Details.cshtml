@@ -1,0 +1,69 @@
+﻿@model TournamentViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+<div class="text-center">
+    <h1>@Model.T?.TournamentName</h1>
+</div>
+
+@if (User.Identity.IsAuthenticated){ <a cd-route="Round" cd-action="Create">Runde hinzufügen</a>  <hr />}
+
+<table class="table">
+    <thead>
+        <tr>
+            @*<th>
+                @Html.DisplayNameFor(model => model.RoundId)
+            </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().RoundName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().FollowUpRound)
+            </th>
+            <th>
+                Status
+            </th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th>Aktion</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.T?.Rounds) {
+        <tr>
+            @*<td>
+                @Html.DisplayFor(modelItem => item.RoundId)
+            </td>*@
+            <td>
+                <a cd-route="Round" cd-route-roundId="@item.RoundId">
+                    @Html.DisplayFor(modelItem => item.RoundName)
+                </a>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Modus)
+            </td>
+            <td>
+                <a cd-route="Round" cd-route-roundId="@item.FollowUpRound?.RoundId">
+                    @Html.DisplayFor(modelItem => item.FollowUpRound.RoundName)
+                </a>
+            </td>
+            <td>
+                @(item.IsRoundFinished ? "Beendet" : item.IsRoundStarted ? "Läuft" : "Erstellt")
+            </td>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+                        <a cd-route="Round" cd-action="Edit" cd-route-roundId="@item.RoundId">Edit</a>
+                        <span> | </span>
+                        <a cd-route="Round" cd-action="Delete" cd-route-roundId="@item.RoundId" onclick="return confirm('Are you sure?')">Delete</a>
+                </td>  
+            }
+        </tr>
+}
+    </tbody>
+</table>

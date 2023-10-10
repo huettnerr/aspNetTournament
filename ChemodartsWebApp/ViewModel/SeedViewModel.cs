@@ -5,15 +5,19 @@ namespace ChemodartsWebApp.ViewModel
 {
     public class SeedViewModel : RoundViewModel
     {
-        public Seed? S { get; set; }
+        private Seed? _s;
+        public Seed? S
+        {
+            get => _s;
+            set
+            {
+                _s = value;
+                if (_s != null) base.R = _s.Round;
+            }
+        }
+
         public IEnumerable<Seed>? Ss { get; set; }
         public MultiSelectList? Players { get; set; }
         public List<int>? SelectedPlayerIds { get; set; }
-
-        public SeedViewModel() { } //Needed for POST
-        public SeedViewModel(Round? r) : base(r) { }
-
-        //public SeedViewModel(IEnumerable<Seed> ss, Round? r) : base(r) => Ss = ss;
-        //public SeedViewModel(Round? r, IEnumerable<Player> asl) : base(r) => AddSeedList = asl;
     }
 }

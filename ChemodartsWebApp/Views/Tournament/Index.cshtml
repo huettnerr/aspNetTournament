@@ -3,29 +3,20 @@
 @{
     ViewData["Title"] = "Home Page";
 }
-<div class="text-center">
-    <h1>@Model.T?.TournamentName</h1>
-</div>
 
-@if (User.Identity.IsAuthenticated){ <a cd-route="Round" cd-action="Create">Runde hinzufügen</a>  <hr />}
+@if (User.Identity.IsAuthenticated){  <a cd-route="Tournament" cd-action="Create">Turnier erstellen</a> <hr /> }
 
 <table class="table">
     <thead>
         <tr>
             @*<th>
-                @Html.DisplayNameFor(model => model.RoundId)
+                @Html.DisplayNameFor(model => model.TournamentId)
             </th>*@
             <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().RoundName)
+                @Html.DisplayNameFor(model => model.Ts.First().TournamentName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().FollowUpRound)
-            </th>
-            <th>
-                Status
+                @Html.DisplayNameFor(model => model.Ts.First().TournamentStart)
             </th>
             @if (User.Identity.IsAuthenticated)
             {
@@ -34,35 +25,27 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model.T?.Rounds) {
+@foreach (var item in Model.Ts) {
         <tr>
             @*<td>
-                @Html.DisplayFor(modelItem => item.RoundId)
+                @Html.DisplayFor(modelItem => item.TournamentId)
             </td>*@
             <td>
-                <a cd-route="Round" cd-route-roundId="@item.RoundId">
-                    @Html.DisplayFor(modelItem => item.RoundName)
+                    <a cd-route="Tournament" cd-route-tournamentId="@item.TournamentId" cd-action="Index">
+                    @Html.DisplayFor(modelItem => item.TournamentName)
                 </a>
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Modus)
+                @Html.DisplayFor(modelItem => item.TournamentStart)
             </td>
-            <td>
-                <a cd-route="Round" cd-route-roundId="@item.FollowUpRound?.RoundId">
-                    @Html.DisplayFor(modelItem => item.FollowUpRound.RoundName)
-                </a>
-            </td>
-            <td>
-                @(item.IsRoundFinished ? "Beendet" : item.IsRoundStarted ? "Läuft" : "Erstellt")
-            </td>
-            @if (User.Identity.IsAuthenticated)
-            {
-                <td>
-                        <a cd-route="Round" cd-action="Edit" cd-route-roundId="@item.RoundId">Edit</a>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <td>
+                        <a cd-route="Tournament" cd-action="Edit" cd-route-tournamentId="@item.TournamentId">Edit</a>
                         <span> | </span>
-                        <a cd-route="Round" cd-action="Delete" cd-route-roundId="@item.RoundId" onclick="return confirm('Are you sure?')">Delete</a>
-                </td>  
-            }
+                        <a cd-route="Tournament" cd-action="Delete" cd-route-tournamentId="@item.TournamentId" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>  
+                }
         </tr>
 }
     </tbody>

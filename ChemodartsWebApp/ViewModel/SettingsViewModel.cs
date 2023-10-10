@@ -5,6 +5,6 @@ namespace ChemodartsWebApp.ViewModel
 {
     public class SettingsViewModel : TournamentViewModel
     {
-        public SettingsViewModel(Tournament? t) : base(t) { }
+
     }
 }

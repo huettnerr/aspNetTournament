@@ -5,15 +5,16 @@ namespace ChemodartsWebApp.ViewModel
 {
     public class RoundViewModel : TournamentViewModel
     {
-        public Round? R { get; set; }
-        public RoundFactory? RF { get; set; }
-
-        public RoundViewModel() { } //Needed for POST
-        public RoundViewModel(Round? r) : base(r?.Tournament)
-        {
-            R = r;
+        private Round? _r;
+        public Round? R { 
+            get => _r;
+            set
+            {
+                _r = value;
+                if (_r is object) base.T = _r.Tournament;
+            } 
         }
 
-        public RoundViewModel(Tournament tournament, RoundFactory rf) : base(tournament) => RF = rf;
+        public RoundFactory? RF { get; set; }
     }
 }

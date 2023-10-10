@@ -41,7 +41,7 @@ namespace ChemodartsWebApp.Controllers
                 matches = matches.Where(m => m.Status == Match.MatchStatus.Created || m.Status == Match.MatchStatus.Active).ToList();
             }
 
-            return View(new MatchViewModel(r, matches.OrderBy(m => m.MatchOrderValue)));
+            return View(new MatchViewModel() { R = r, Ms = matches.OrderBy(m => m.MatchOrderValue) });
         }
 
         // GET: Players/Details/5
@@ -54,7 +54,7 @@ namespace ChemodartsWebApp.Controllers
                 return NotFound();
             }
 
-            return View(new MatchViewModel(m));
+            return View(new MatchViewModel() { M = m });
         }
 
         [Authorize(Roles = "Administrator")]

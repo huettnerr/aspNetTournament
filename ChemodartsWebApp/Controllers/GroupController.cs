@@ -33,7 +33,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                return View(new GroupViewModel(g));
+                return View(new GroupViewModel() { G = g });
             }
         }
 
@@ -47,10 +47,10 @@ namespace ChemodartsWebApp.Controllers
             switch(r.Modus)
             {
                 case RoundModus.RoundRobin:
-                    return View(new GroupViewModel(r, new GroupFactoryRR("CreateRR")));
+                    return View(new GroupViewModel() { R = r, GF = new GroupFactoryRR("CreateRR") });
                 case RoundModus.SingleKo:
                     //return View(new GroupViewModel(r, new OldGroupFactoryKO("CreateKO")));
-                    return View(new GroupViewModel(r, new GroupFactoryKO("CreateKONew")));
+                    return View(new GroupViewModel() { R = r, GF = new GroupFactoryKO("CreateKONew") });
                 default:
                     return NotFound();
             }
@@ -71,7 +71,7 @@ namespace ChemodartsWebApp.Controllers
             {
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }
-            return View("Create", new GroupViewModel(r, rrFactory));
+            return View("Create", new GroupViewModel() { R = r, GF = rrFactory });
         }
 
         // POST: Players/Create
@@ -90,7 +90,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }
 
-            return View("Create", new GroupViewModel(r, koFactory));
+            return View("Create", new GroupViewModel() { R = r, GF = koFactory });
         }
 
         // POST: Players/Create
@@ -109,7 +109,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }
 
-            return View("Create", new GroupViewModel(r, koFactory));
+            return View("Create", new GroupViewModel() { R = r, GF = koFactory });
         }
 
         // GET: Players/Edit/5
@@ -119,7 +119,7 @@ namespace ChemodartsWebApp.Controllers
             Group? g = await _context.Groups.QueryId(groupId);
             if (g is null) return NotFound();
 
-            return View(new GroupViewModel(g, new GroupFactory("Edit", g)));
+            return View(new GroupViewModel() { G = g, GF = new GroupFactory("Edit", g) });
         }
 
         // POST: Players/Edit/5
@@ -138,7 +138,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToRoute("Round", new { tournamentId = tournamentId, roundId = roundId, action = "Index" });
             }
 
-            return View(new GroupViewModel(g, groupFactory));
+            return View(new GroupViewModel() { G = g, GF = groupFactory });
         }
 
         [Authorize(Roles = "Administrator")]

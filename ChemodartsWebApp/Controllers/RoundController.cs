@@ -33,7 +33,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                return View(new RoundViewModel(r));
+                return View(new RoundViewModel() { R = r });
             }
         }
 
@@ -45,7 +45,7 @@ namespace ChemodartsWebApp.Controllers
             if(t is null) return NotFound();
 
             RoundFactory rf = new RoundFactory("Create", t, null);
-            return View(new RoundViewModel(t, rf));
+            return View(new RoundViewModel() { T = t, RF = rf });
         }
 
         // POST: Rounds/Create
@@ -67,7 +67,7 @@ namespace ChemodartsWebApp.Controllers
                 //return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
             }
 
-            return View(new RoundViewModel(t, roundFactory));
+            return View(new RoundViewModel() { T = t, RF = roundFactory });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -77,7 +77,7 @@ namespace ChemodartsWebApp.Controllers
             if (r is null) return NotFound();
 
             RoundFactory rf = new RoundFactory("Edit", r.Tournament, r);
-            return View(new RoundViewModel(r.Tournament, rf));
+            return View(new RoundViewModel() { T = r.Tournament, RF = rf });
         }
 
         [HttpPost]
@@ -94,7 +94,7 @@ namespace ChemodartsWebApp.Controllers
                 //return RedirectToAction(nameof(Index), new { roundId = r.RoundId });
             }
 
-            return View(new RoundViewModel(t, roundFactory));
+            return View(new RoundViewModel() { T = t, RF = roundFactory });
         }
 
         [Authorize(Roles = "Administrator")]

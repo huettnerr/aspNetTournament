@@ -25,7 +25,7 @@ namespace ChemodartsWebApp.Controllers
         // GET: Players
         public async Task<IActionResult> Index(int? playerId)
         {
-              return View(new PlayerViewModel(await _context.Players.ToListAsync()));
+              return View(new PlayerViewModel() { Ps = await _context.Players.ToListAsync() });
         }
 
         // GET: Players/Details/5
@@ -34,7 +34,7 @@ namespace ChemodartsWebApp.Controllers
             Player? p = await _context.Players.QueryId(playerId);
             if (p is null) return NotFound();
 
-            return View(new PlayerViewModel(p));
+            return View(new PlayerViewModel() { P = p });
         }
 
         // GET: Players/Create
@@ -42,7 +42,7 @@ namespace ChemodartsWebApp.Controllers
         public IActionResult Create()
         {
             PlayerFactory pf = new PlayerFactory("Create", null);
-            return View(new PlayerViewModel(pf));
+            return View(new PlayerViewModel() { PF = pf});
         }
 
         // POST: Players/Create
@@ -58,7 +58,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index), new { playerId = p.PlayerId });
             }
 
-            return View(new PlayerViewModel(playerFactory));
+            return View(new PlayerViewModel() { PF = playerFactory });
         }
 
         // GET: Players/Edit/5
@@ -69,7 +69,7 @@ namespace ChemodartsWebApp.Controllers
             if (p is null) return NotFound();
 
             PlayerFactory pf = new PlayerFactory("Edit", p);
-            return View(new PlayerViewModel(pf));
+            return View(new PlayerViewModel() { PF = pf });
         }
 
         // POST: Players/Edit/5
@@ -85,7 +85,7 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToAction(nameof(Index)/*, new { playerId = playerId }*/);
             }
 
-            return View(new PlayerViewModel(playerFactory));
+            return View(new PlayerViewModel() { PF = playerFactory });
         }
 
         // GET: Players/Delete/5
@@ -95,7 +95,7 @@ namespace ChemodartsWebApp.Controllers
             Player? p = await _context.Players.QueryId(playerId);
             if (p is null) return NotFound();
 
-            return View(new PlayerViewModel(p));
+            return View(new PlayerViewModel() { P = p });
         }
 
         // POST: Players/Delete/5

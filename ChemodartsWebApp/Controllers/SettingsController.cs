@@ -29,7 +29,7 @@ namespace ChemodartsWebApp.Controllers
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
             if (t is null) return NotFound();
 
-            return View(new SettingsViewModel(t));
+            return View(new SettingsViewModel() { T = t });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -42,7 +42,7 @@ namespace ChemodartsWebApp.Controllers
             if (r is null)
             {
                 ViewBag.UpdateMessage = "RoundId ungültig";
-                return View(nameof(Index), new SettingsViewModel(t));
+                return View(nameof(Index), new SettingsViewModel() { T = t });
             }
 
             r.IsRoundStarted = true;
@@ -69,7 +69,7 @@ namespace ChemodartsWebApp.Controllers
             if (r is null)
             {
                 ViewBag.UpdateMessage = "RoundId ungültig";
-                return View(nameof(Index), new SettingsViewModel(t));
+                return View(nameof(Index), new SettingsViewModel() { T = t });
             }
 
             r.IsRoundStarted = true;
