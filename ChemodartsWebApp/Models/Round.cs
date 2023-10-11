@@ -8,8 +8,9 @@ namespace ChemodartsWebApp.Models
     public enum RoundModus
     {
         [Display(Name = "Gruppenphase")] RoundRobin,
-        [Display(Name = "Einfach KO")] SingleKo,
-        [Display(Name = "Doppel KO")] DoubleKo
+        [Display(Name = "Einfach-KO")] SingleKo,
+        [Display(Name = "Doppel-KO")] DoubleKo,
+        [Display(Name = "Rangliste")] Ranking
     }
 
     public enum ScoreType

@@ -26,13 +26,23 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> Index(int? tournamentId)
+        public async Task<IActionResult> Index(int? tournamentId, int? roundId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is object)
+            {
+                return View(new SettingsViewModel() { R = r });
+            }
+            else
+            {
+                Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+                if (t is null) return NotFound();
 
-            return View(new SettingsViewModel() { T = t });
+                return View(new SettingsViewModel() { T = t });
+            }
         }
+
+        #region Progressions
 
         [Authorize(Roles = "Administrator")]
         [HttpGet]
@@ -42,19 +52,6 @@ namespace ChemodartsWebApp.Controllers
             if (r is null) return NotFound();
 
             return View(new SettingsViewModel() { R = r });
-        }
-
-        [Authorize(Roles = "Administrator")]
-        [HttpGet]
-        public async Task<IActionResult> DeleteProgression(int? tournamentId, int? roundId, int? mrpId)
-        {
-            MapRoundProgression? rp = await _context.MapperRP.QueryId(mrpId);
-            if (rp is null) return NotFound();
-
-            _context.MapperRP.Remove(rp);
-            await _context.SaveChangesAsync();
-
-            return this.RedirectToPreviousPage();
         }
 
         [Authorize(Roles = "Administrator")]
@@ -94,18 +91,27 @@ namespace ChemodartsWebApp.Controllers
             return this.RedirectToPreviousPage(new Dictionary<string, string>() {{ editQuery, newMrp.TP_MrpMapId.ToString() }}, $"MRP_{newMrp.TP_MrpMapId}");
         }
 
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> StartRound(int? tournamentId, int selectedRoundId)
-        {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
 
-            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
-            if (r is null)
-            {
-                ViewBag.UpdateMessage = "RoundId ungültig";
-                return View(nameof(Index), new SettingsViewModel() { T = t });
-            }
+        [Authorize(Roles = "Administrator")]
+        [HttpGet]
+        public async Task<IActionResult> DeleteProgression(int? tournamentId, int? roundId, int? mrpId)
+        {
+            MapRoundProgression? rp = await _context.MapperRP.QueryId(mrpId);
+            if (rp is null) return NotFound();
+
+            _context.MapperRP.Remove(rp);
+            await _context.SaveChangesAsync();
+
+            return this.RedirectToPreviousPage();
+        }
+
+        #endregion
+
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> StartRound(int? tournamentId, int roundId)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
             r.IsRoundStarted = true;
             r.IsRoundFinished = false;
@@ -122,24 +128,30 @@ namespace ChemodartsWebApp.Controllers
         }
 
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> FinishRound(int? tournamentId, int selectedRoundId)
+        public async Task<IActionResult> FinishRound(int? tournamentId, int roundId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+            //Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+            //if (t is null) return NotFound();
 
-            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
-            if (r is null)
+            Round? r =await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
+            ProgressionManager pm = new ProgressionManager(_context);
+            if(await pm.ManageAll(r))
             {
-                ViewBag.UpdateMessage = "RoundId ungültig";
-                return View(nameof(Index), new SettingsViewModel() { T = t });
+
+                r.IsRoundStarted = true;
+                //r.IsRoundFinished = true;
+                _context.Rounds.Update(r);
+                await _context.SaveChangesAsync();
+
+                int newRoundId = r.ProgressionRulesAsBase.FirstOrDefault()?.TargetRound?.RoundId ?? roundId;
+                return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = newRoundId });
             }
-
-            r.IsRoundStarted = true;
-            r.IsRoundFinished = true;
-            _context.Rounds.Update(r);
-            await _context.SaveChangesAsync();
-
-            return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+            else
+            {
+                return this.RedirectToPreviousPage();
+            }
         }
 
         [Authorize(Roles = "Administrator")]

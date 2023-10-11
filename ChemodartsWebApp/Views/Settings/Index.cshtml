@@ -10,27 +10,26 @@
 
 <br />
 
-<a cd-route="Settings" cd-action="Progressions">Progressing Settings</a>
-
-<br />
-
-<div>
-    <form asp-action="StartRound">
-        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
-        <button type="submit">Start Round</button>
-    </form>
-</div>
+<button><a cd-route="Settings" cd-action="Progressions">Progressing Settings</a></button>
 
 <br />
 <br />
 
-
-<div>
-    <form asp-action="FinishRound">
-        @Html.DropDownListFor(m => selectedRoundId, new SelectList(Model.T.Rounds, "RoundId", "RoundName"), "Select Round")
-        <button type="submit">Finish Round</button>
-    </form>
-</div>
+@if(Model.R is object)
+{
+    @if (!Model.R.IsRoundStarted)
+    {
+        <button><a cd-route="Settings" cd-action="StartRound">Start Round</a></button>
+    }
+    else if (!Model.R.IsRoundFinished)
+    {
+        <button><a cd-route="Settings" cd-action="FinishRound">Finish Round</a></button>
+    }
+    else
+    {
+        <span>Runde beendet</span>
+    }
+}
 
 <br />
 <br />

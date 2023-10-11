@@ -8,16 +8,16 @@ namespace ChemodartsWebApp.ModelHelper
 {
     public static class RoundKoLogic
     {
-        public static async Task<bool> CreateSystemSingleKO(ChemodartsContext context, GroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
+        public static async Task<bool> CreateSystemSingleKO(ChemodartsContext context, Round r, int numberOfPlayers, bool createSeeds)
         {
-            if (r is null || r.Modus != RoundModus.SingleKo || factory.NumberOfPlayers < 2) return false;
+            if (r is null || r.Modus != RoundModus.SingleKo || numberOfPlayers < 2) return false;
 
             //Remove old system
             context.Groups.RemoveRange(r.Groups);
             await context.SaveChangesAsync();
 
             //2P -> 1; 4P -> 2, 8P -> 3, ...
-            int numberOfStages = (int)Math.Ceiling(Math.Log2(factory.NumberOfPlayers));
+            int numberOfStages = (int)Math.Ceiling(Math.Log2(numberOfPlayers));
 
             //Stage 1 is the final, stage 2 the semi and so on
             List<Match>? prevStageMatches = null;
@@ -67,10 +67,10 @@ namespace ChemodartsWebApp.ModelHelper
                 prevStageMatches = matches;
 
                 //Make seeds if neccesary
-                if (r.ProgressionRulesAsTarget?.Count == 0 && stageNr == numberOfStages)
+                if (createSeeds && stageNr == numberOfStages)
                 {
                     List<Seed> seeds = new List<Seed>();
-                    for (int seedNr = 0; seedNr < factory.NumberOfPlayers; seedNr++)
+                    for (int seedNr = 0; seedNr < numberOfPlayers; seedNr++)
                     {
                         Seed s = new Seed()
                         {
@@ -83,40 +83,8 @@ namespace ChemodartsWebApp.ModelHelper
                     context.Seeds.AddRange(seeds);
                     await context.SaveChangesAsync();
 
-                    Seed randomSeed;
-                    Random random = new Random();
-
-                    //Randomize 1st seed
-                    foreach(Match m in matches)
-                    {
-                        //Set seed 1
-                        randomSeed = seeds.ElementAt(random.Next(seeds.Count));
-                        m.Seed1Id = randomSeed.SeedId;
-                        seeds.Remove(randomSeed);
-                    }
-
-                    //Fill with bye's if necessary
-                    Seed byeSeed = new Seed() { SeedName = "Bye" };
-                    while (seeds.Count < numberOfMatchesInStage) seeds.Add(byeSeed);
-
-                    //Randomize 2nd seed
-                    foreach(Match m in matches)
-                    {
-                        //set seed 2
-                        randomSeed = seeds.ElementAt(random.Next(seeds.Count));
-                        seeds.Remove(randomSeed);
-
-                        //Handle bye seeds
-                        if (!randomSeed.Equals(byeSeed))
-                        {
-                            m.Seed2Id = randomSeed.SeedId;
-                        }
-                        else
-                        {
-                            m.SetNewStatus(Match.MatchStatus.Finished);
-                        }
-                    }
-
+                    matches = RandomizeSeedsForMatches(matches, seeds);
+                    context.Matches.UpdateRange(matches);
                     await context.SaveChangesAsync();
                 }
             }
@@ -126,6 +94,45 @@ namespace ChemodartsWebApp.ModelHelper
             await context.SaveChangesAsync();
 
             return true;
+        }
+
+        public static List<Match> RandomizeSeedsForMatches(List<Match> matches, List<Seed> seeds)
+        {
+            Seed randomSeed;
+            Random random = new Random();
+
+            //Randomize 1st seed
+            foreach (Match m in matches)
+            {
+                //Set seed 1
+                randomSeed = seeds.ElementAt(random.Next(seeds.Count));
+                m.Seed1Id = randomSeed.SeedId;
+                seeds.Remove(randomSeed);
+            }
+
+            //Fill with bye's if necessary
+            Seed byeSeed = new Seed() { SeedName = "Bye" };
+            while (seeds.Count < matches.Count) seeds.Add(byeSeed);
+
+            //Randomize 2nd seed
+            foreach (Match m in matches)
+            {
+                //set seed 2
+                randomSeed = seeds.ElementAt(random.Next(seeds.Count));
+                seeds.Remove(randomSeed);
+
+                //Handle bye seeds
+                if (!randomSeed.Equals(byeSeed))
+                {
+                    m.Seed2Id = randomSeed.SeedId;
+                }
+                else
+                {
+                    m.SetNewStatus(Match.MatchStatus.Finished);
+                }
+            }
+
+            return matches;
         }
 
         public static async Task<bool> CreateSystem(ChemodartsContext context, OldGroupFactoryKO factory, Round r, ModelStateDictionary? modelState)

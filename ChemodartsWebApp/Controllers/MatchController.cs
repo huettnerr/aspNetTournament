@@ -121,6 +121,7 @@ namespace ChemodartsWebApp.Controllers
                 if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
                 m.Venue = await _context.Venues.QueryId(newVenueId);
 
+                _context.Matches.Update(m);
                 await _context.SaveChangesAsync();
             }
 
