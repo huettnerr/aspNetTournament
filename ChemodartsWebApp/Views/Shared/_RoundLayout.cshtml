@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Runde";
     Layout = "~/Views/Shared/_TournamentLayout.cshtml";
+    SettingsViewModel? setvm = Model as SettingsViewModel;
     SeedViewModel? svm = Model as SeedViewModel;
     GroupViewModel? gvm = Model as GroupViewModel;
     MatchViewModel? mvm = Model as MatchViewModel;
@@ -25,6 +26,13 @@
     @{
         //<span> > </span>
         //<a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.T.TournamentId">Runden</a>
+
+        
+        if (setvm is object)
+        {
+            <span> > </span>
+            <a cd-route="Settings" cd-action="Index">Settings</a>
+        }
 
         if(Model.R is object)
         {

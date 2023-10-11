@@ -1,0 +1,19 @@
+﻿@model MapRoundProgression
+
+<td>
+    @if(Model.TargetRound is object)
+    {
+        <a cd-route="Round" cd-action="Details" cd-route-roundId="@Model.TargetRound?.RoundId">@Html.DisplayFor(m => m.TargetRound.RoundName)</a>
+    }else{
+        <span>N/A</span>
+    }
+</td>
+<td>
+    @Html.DisplayFor(m => m.ProgressionType)
+</td>
+<td>
+    @Html.DisplayFor(m => m.AdvanceCount)
+</td>
+<td>
+    @Html.DisplayFor(m => m.ByeCount)
+</td>

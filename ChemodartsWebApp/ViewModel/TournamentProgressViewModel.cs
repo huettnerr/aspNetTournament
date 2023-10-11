@@ -7,6 +7,6 @@ namespace ChemodartsWebApp.ViewModel
 {
     public class TournamentProgressViewModel : RoundViewModel
     {
-        public MapTournamentProgression? ProgressionSetting { get; set; }
+        public MapRoundProgression? ProgressionSetting { get; set; }
     }
 }

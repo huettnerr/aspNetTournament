@@ -2,8 +2,10 @@
 
 @{
     ViewData["Title"] = "Home Page";
+    Layout = "~/Views/Shared/_MasterLayout.cshtml";
 }
 
+<br />
 @if (User.Identity.IsAuthenticated){  <a cd-route="Tournament" cd-action="Create">Turnier erstellen</a> <hr /> }
 
 <table class="table">
@@ -31,7 +33,7 @@
                 @Html.DisplayFor(modelItem => item.TournamentId)
             </td>*@
             <td>
-                    <a cd-route="Tournament" cd-route-tournamentId="@item.TournamentId" cd-action="Index">
+                    <a cd-route="Tournament" cd-action="Details" cd-route-tournamentId="@item.TournamentId">
                     @Html.DisplayFor(modelItem => item.TournamentName)
                 </a>
             </td>

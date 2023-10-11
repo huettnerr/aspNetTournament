@@ -3,7 +3,7 @@ using ChemodartsWebApp.Data.Factory;
 
 namespace ChemodartsWebApp.ViewModel
 {
-    public class SettingsViewModel : TournamentViewModel
+    public class SettingsViewModel : RoundViewModel
     {
 
     }

@@ -17,6 +17,8 @@ namespace ChemodartsWebApp.Controllers
     {
         private readonly ChemodartsContext _context;
 
+        private const string editQuery = "editMatchId";
+
         public MatchController(ChemodartsContext context)
         {
             _context = context;
@@ -72,7 +74,7 @@ namespace ChemodartsWebApp.Controllers
 
             await _context.SaveChangesAsync();
 
-            return RedirectToPreviousPage(matchId);
+            return this.RedirectToPreviousPage(fragment: $"Match_{matchId}");
         }
 
         [Authorize(Roles = "Administrator")]
@@ -94,7 +96,7 @@ namespace ChemodartsWebApp.Controllers
                 ViewBag.Message = "Kein freies Board gefunden";
             }
 
-            return RedirectToPreviousPage(matchId);
+            return this.RedirectToPreviousPage(fragment: $"Match_{matchId}");
         }
 
         [HttpPost]
@@ -122,32 +124,7 @@ namespace ChemodartsWebApp.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPreviousPage(matchId, true);
-        }
-
-        private const string editQuery = "editMatchId";
-        private ActionResult RedirectToPreviousPage(int? fragmentId, bool removeEdit = false)
-        {
-            //Uri uri = new Uri(HttpContext.Request.Headers.Referer);
-            UriBuilder uriBuilder = new UriBuilder(HttpContext.Request.Headers.Referer);
-
-            if(fragmentId is object)
-            {
-                uriBuilder.Fragment = $"Match_{fragmentId}";
-            }
-
-            if(removeEdit)
-            {
-                var queryDictionary = System.Web.HttpUtility.ParseQueryString(uriBuilder.Query);
-                var id = queryDictionary[editQuery];
-                if (id is object)
-                {
-                    queryDictionary.Remove(editQuery);
-                }
-                uriBuilder.Query = queryDictionary.ToString();
-            }
-
-            return Redirect(uriBuilder.Uri.AbsoluteUri);
+            return this.RedirectToPreviousPage(fragment: $"Match_{matchId}", editQueryStringToRemove: editQuery);
         }
     }
 }

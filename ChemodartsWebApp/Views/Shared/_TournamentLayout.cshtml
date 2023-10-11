@@ -5,8 +5,6 @@
     Layout = "~/Views/Shared/_MasterLayout.cshtml";
 
     string tournamentName = Model.T?.TournamentName ?? $"Turnier ID '{ViewContext.RouteData?.Values["tournamentId"]?.ToString()}'";
-
-    SettingsViewModel? setvm = Model as SettingsViewModel;
 }
 
 @section MainNavigationAdditions {
@@ -16,7 +14,7 @@
         </a>
         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li class="nav-item">
-                <a cd-route="Tournament" cd-action="Index" class="nav-link text-dark">Übersicht</a>
+                <a cd-route="Tournament" cd-action="Index" cd-clear="tournamentId" class="nav-link text-dark">Übersicht</a>
             </li>
             @if (User.Identity.IsAuthenticated){ 
                 <li class="nav-item">
@@ -30,17 +28,11 @@
 }
 
 <span>
-    <a asp-controller="Home" asp-action="Tournaments">Turniere</a>
+    <a cd-route="Tournament" cd-action="Index" cd-clear="tournamentId">Turniere</a>
     @if (Model.T is object)
     {
         <span> > </span>
-        <a cd-route="Tournament" cd-action="Index" cd-route-tournamentId="@Model.T.TournamentId">"@Model.T.TournamentName"</a>
-
-        if (setvm is object)
-        {
-            <span> > </span>
-            <a cd-route="Settings" cd-action="Index">Settings</a>
-        }
+        <a cd-route="Tournament" cd-action="Details" cd-route-tournamentId="@Model.T.TournamentId">"@Model.T.TournamentName"</a>
 
         @await RenderSectionAsync("TournamentHierarchyAdditions", required: false)
     }

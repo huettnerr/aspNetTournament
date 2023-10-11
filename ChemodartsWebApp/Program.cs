@@ -76,7 +76,7 @@ app.MapControllerRoute(
 //Settings Controller
 app.MapControllerRoute(
     name: "Settings",
-    pattern: "Tournament/{tournamentId}/Settings/{action}/{id:int?}",
+    pattern: "Tournament/{tournamentId}/Settings/{action}/Round/{roundId:int?}",
     defaults: new { controller = "Settings", action = "Index" });
 
 //Seed Controller

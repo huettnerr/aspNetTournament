@@ -67,7 +67,7 @@ namespace ChemodartsWebApp.ModelHelper
                 prevStageMatches = matches;
 
                 //Make seeds if neccesary
-                if (r.FollowUpRound is null && stageNr == numberOfStages)
+                if (r.ProgressionRulesAsTarget?.Count == 0 && stageNr == numberOfStages)
                 {
                     List<Seed> seeds = new List<Seed>();
                     for (int seedNr = 0; seedNr < factory.NumberOfPlayers; seedNr++)

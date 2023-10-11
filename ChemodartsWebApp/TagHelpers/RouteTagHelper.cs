@@ -12,25 +12,33 @@ namespace ChemodartsWebApp.TagHelpers
 {
     [HtmlTargetElement("a", Attributes = ActionAttributeName)]
     [HtmlTargetElement("a", Attributes = RouteAttributeName)]
+    [HtmlTargetElement("a", Attributes = ClearAttributeName)]
     [HtmlTargetElement("a", Attributes = RouteValuesDictionaryName)]
     [HtmlTargetElement("a", Attributes = RouteValuesPrefix + "*")]
+    [HtmlTargetElement("a", Attributes = FragmentAttributeName)]
     [HtmlTargetElement("form", Attributes = ActionAttributeName)]
     [HtmlTargetElement("form", Attributes = RouteAttributeName)]
+    [HtmlTargetElement("form", Attributes = ClearAttributeName)]
     [HtmlTargetElement("form", Attributes = RouteValuesDictionaryName)]
     [HtmlTargetElement("form", Attributes = RouteValuesPrefix + "*")]
     public class RouteTagHelper : TagHelper
     {
         private const string ActionAttributeName = "cd-action";
         private const string RouteAttributeName = "cd-route";
+        private const string ClearAttributeName = "cd-clear";
         private const string RouteValuesDictionaryName = "cd-all-route-data";
         private const string RouteValuesPrefix = "cd-route-";
         private IDictionary<string, string> _routeValues;
+        private const string FragmentAttributeName = "cd-fragment";
 
         [HtmlAttributeName(ActionAttributeName)]
         public string Action { get; set; }
 
         [HtmlAttributeName(RouteAttributeName)]
         public string RouteName { get; set; }
+
+        [HtmlAttributeName(ClearAttributeName)]
+        public string ClearName { get; set; }
 
         [HtmlAttributeName(RouteValuesDictionaryName, DictionaryAttributePrefix = RouteValuesPrefix)]
         public IDictionary<string, string> RouteValues
@@ -49,6 +57,9 @@ namespace ChemodartsWebApp.TagHelpers
                 _routeValues = value;
             }
         }
+
+        [HtmlAttributeName(FragmentAttributeName)]
+        public string Fragment { get; set; }
 
         [HtmlAttributeNotBound]
         [ViewContext]
@@ -80,7 +91,7 @@ namespace ChemodartsWebApp.TagHelpers
 
             ViewContext.RouteData.Values.ToList().ForEach(rd =>
             {
-                if (!IsRouteAttributeAllowed(RouteName, rd.Key)) return; 
+                if (!RouteContraints.IsRouteAttributeAllowed(RouteName, rd.Key) || rd.Key.Equals(ClearName)) return; 
                 if (RouteValues.ContainsKey(rd.Key)) return;
 
                 RouteValues.Add(new KeyValuePair<string, string>(rd.Key.ToString(), rd.Value?.ToString() ?? ""));
@@ -92,7 +103,7 @@ namespace ChemodartsWebApp.TagHelpers
                 RouteValues.Add(new KeyValuePair<string, string>("action", Action));
             }
 
-            string url = _urlHelper.RouteUrl(RouteName, RouteValues);
+            string url = _urlHelper.RouteUrl(RouteName, RouteValues, null, null, Fragment);
 
             if(context.TagName.Equals("a")) 
             {
@@ -107,30 +118,6 @@ namespace ChemodartsWebApp.TagHelpers
             {
                 Console.WriteLine(context.TagName);
             }
-        }
-
-
-        private static Dictionary<string, List<string>> ALLOWED_ROUTE_ATTRIBUTES = new Dictionary<string, List<string>>()
-        {
-            { "Players", new List<string>() { "action", "playerId" } },
-            { "Tournament", new List<string>() { "action", "tournamentId", "" } },
-            { "Round", new List<string>() { "action", "tournamentId", "roundId" } },
-            { "Settings", new List<string>() { "action", "tournamentId", "id" } },
-            { "Seed", new List<string>() { "action", "tournamentId", "roundId", "seedId" } },
-            { "Group", new List<string>() { "action", "tournamentId", "roundId", "groupId" } },
-            { "Match", new List<string>() { "action", "tournamentId", "roundId", "matchId", "showAll", "editMatchId" } },
-            { "Venue", new List<string>() { "action", "tournamentId", "roundId", "venueId" } },
-        };
-
-        private static bool IsRouteAttributeAllowed(string routeName, string attributeName)
-        {
-            if (!ALLOWED_ROUTE_ATTRIBUTES.ContainsKey(routeName))
-            {
-                //Route has no restrictions 
-                return true;
-            }
-
-            return ALLOWED_ROUTE_ATTRIBUTES[routeName].Contains(attributeName);
         }
     }
 }

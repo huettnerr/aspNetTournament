@@ -188,7 +188,7 @@ namespace ChemodartsWebApp.ModelHelper
                 List<MapRoundSeedPlayer>? mappers = createMapping(r, seeds);
                 if (mappers is null) throw new ArgumentNullException();
 
-                context.MapperRP.AddRange(mappers);
+                context.MapperRSP.AddRange(mappers);
                 await context.SaveChangesAsync();   
 
                 //create the matches

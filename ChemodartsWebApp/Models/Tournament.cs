@@ -13,6 +13,5 @@ namespace ChemodartsWebApp.Models
 
         //Navigation
         public virtual ICollection<Round>? Rounds { get; set; }
-        public virtual ICollection<MapTournamentProgression>? ProgressionRules { get; set; }
     }
 }

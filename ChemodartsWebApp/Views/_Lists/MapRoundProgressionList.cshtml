@@ -1,0 +1,53 @@
+﻿@model IEnumerable<MapRoundProgression>
+@{
+    MapRoundProgression dummy = Model.FirstOrDefault();
+}
+
+<table id="roundProgressionTable" class="table">
+    <thead>
+        <tr>
+            <th><label asp-for="@dummy.TargetRound"></label></th>
+            <th><label asp-for="@dummy.ProgressionType"></label></th>
+            <th><label asp-for="@dummy.AdvanceCount"></label></th>
+            <th><label asp-for="@dummy.ByeCount"></label></th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th>Aktion</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+@foreach(MapRoundProgression mrp in Model) {
+        <tr id="MRP_@mrp.TP_MrpMapId">
+            @if (User.Identity.IsAuthenticated && Context.Request.Query["editMrpId"].Equals(mrp.TP_MrpMapId.ToString()))
+            {
+                <form cd-route="Settings" cd-action="EditProgression" cd-route-tournamentId="@mrp.BaseRound.TournamentId" cd-route-roundId="@mrp.BaseRound.RoundId" method="post">
+                    @Html.EditorFor(m => mrp)
+                    <td>
+                        <button type="submit">Speichern</button>
+                    </td>
+                </form>
+            }
+            else
+            {
+                @Html.DisplayFor(m => mrp)
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <td>
+                        <a cd-route="Settings" cd-action="Progressions" cd-route-editMrpId="@mrp.TP_MrpMapId" cd-fragment="MRP_@mrp.TP_MrpMapId">Edit</a>
+                        <span> | </span>
+                        <a cd-route="Settings" cd-action="DeleteProgression" cd-route-mrpId="@mrp.TP_MrpMapId">Delete</a>
+                    </td>
+                }
+            }
+        </tr>
+}
+        @if (User.Identity.IsAuthenticated)
+        {
+            <tr>
+                <td></td><td></td><td></td>
+                <td><a cd-route="Settings" cd-action="CreateProgression">Create new Progression</a></td>
+            </tr>
+        }
+    </tbody>
+</table>

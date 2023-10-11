@@ -19,7 +19,8 @@ namespace ChemodartsWebApp.Data
         public DbSet<Match> Matches { get; set; } = default!;
         public DbSet<Score> Scores { get; set; } = default!;
         public DbSet<MapRoundVenue> MapperRV { get; set; } = default!;
-        public DbSet<MapRoundSeedPlayer> MapperRP { get; set; } = default!;
+        public DbSet<MapRoundSeedPlayer> MapperRSP { get; set; } = default!;
+        public DbSet<MapRoundProgression> MapperRP { get; set; } = default!;
 
         public ChemodartsContext (DbContextOptions<ChemodartsContext> options)
             : base(options)
@@ -40,7 +41,6 @@ namespace ChemodartsWebApp.Data
             //Navigation for Database
             modelBuilder.Entity<Tournament>().HasMany<Round>(t => t.Rounds).WithOne(r => r.Tournament).HasForeignKey(r => r.TournamentId);
             modelBuilder.Entity<Round>().HasMany<Group>(r => r.Groups).WithOne(g => g.Round).HasForeignKey(g => g.RoundId);
-            modelBuilder.Entity<Round>().HasOne<Round>(r => r.FollowUpRound).WithMany(r => r.PreviousRounds).HasForeignKey(r => r.FollowUpRoundId);
             modelBuilder.Entity<Group>().HasMany<Match>(g => g.Matches).WithOne(m => m.Group).HasForeignKey(m => m.GroupId);
             modelBuilder.Entity<Group>().HasMany<Seed>(g => g.Seeds).WithOne(s => s.Group).HasForeignKey(s => s.GroupId);
             modelBuilder.Entity<Match>().HasOne<Seed>(m => m.Seed1).WithMany(p => p.MatchesAsS1).HasForeignKey(m => m.Seed1Id);
@@ -61,15 +61,14 @@ namespace ChemodartsWebApp.Data
             modelBuilder.Entity<MapRoundVenue>().HasOne<Round>(map => map.Round).WithMany(r => r.MappedVenues).HasForeignKey(map => map.RVM_RoundId);
             modelBuilder.Entity<MapRoundVenue>().HasOne<Venue>(map => map.Venue).WithMany(p => p.MappedRounds).HasForeignKey(map => map.RVM_VenueId);
 
-            modelBuilder.Entity<MapTournamentProgression>().HasKey(map => new { map.TP_TournamentId, map.TP_RoundId });
-            modelBuilder.Entity<MapTournamentProgression>().HasOne<Tournament>(map => map.Tournament).WithMany(t => t.ProgressionRules).HasForeignKey(map => map.TP_TournamentId);
-            modelBuilder.Entity<MapTournamentProgression>().HasOne<Round>(map => map.Round).WithOne(r => r.ProgressionRule).HasForeignKey<MapTournamentProgression>(map => map.TP_RoundId);
+            modelBuilder.Entity<MapRoundProgression>().HasOne<Round>(map => map.BaseRound).WithMany(t => t.ProgressionRulesAsBase).HasForeignKey(map => map.TP_BaseRoundId);
+            modelBuilder.Entity<MapRoundProgression>().HasOne<Round>(map => map.TargetRound).WithMany(r => r.ProgressionRulesAsTarget).HasForeignKey(map => map.TP_TargetRoundId);
 
             //Converter for enums
             modelBuilder.Entity<Round>().Property(e => e.Modus).HasConversion(createValueConverter<RoundModus>());  
             modelBuilder.Entity<Round>().Property(e => e.Scoring).HasConversion(createValueConverter<ScoreType>());  
             modelBuilder.Entity<Match>().Property(e => e.Status).HasConversion(createValueConverter<Match.MatchStatus>());  
-            modelBuilder.Entity<MapTournamentProgression>().Property(e => e.ProgressionType).HasConversion(createValueConverter<MapTournamentProgression.TournamentProgressionType>());  
+            modelBuilder.Entity<MapRoundProgression>().Property(e => e.ProgressionType).HasConversion(createValueConverter<MapRoundProgression.TournamentProgressionType>());  
         }
 
         private ValueConverter createValueConverter<T>()

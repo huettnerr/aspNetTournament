@@ -29,10 +29,10 @@
                             <a asp-controller="Home" asp-action="Index" class="nav-link text-dark">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a cd-route="Players" cd-action="Index" class="nav-link text-dark">Spieler</a>
+                            <a cd-route="Players" cd-action="Index" cd-clear="playerId" class="nav-link text-dark">Spieler</a>
                         </li>
                         <li class="nav-item">
-                            <a cd-route="Tournament" cd-action="Index" class="nav-link text-dark">Turniere</a>
+                            <a cd-route="Tournament" cd-action="Index" cd-clear="tournamentId" class="nav-link text-dark">Turniere</a>
                         </li>
                         @await RenderSectionAsync("MainNavigationAdditions", required: false)
                     </ul>

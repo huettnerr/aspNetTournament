@@ -30,17 +30,21 @@ namespace ChemodartsWebApp.Controllers
         //GET Turnierübersicht
         public async Task<IActionResult> Index(int? tournamentId)
         {
+            List<Tournament> ts = await _context.Tournaments.ToListAsync();
+            return View(new TournamentViewModel() { Ts = ts });
+        }
+
+        //GET Turnierübersicht
+        public async Task<IActionResult> Details(int? tournamentId)
+        {
             //search for spezific tournament
             Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is object)
+            if (t is null)
             {
-                return View("Details", new TournamentViewModel() { T = t });
+                return NotFound();
             }
-            else
-            {
-                List<Tournament> ts = await _context.Tournaments.ToListAsync();
-                return View(new TournamentViewModel() { Ts = ts });
-            }
+
+            return View(new TournamentViewModel() { T = t });
         }
 
         // GET: Tournament/Create

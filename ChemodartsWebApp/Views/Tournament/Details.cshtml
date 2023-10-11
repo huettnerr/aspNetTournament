@@ -22,9 +22,6 @@
                 @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().Modus)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.T.Rounds.FirstOrDefault().FollowUpRound)
-            </th>
-            <th>
                 Status
             </th>
             @if (User.Identity.IsAuthenticated)
@@ -40,17 +37,12 @@
                 @Html.DisplayFor(modelItem => item.RoundId)
             </td>*@
             <td>
-                <a cd-route="Round" cd-route-roundId="@item.RoundId">
+                <a cd-route="Round" cd-action="Index" cd-route-roundId="@item.RoundId">
                     @Html.DisplayFor(modelItem => item.RoundName)
                 </a>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Modus)
-            </td>
-            <td>
-                <a cd-route="Round" cd-route-roundId="@item.FollowUpRound?.RoundId">
-                    @Html.DisplayFor(modelItem => item.FollowUpRound.RoundName)
-                </a>
             </td>
             <td>
                 @(item.IsRoundFinished ? "Beendet" : item.IsRoundStarted ? "Läuft" : "Erstellt")

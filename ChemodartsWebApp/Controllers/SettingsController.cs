@@ -18,6 +18,8 @@ namespace ChemodartsWebApp.Controllers
     {
         private readonly ChemodartsContext _context;
 
+        private const string editQuery = "editMrpId";
+
         public SettingsController(ChemodartsContext context)
         {
             _context = context;
@@ -34,15 +36,62 @@ namespace ChemodartsWebApp.Controllers
 
         [Authorize(Roles = "Administrator")]
         [HttpGet]
-        public async Task<IActionResult> Progress(int? tournamentId, int? roundId)
+        public async Task<IActionResult> Progressions(int? tournamentId, int? roundId)
         {
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
 
-            MapTournamentProgression ps = t.ProgressionRules?.FirstOrDefault();
-            if (ps is null) ps = new MapTournamentProgression();
+            return View(new SettingsViewModel() { R = r });
+        }
 
-            return View(new TournamentProgressViewModel() { T = t, ProgressionSetting = ps });
+        [Authorize(Roles = "Administrator")]
+        [HttpGet]
+        public async Task<IActionResult> DeleteProgression(int? tournamentId, int? roundId, int? mrpId)
+        {
+            MapRoundProgression? rp = await _context.MapperRP.QueryId(mrpId);
+            if (rp is null) return NotFound();
+
+            _context.MapperRP.Remove(rp);
+            await _context.SaveChangesAsync();
+
+            return this.RedirectToPreviousPage();
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpPost]
+        public async Task<IActionResult> EditProgression(int? tournamentId, int? roundId, MapRoundProgression mrp)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
+            ModelState.Remove($"{nameof(mrp)}.{nameof(mrp.BaseRound)}");
+            if (ModelState.IsValid)
+            {
+                _context.MapperRP.Update(mrp);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                ViewBag.UpdateMessage = ModelState.ToString();
+            }
+
+            return this.RedirectToPreviousPage(null, $"MRP_{mrp.TP_MrpMapId}", editQuery);
+        }
+
+        [Authorize(Roles = "Administrator")]
+        [HttpGet]
+        public async Task<IActionResult> CreateProgression(int? tournamentId, int? roundId)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
+            //Add the Progression Rule
+            MapRoundProgression newMrp = new MapRoundProgression() { TP_BaseRoundId = r.RoundId };
+            _context.MapperRP.Add(newMrp);
+
+            await _context.SaveChangesAsync();
+
+            return this.RedirectToPreviousPage(new Dictionary<string, string>() {{ editQuery, newMrp.TP_MrpMapId.ToString() }}, $"MRP_{newMrp.TP_MrpMapId}");
         }
 
         [Authorize(Roles = "Administrator")]

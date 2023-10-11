@@ -1,0 +1,21 @@
+﻿@model MapRoundProgression
+
+@{
+    SelectList list = new SelectList(new List<Round>());
+    list = new SelectList(Model.BaseRound.Tournament.Rounds.Where(r => !r.Equals(Model.BaseRound)), "RoundId", "RoundName", Model.TP_TargetRoundId);
+}
+
+<td>
+    @Html.DropDownListFor(m => m.TP_TargetRoundId, list, "Select Target Round")
+</td>
+<td>
+    @Html.EditorFor(m => m.ProgressionType)
+</td>
+<td>
+    <input asp-for="@Model.AdvanceCount" />
+</td>
+<td>
+    <input asp-for="@Model.ByeCount" />
+</td>
+<input type="hidden" asp-for="@Model.TP_MrpMapId" />
+<input type="hidden" asp-for="@Model.TP_BaseRoundId" />

@@ -1,10 +1,5 @@
 ﻿@model ChemodartsWebApp.Data.Factory.RoundFactory
 
-@{
-    SelectList list = new SelectList(new List<Round>());
-    if (Model?.T?.Rounds is object) list = new SelectList(Model.T.Rounds, "RoundId", "RoundName");
-}
-
 @using (Html.BeginForm(Model.Action, Model.Controller, FormMethod.Post))
 {
     @Html.ValidationSummary(true)
@@ -22,13 +17,6 @@
     <div class="form-group">
         @Html.LabelFor(m => m.Scoring)
         @Html.EditorFor(m => m.Scoring)
-    </div>
-
-    //<br />
-
-    <div class="form-group">
-        @Html.LabelFor(m => m.FollowUpRoundId)
-        @Html.DropDownListFor(m => m.FollowUpRoundId, list, "Select Round")
     </div>
 
     @Html.HiddenFor(m => m.Action)
