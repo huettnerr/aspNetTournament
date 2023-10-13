@@ -24,6 +24,9 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Spieler")]
         [DisplayFormat(NullDisplayText = "n. A.")]
         public string CombinedName { get => $"{PlayerName} {(!(PlayerDartname?.Equals(String.Empty) ?? true) ? $"\"{PlayerDartname}\"" : "")}"; }
+        
+        [NotMapped]
+        public string? ShortName { get => PlayerDartname ?? PlayerName; }
 
         public override string ToString()
         {

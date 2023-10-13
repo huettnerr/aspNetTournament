@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Reflection;
 using System.Text;
 
 namespace ChemodartsWebApp.Models
@@ -47,13 +48,11 @@ namespace ChemodartsWebApp.Models
         public virtual Seed? Seed2 { get; set; }
         public virtual Seed? WinnerSeed { get; set; }
         public virtual Score? Score { get; set; }
-        public virtual Seed? WinnerSeedFollowUp { get; set; }
-
         public virtual Match? WinnerFollowUpMatch { get; set; }
         public virtual Match? LoserFollowUpMatch { get; set; }
-        public virtual ICollection<Match>? AncestorMatchesWinner { get; set; } = new List<Match>(); 
-        public virtual ICollection<Match>? AncestorMatchesLoser { get; set; } = new List<Match>();
-        [NotMapped] public ICollection<Match>? AncestorMatches { get { return AncestorMatchesWinner?.Concat(AncestorMatchesLoser)?.ToList(); } }
+        public virtual ICollection<Match>? AncestorMatchesAsWinner { get; set; } = new List<Match>(); 
+        public virtual ICollection<Match>? AncestorMatchesAsLoser { get; set; } = new List<Match>();
+        [NotMapped] public ICollection<Match>? AncestorMatches { get { return AncestorMatchesAsWinner?.Concat(AncestorMatchesAsLoser)?.ToList(); } }
 
         //Helpers
         [NotMapped]
@@ -84,60 +83,69 @@ namespace ChemodartsWebApp.Models
                     break;
             }
 
-            WinnerSeed = Ranking.GetWinnerSeed(this);
+            Update();
+        }
 
-            switch(Group.Round.Modus)
+        public void Update()
+        {
+            switch (Group.Round.Modus)
             {
                 case RoundModus.RoundRobin:
+                    WinnerSeed = Ranking.GetWinnerSeed(this);
                     Ranking.UpdateGroupRanking(Group);
                     break;
                 case RoundModus.SingleKo:
+                    PropagateToTopTier(nameof(WinnerFollowUpMatch));
+                    goto case RoundModus.DoubleKo;
                 case RoundModus.DoubleKo:
-                    UpdateTopTierFollowUp();
+                    PropagateToTopTier(nameof(LoserFollowUpMatch));
                     break;
             }
         }
 
-        public void UpdateTopTierFollowUp()
+        public void PropagateToTopTier(string propertyName)
         {
-            if(WinnerFollowUpMatch?.WinnerFollowUpMatch is object)
+            //Make sure only winner or loser follow up match property is passed
+            if (!(propertyName.Equals(nameof(Match.WinnerFollowUpMatch)) || propertyName.Equals(nameof(Match.LoserFollowUpMatch)))) return;
+            PropertyInfo followUpProperty = typeof(Match).GetProperty(propertyName);
+
+            //get the (winner or loser) follow up match property
+            Match? followUpMatch = followUpProperty?.GetValue(this) as Match;
+            Match? followUpMatchsFollowUpMatch = followUpMatch is object ? followUpProperty?.GetValue(followUpMatch) as Match : null;
+
+            //propagate correctly
+            if(followUpMatchsFollowUpMatch is object)
             {
                 //Follow Up is not the top tier
-                WinnerFollowUpMatch.UpdateTopTierFollowUp();
+                followUpMatch.PropagateToTopTier(propertyName);
             }
             else
             {
-                if(WinnerFollowUpMatch is object)
-                {
-                    //FollowUp os the top tier
-                    WinnerFollowUpMatch.UpdateSeedsFromAcestors();
-                }
-                else
-                {
-                    //we are the top tier
-                    this.UpdateSeedsFromAcestors();
-                }
+                //when follow up match is an object, than its the top tier, otherwise we are
+                UpdateSeedsFromAcestors(followUpMatch ?? this);
             }
         }
 
         //Recursivly updates from their ancestor matches
-        public void UpdateSeedsFromAcestors()
+        public static void UpdateSeedsFromAcestors(Match m)
         {
-            if (AncestorMatchesWinner?.Count == 2)
+            if (m.AncestorMatches?.Count == 2)
             {
-                Match am1 = AncestorMatchesWinner.OrderBy(m => m.MatchOrderValue).ElementAt(0);
-                this.updateSeedFromAncestor(this, am1, this.Seed1, out Seed s1New);
-                this.Seed1 = s1New;
+                Match am1 = m.AncestorMatches.OrderBy(m => m.MatchOrderValue).ElementAt(0);
+                Match.updateSeedFromAncestor(m.GroupId, am1, m.Seed1, out Seed s1New);
+                m.Seed1 = s1New;
 
-                Match am2 = AncestorMatchesWinner.OrderBy(m => m.MatchOrderValue).ElementAt(1);
-                this.updateSeedFromAncestor(this, am2, this.Seed2, out Seed s2New);
-                this.Seed2 = s2New;
+                Match am2 = m.AncestorMatches.OrderBy(m => m.MatchOrderValue).ElementAt(1);
+                Match.updateSeedFromAncestor(m.GroupId, am2, m.Seed2, out Seed s2New);
+                m.Seed2 = s2New;
             }
         }
 
-        private void updateSeedFromAncestor(Match m, Match ancestorMatch, Seed? S1orS2, out Seed newSeed)
+        private static void updateSeedFromAncestor(int baseGroupId, Match ancestorMatch, Seed? S1orS2, out Seed newSeed)
         {
-            ancestorMatch.UpdateSeedsFromAcestors();
+            UpdateSeedsFromAcestors(ancestorMatch);
+
+            ancestorMatch.WinnerSeed = Ranking.GetWinnerSeed(ancestorMatch);
             if (ancestorMatch.WinnerSeed is object)
             {
                 //Match has winner
@@ -146,13 +154,13 @@ namespace ChemodartsWebApp.Models
             else
             {
                 //Match has no winner
-                newSeed = S1orS2 is object ? S1orS2 : new Seed() { GroupId = m.GroupId };
+                newSeed = S1orS2 is object ? S1orS2 : new Seed() { GroupId = baseGroupId };
 
                 //Update Seedname
                 List<string?> sb = new List<string?>
                 {
-                    ancestorMatch.Seed1?.Player?.PlayerDartname ?? ancestorMatch.Seed1?.SeedName,
-                    ancestorMatch.Seed2?.Player?.PlayerDartname ?? ancestorMatch.Seed2?.SeedName
+                    ancestorMatch.Seed1?.Player?.ShortName ?? ancestorMatch.Seed1?.SeedName,
+                    ancestorMatch.Seed2?.Player?.ShortName ?? ancestorMatch.Seed2?.SeedName
                 };
                 newSeed.SeedName = String.Join(" | ", sb.Where(s => s is object));
             }

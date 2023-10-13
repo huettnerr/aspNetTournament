@@ -11,7 +11,6 @@ namespace ChemodartsWebApp.Data.Factory
         public int Nr { get; set; }
         public int Rank { get; set; }
 
-        public int? AnchestorMatchId { get; set; }
 
         [ScaffoldColumn(false)]
         public Group? G { get; set; }
@@ -24,14 +23,12 @@ namespace ChemodartsWebApp.Data.Factory
                 Name = s.SeedName;
                 Nr = s.SeedNr;
                 Rank = s.SeedRank;
-                AnchestorMatchId = s.AncestorMatchId;
             }
             else
             {
                 Name = String.Empty;
                 Nr = 0;
                 Rank = 0;
-                AnchestorMatchId = null;
             }
         }
 

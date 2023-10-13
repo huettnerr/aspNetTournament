@@ -90,7 +90,7 @@ namespace ChemodartsWebApp.ModelHelper
             }
 
             //After creating this list should contain only the final. Updating it will recursivly update all matches
-            prevStageMatches?.FirstOrDefault()?.UpdateSeedsFromAcestors();
+            prevStageMatches?.FirstOrDefault()?.Update();
             await context.SaveChangesAsync();
 
             return true;
@@ -135,77 +135,77 @@ namespace ChemodartsWebApp.ModelHelper
             return matches;
         }
 
-        public static async Task<bool> CreateSystem(ChemodartsContext context, OldGroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
-        {
-            if (r is null || r.Modus != RoundModus.SingleKo) return false;
+        //public static async Task<bool> CreateSystem(ChemodartsContext context, OldGroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
+        //{
+        //    if (r is null || r.Modus != RoundModus.SingleKo) return false;
 
-            context.Groups.RemoveRange(r.Groups);
-            await context.SaveChangesAsync();
+        //    context.Groups.RemoveRange(r.Groups);
+        //    await context.SaveChangesAsync();
 
-            factory.R = r;
-            factory.NumberOfRounds--; // Fühlt sich natürlicher an das Finale mitzuzählen
+        //    factory.R = r;
+        //    factory.NumberOfRounds--; // Fühlt sich natürlicher an das Finale mitzuzählen
 
-            List<Group> groups = new List<Group>();
-            for (int roundNr = 0; roundNr <= factory.NumberOfRounds; roundNr++)
-            {
-                //Make Groups
-                int playersInRound = 2 * getPlayersPerStage(factory.NumberOfRounds - roundNr);
-                Group g = new Group()
-                {
-                    GroupName = getGroupName(playersInRound),
-                    RoundId = factory.R.RoundId,
-                };
-                g.Matches = new List<Match>();
-                groups.Add(g);
-                context.Groups.Add(g);
-                context.SaveChanges();
+        //    List<Group> groups = new List<Group>();
+        //    for (int roundNr = 0; roundNr <= factory.NumberOfRounds; roundNr++)
+        //    {
+        //        //Make Groups
+        //        int playersInRound = 2 * getPlayersPerStage(factory.NumberOfRounds - roundNr);
+        //        Group g = new Group()
+        //        {
+        //            GroupName = getGroupName(playersInRound),
+        //            RoundId = factory.R.RoundId,
+        //        };
+        //        g.Matches = new List<Match>();
+        //        groups.Add(g);
+        //        context.Groups.Add(g);
+        //        context.SaveChanges();
 
-                //Make Seeds
-                List<Seed> seeds = new List<Seed>();
-                for (int iPlayer = 0; iPlayer < playersInRound; iPlayer++)
-                {
-                    Seed s = new Seed()
-                    {
-                        SeedName = "Please Run Script",
-                        GroupId = g.GroupId,
-                    };
+        //        //Make Seeds
+        //        List<Seed> seeds = new List<Seed>();
+        //        for (int iPlayer = 0; iPlayer < playersInRound; iPlayer++)
+        //        {
+        //            Seed s = new Seed()
+        //            {
+        //                SeedName = "Please Run Script",
+        //                GroupId = g.GroupId,
+        //            };
 
-                    if (roundNr > 1)
-                    {
-                        //Link Ancestors
-                        s.AncestorMatch = groups.ElementAt(roundNr - 1).Matches.ElementAt(iPlayer);
-                    }
-                    else
-                    {
-                        //First round
-                        s.SeedNr = iPlayer;
-                    }
+        //            if (roundNr > 1)
+        //            {
+        //                //Link Ancestors
+        //                s.AncestorMatch = groups.ElementAt(roundNr - 1).Matches.ElementAt(iPlayer);
+        //            }
+        //            else
+        //            {
+        //                //First round
+        //                s.SeedNr = iPlayer;
+        //            }
 
-                    seeds.Add(s);
-                }
-                context.Seeds.AddRange(seeds);
-                context.SaveChanges();
+        //            seeds.Add(s);
+        //        }
+        //        context.Seeds.AddRange(seeds);
+        //        context.SaveChanges();
 
-                //Make Matches
-                List<Match> matches = new List<Match>();
-                for (var iMatch = 0; iMatch < getPlayersPerStage(factory.NumberOfRounds - roundNr); iMatch++)
-                {
-                    Match m = new Match()
-                    {
-                        Seed1Id = seeds.ElementAt(2 * iMatch).SeedId,
-                        Seed2Id = seeds.ElementAt(2 * iMatch + 1).SeedId,
-                        MatchOrderValue = iMatch,
-                        GroupId = g.GroupId,
-                    };
-                    g.Matches.Add(m);
-                    matches.Add(m);
-                }
-                context.Matches.AddRange(matches);
-                context.SaveChanges();
-            }
+        //        //Make Matches
+        //        List<Match> matches = new List<Match>();
+        //        for (var iMatch = 0; iMatch < getPlayersPerStage(factory.NumberOfRounds - roundNr); iMatch++)
+        //        {
+        //            Match m = new Match()
+        //            {
+        //                Seed1Id = seeds.ElementAt(2 * iMatch).SeedId,
+        //                Seed2Id = seeds.ElementAt(2 * iMatch + 1).SeedId,
+        //                MatchOrderValue = iMatch,
+        //                GroupId = g.GroupId,
+        //            };
+        //            g.Matches.Add(m);
+        //            matches.Add(m);
+        //        }
+        //        context.Matches.AddRange(matches);
+        //        context.SaveChanges();
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
         public static void UpdateFirstRoundSeeds(Data.ChemodartsContext context, Round previousRound, Group firstKoRoundGroup)
         {
@@ -250,7 +250,7 @@ namespace ChemodartsWebApp.ModelHelper
             {
                 foreach(Match m in g.Matches)
                 {
-                    m.UpdateSeedsFromAcestors();
+                    m.Update();
                 }
             }
 

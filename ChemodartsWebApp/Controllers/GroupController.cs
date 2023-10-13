@@ -50,7 +50,7 @@ namespace ChemodartsWebApp.Controllers
                     return View(new GroupViewModel() { R = r, GF = new GroupFactoryRR("CreateRR") });
                 case RoundModus.SingleKo:
                     //return View(new GroupViewModel(r, new OldGroupFactoryKO("CreateKO")));
-                    return View(new GroupViewModel() { R = r, GF = new GroupFactoryKO("CreateKONew") });
+                    return View(new GroupViewModel() { R = r, GF = new GroupFactoryKO("CreateKO") });
                 default:
                     return NotFound();
             }
@@ -80,31 +80,12 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateKONew(int? tournamentId, int? roundId, int? groupId, GroupFactoryKO koFactory)
+        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, GroupFactoryKO koFactory)
         {
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
             if (await RoundKoLogic.CreateSystemSingleKO(_context, r, koFactory.NumberOfPlayers, true))
-            {
-                return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
-            }
-
-            return View("Create", new GroupViewModel() { R = r, GF = koFactory });
-        }
-
-        // POST: Players/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, OldGroupFactoryKO koFactory)
-        {
-            Round? r = await _context.Rounds.QueryId(roundId);
-            if (r is null) return NotFound();
-
-            if (await RoundKoLogic.CreateSystem(_context, koFactory, r, ModelState))
             {
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }

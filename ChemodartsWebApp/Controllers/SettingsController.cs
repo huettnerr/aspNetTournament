@@ -150,6 +150,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
+                ViewBag.UpdateMessage = pm.ErrorMessage;
                 return this.RedirectToPreviousPage();
             }
         }

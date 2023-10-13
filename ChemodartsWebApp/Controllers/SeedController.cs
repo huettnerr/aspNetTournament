@@ -95,7 +95,8 @@ namespace ChemodartsWebApp.Controllers
                 List<MapRoundSeedPlayer> availableMappedSeeds = r.MappedSeedsPlayers.Where(msp => msp.Seed.Player is null).ToList();
 
                 //Update Seeds
-                foreach (int playerId in viewModel.SelectedPlayerIds)
+                List<Player?> selectedPlayers = viewModel.SelectedPlayerIds.Select(id => _context.Players.QueryId(id).Result).ToList();
+                foreach (Player? p in selectedPlayers)
                 {
                     if (availableMappedSeeds.Count == 0)
                     {
@@ -105,10 +106,10 @@ namespace ChemodartsWebApp.Controllers
 
                     MapRoundSeedPlayer? msp = availableMappedSeeds.FirstOrDefault();
 
-                    if (changeSeedPlayer(msp, playerId).Result)
+                    if (await changeSeedPlayer(msp, p))
                     {
                         availableMappedSeeds.Remove(msp);
-                        sb.Append($"Spieler '{_context.Players.Single(p => p.PlayerId == playerId).CombinedName}' hat Seed #{msp.Seed.SeedNr}\n");
+                        sb.Append($"Spieler '{p?.CombinedName}' hat Seed #{msp.Seed.SeedNr}\n");
                     }
                     else
                     {
@@ -172,13 +173,13 @@ namespace ChemodartsWebApp.Controllers
 
         #region Reorder and Shuffle Seeds
 
-        private async Task<bool> changeSeedPlayer(MapRoundSeedPlayer? msp, int? playerId)
+        private async Task<bool> changeSeedPlayer(MapRoundSeedPlayer? msp, Player? p)
         {
             if (msp is null) return false;
 
             try
             {
-                msp.TSP_PlayerId = playerId;
+                msp.SetPlayer(p);
                 _context.Update(msp);
                 await _context.SaveChangesAsync();
                 return true;
@@ -196,14 +197,8 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            List<MapRoundSeedPlayer> oldMapping = r.MappedSeedsPlayers
-                .Select(m => new MapRoundSeedPlayer
-                {
-                    TSP_PlayerId = m.TSP_PlayerId,
-                    TSP_PlayerCheckedIn = m.TSP_PlayerCheckedIn,
-                    TSP_PlayerFixed = m.TSP_PlayerFixed,
-                    Seed = new Seed{ SeedName = m.Seed.SeedName, SeedNr = m.Seed.SeedNr }
-                }).ToList();
+            List<MapRoundSeedPlayer> oldMapping = r.MappedSeedsPlayers.Select(m => new MapRoundSeedPlayer(m)).ToList();
+            oldMapping.ForEach(m => m.Seed = new Seed { SeedName = m.Seed.SeedName, SeedNr = m.Seed.SeedNr });
 
             int i = 0;
             foreach(Seed s in r.Seeds)
@@ -211,7 +206,7 @@ namespace ChemodartsWebApp.Controllers
                 MapRoundSeedPlayer? oldMap = oldMapping.Find(m => m.Seed.SeedNr == newSeedNrs[i]);
                 if (oldMap is null) continue;
 
-                s.MappedRoundSeedPlayer.TSP_PlayerId = oldMap.TSP_PlayerId;
+                s.MappedRoundSeedPlayer.SetPlayer(oldMap.Player);
                 s.MappedRoundSeedPlayer.TSP_PlayerCheckedIn = oldMap.TSP_PlayerCheckedIn;
                 s.MappedRoundSeedPlayer.TSP_PlayerFixed = oldMap.TSP_PlayerFixed;
                 s.SeedName = oldMap.Seed.SeedName;
@@ -237,7 +232,7 @@ namespace ChemodartsWebApp.Controllers
             //And clear old mapping
             foreach (MapRoundSeedPlayer mps in r.MappedSeedsPlayers)
             {
-                mps.TSP_PlayerId = null;
+                mps.SetPlayer(null);
             }
 
             //Randomize
@@ -246,7 +241,7 @@ namespace ChemodartsWebApp.Controllers
             while (players.Count > 0)
             {
                 Player randomPlayer = players.ElementAt(random.Next(players.Count));
-                r.MappedSeedsPlayers.ElementAt(iSeed++).TSP_PlayerId = randomPlayer.PlayerId;
+                r.MappedSeedsPlayers.ElementAt(iSeed++).SetPlayer(randomPlayer);
                 players.Remove(randomPlayer);
             }
 

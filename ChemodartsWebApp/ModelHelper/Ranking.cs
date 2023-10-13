@@ -8,7 +8,13 @@ namespace ChemodartsWebApp.ModelHelper
         public static Seed? GetWinnerSeed(Match m)
         {
             if (m.Status != MatchStatus.Finished) return null;
+
+            if (m.Seed1 is object && m.Seed2 is null) return m.Seed1;
+            if (m.Seed1 is null && m.Seed2 is object) return m.Seed2;
+
+            if (m.Seed1 is null && m.Seed2 is null) return null;
             if (m.Score == null) return null;
+
 
             if (m.Group.Round.Scoring == ScoreType.LegsOnly)
             {

@@ -246,7 +246,6 @@ namespace ChemodartsWebApp.ModelHelper
                     TSP_RoundId = r.RoundId,
                     TSP_PlayerCheckedIn = false,
                     TSP_PlayerFixed = false,
-                    Player = null
                 });
             }
 

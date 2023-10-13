@@ -66,15 +66,4 @@ namespace ChemodartsWebApp.Data.Factory
             NumberOfPlayers = 0;
         }
     }
-
-    public class OldGroupFactoryKO : GroupFactory
-    {
-        public int NumberOfRounds { get; set; }
-
-        public OldGroupFactoryKO() { } //Needed for POST
-        public OldGroupFactoryKO(string action) : base(action, null)
-        {
-            NumberOfRounds = 0;
-        }
-    }
 }

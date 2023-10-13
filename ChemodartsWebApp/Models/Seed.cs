@@ -11,13 +11,11 @@ namespace ChemodartsWebApp.Models
         [Display(Name = "Seed")][Column("seedNr")] public int SeedNr { get; set; }
         [Display(Name = "Rank")][Column("seedRank")] public int SeedRank { get; set; }
         [Display(Name = "Seed Name")][Column("seedName")] public string? SeedName { get; set; }
-        [Column("ancestorMatchId")] public int? AncestorMatchId { get; set; }
 
         //Navigation
         [Display(Name = "Gruppe")] public virtual Group Group { get; set; }
         [Display(Name = "Stats")][DisplayFormat(NullDisplayText = "n. A.")] public virtual SeedStatistics? SeedStatistics { get; set; } 
         public virtual MapRoundSeedPlayer MappedRoundSeedPlayer { get; set; }
-        public virtual Match? AncestorMatch { get; set; }
         public virtual ICollection<Match> MatchesAsS1 { get; set; } = new List<Match>();
         public virtual ICollection<Match> MatchesAsS2 { get; set; } = new List<Match>();
 
