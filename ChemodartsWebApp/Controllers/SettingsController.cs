@@ -51,7 +51,7 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            return View(new SettingsViewModel() { R = r });
+            return View("Index", new SettingsViewModel() { R = r });
         }
 
         [Authorize(Roles = "Administrator")]
@@ -61,14 +61,31 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
+            //Check if the progression setting has valid values
             ModelState.Remove($"{nameof(mrp)}.{nameof(mrp.BaseRound)}");
             if (ModelState.IsValid)
             {
                 _context.MapperRP.Update(mrp);
-                await _context.SaveChangesAsync();
+                _context.Entry(mrp).Reference(m => m.TargetRound).Load();
+
+                //try handle progression as a dummy 
+                ProgressionManager pm = new ProgressionManager(_context, true);
+                if (await pm.Manage(mrp))
+                {
+                    //everything all right, save in database
+                    await _context.SaveChangesAsync();
+
+                    ViewBag.UpdateMessage = "Save successful!";
+                }
+                else
+                {
+                    //error with progression handling
+                    ViewBag.UpdateMessage = "Progression Setting has Errors!";
+                }
             }
             else
             {
+                //error with progression values
                 ViewBag.UpdateMessage = ModelState.ToString();
             }
 
@@ -193,54 +210,54 @@ namespace ChemodartsWebApp.Controllers
             return RedirectToRoute("Match", new { controller = "Match", tournamentId = tournamentId, action = "Index", roundId = selectedRoundId });
         }
 
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> UpdateKoFirstRound(int? tournamentId, int selectedRoundId, int selectedRound2Id)
-        {
-            //KoFactory.UpdateFirstRoundSeeds(
-            //    _context,
-            //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } },
-            //    new Group() { Matches = new List<Match>() { new Match(), new Match() } });
+        //[Authorize(Roles = "Administrator")]
+        //public async Task<IActionResult> UpdateKoFirstRound(int? tournamentId, int selectedRoundId, int selectedRound2Id)
+        //{
+        //    //KoFactory.UpdateFirstRoundSeeds(
+        //    //    _context,
+        //    //    new Round() { Groups = new List<Group>() { new Group(), new Group(), new Group(), new Group() } },
+        //    //    new Group() { Matches = new List<Match>() { new Match(), new Match() } });
 
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+        //    Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+        //    if (t is null) return NotFound();
 
-            Round? r1 = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
-            Round? r2 = t.Rounds.Where(x => x.RoundId == selectedRound2Id).FirstOrDefault();
-            if (r1 is null || r2 is null)
-            {
-                ViewBag.UpdateKoFirstRoundMessage = "RoundId ungültig";
-                return RedirectToAction(nameof(Index), t);
-            }
+        //    Round? r1 = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+        //    Round? r2 = t.Rounds.Where(x => x.RoundId == selectedRound2Id).FirstOrDefault();
+        //    if (r1 is null || r2 is null)
+        //    {
+        //        ViewBag.UpdateKoFirstRoundMessage = "RoundId ungültig";
+        //        return RedirectToAction(nameof(Index), t);
+        //    }
 
-            RoundKoLogic.UpdateFirstRoundSeeds(_context, r1, r2.Groups.ElementAt(0));
+        //    RoundKoLogic.UpdateFirstRoundSeeds(_context, r1, r2.Groups.ElementAt(0));
 
-            return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r2.RoundId });
-        }
+        //    return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r2.RoundId });
+        //}
 
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> UpdateKoRound(int? tournamentId, int selectedRoundId)
-        {
-            //Tournament? t = await queryId(tournamentId, _context.Tournaments);
-            //if (t is null) return NotFound();
+        //[Authorize(Roles = "Administrator")]
+        //public async Task<IActionResult> UpdateKoRound(int? tournamentId, int selectedRoundId)
+        //{
+        //    //Tournament? t = await queryId(tournamentId, _context.Tournaments);
+        //    //if (t is null) return NotFound();
 
-            //Group? g1 = t.Rounds.Where(r => r.Modus == Round.RoundModus.SingleKo).FirstOrDefault()?.Groups.Where(g => g.GroupId == finishedGroup).FirstOrDefault();
-            ////Group? g2 = t.Rounds.Where(x => x.RoundId == selectedRound2Id).FirstOrDefault();
-            //if (g1 is null || g2 is null)
-            //{
-            //    ViewBag.UpdateKoFirstRoundMessage = "RoundId ungültig";
-            //    return View("TournamentSettings", t);
-            //}
+        //    //Group? g1 = t.Rounds.Where(r => r.Modus == Round.RoundModus.SingleKo).FirstOrDefault()?.Groups.Where(g => g.GroupId == finishedGroup).FirstOrDefault();
+        //    ////Group? g2 = t.Rounds.Where(x => x.RoundId == selectedRound2Id).FirstOrDefault();
+        //    //if (g1 is null || g2 is null)
+        //    //{
+        //    //    ViewBag.UpdateKoFirstRoundMessage = "RoundId ungültig";
+        //    //    return View("TournamentSettings", t);
+        //    //}
 
-            Tournament? t = await _context.Tournaments.QueryId(tournamentId);
-            if (t is null) return NotFound();
+        //    Tournament? t = await _context.Tournaments.QueryId(tournamentId);
+        //    if (t is null) return NotFound();
 
-            Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
-            if (r is null) return NotFound();
+        //    Round? r = t.Rounds.Where(x => x.RoundId == selectedRoundId).FirstOrDefault();
+        //    if (r is null) return NotFound();
 
-            RoundKoLogic.UpdateKoRoundSeeds(_context, r);
+        //    RoundKoLogic.UpdateKoRoundSeeds(_context, r);
 
-            return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
-        }
+        //    return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+        //}
 
 
     }

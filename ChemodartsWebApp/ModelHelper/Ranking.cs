@@ -165,5 +165,24 @@ namespace ChemodartsWebApp.ModelHelper
                 s.SeedRank = orderedSeeds.Find(os => os.Equals(s))?.SeedRank ?? 0;
             }
         }
+
+        public static List<Seed>? GetProgressingSeeds(Round r, int advanceCount)
+        {
+            List<Seed> seeds = new List<Seed>();
+            switch (r.Modus)
+            {
+                case RoundModus.RoundRobin:
+                    foreach (Group g in r.Groups)
+                    {
+                        seeds.AddRange(g.RankedSeeds.ToList().GetRange(0, advanceCount));
+                    }
+                    return seeds;
+                case RoundModus.SingleKo:
+                case RoundModus.DoubleKo:
+                case RoundModus.Ranking:
+                default:
+                    return null;
+            }
+        }
     }
 }

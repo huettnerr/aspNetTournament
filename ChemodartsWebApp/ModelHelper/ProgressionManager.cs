@@ -48,39 +48,50 @@ namespace ChemodartsWebApp.ModelHelper
 
         public async Task<bool> ManageRanking(MapRoundProgression mrp, bool fixedPositions)
         {
-            if(mrp.TargetRound?.Groups is null) return false;
-            if(!(mrp.TargetRound.Modus == RoundModus.SingleKo || mrp.TargetRound.Modus == RoundModus.DoubleKo)) return false;
-
-            int numberOfGroups = mrp.BaseRound.Groups?.Count ?? 0;
-            int numberOfPlayers = mrp.AdvanceCount * numberOfGroups;
-            int numberOfByePlayers = mrp.ByeCount * numberOfGroups;
-
-            if(!await RoundKoLogic.CreateSystemSingleKO(_context, mrp.TargetRound, numberOfPlayers, false))
+            if (mrp.BaseRound?.Groups is null || mrp.BaseRound.Groups.Count == 0 || mrp.TargetRound is null)
             {
+                ErrorMessage = $"No groups in Base round or target round is not set";
                 return false;
             }
 
-            List<Match>? firstRoundMatches = mrp.TargetRound.Groups.MinBy(g => g.GroupOrderValue)?.Matches.ToList();
-            if (firstRoundMatches is null || firstRoundMatches.Count == 0) return false;
+            if(!(mrp.TargetRound.Modus == RoundModus.SingleKo || mrp.TargetRound.Modus == RoundModus.DoubleKo))
+            {
+                ErrorMessage = $"Target Round is not configured for KO tournament brackets!";
+                return false;
+            }
+
+            int numberOfGroups = mrp.BaseRound.Groups.Count;
+            int numberOfPlayers = mrp.AdvanceCount * numberOfGroups;
+            int numberOfByePlayers = mrp.ByeCount * numberOfGroups;
+
+            if (!await RoundKoLogic.CreateKoSystem(_context, mrp.TargetRound, numberOfPlayers))
+            {
+                ErrorMessage = $"Failed to create Ko-System!";
+                return false;
+            }
 
             //Get all the seeds that advance
             List<Seed>? relevantSeeds;
-            if (_useDummySeeds)
+            if (!_useDummySeeds)
             {
-                relevantSeeds = getRelevantSeeds(mrp);
+                //Get the advancing seeds from base round
+                relevantSeeds = Ranking.GetProgressingSeeds(mrp.BaseRound, mrp.AdvanceCount);
+                if(relevantSeeds is null || relevantSeeds.Count == 0)
+                {
+                    ErrorMessage = $"No Advancing Seeds found!";
+                    return false;
+                }
 
                 //Order the seeds first by rank and afterwards by the order of the groups
                 relevantSeeds = relevantSeeds.OrderBy(s => s.SeedRank).ThenBy(s => s.Group?.GroupOrderValue).ToList();
-
-                if (relevantSeeds is null || relevantSeeds.Count == 0) return false;
             }
             else
             {
-                Group? firstRoundGroup = firstRoundMatches.FirstOrDefault()?.Group;
+                //Use dummy names
+                Group? firstRoundGroup = RoundKoLogic.GetFirstRoundGroup(mrp.TargetRound);
                 if(firstRoundGroup is null) return false;
 
                 relevantSeeds = new List<Seed>();
-                int seedRank = 1;
                 for (int rank = 1; rank <= mrp.AdvanceCount; rank++)
                 {
                     List<Group> orderedGroups = mrp.BaseRound.Groups?.OrderBy(g => g.GroupOrderValue).ToList() ?? new List<Group>();
@@ -90,32 +101,73 @@ namespace ChemodartsWebApp.ModelHelper
                         {
                             Group = firstRoundGroup,
                             SeedName = $"{rank}. Gruppe \"{g.GroupName}\""
-                            //SeedName = $"Seed {seedRank++}"
                         });
                     }
                 }
             }
 
-            //Fill with bye's if necessary
-            Seed byeSeed = new Seed() { SeedName = "Bye" };
-            for (int i = 0; i < numberOfByePlayers; i++) relevantSeeds.Add(byeSeed);
+            // fill the seeds
+            await RoundKoLogic.FillSeeds(
+                _context, 
+                fixedPositions ? RoundKoLogic.SeedingType.FixedForAll : RoundKoLogic.SeedingType.Random, 
+                mrp.TargetRound,
+                (_useDummySeeds && !fixedPositions) ? null : relevantSeeds //when random dummys, the group names shall not be used
+            );
 
-            //Check if tournament tree can be filled with the given information
-            if (2 * firstRoundMatches.Count != relevantSeeds.Count)
+            //Get the matches of the first round of the tournament bracket
+            List<Match>? firstRoundMatches = RoundKoLogic.GetFirstRoundMatches(mrp.TargetRound);
+            if (firstRoundMatches is null || firstRoundMatches.Count == 0)
             {
-                //This is not the case. Probably because the number of seeds advancing doesn't fit the required ko stages
-                ErrorMessage = $"Number of Advancing Seeds ({relevantSeeds.Count}) of the {mrp.BaseRound.Groups?.Count} groups can't be mapped to the required minimum of {firstRoundMatches.Count} matches. Check Progression Settings and Group Count";
+                ErrorMessage = $"No first round matches found!";
                 return false;
             }
 
+            //move every second match in the other half of the bracket to ensure players of the same group meet as late as possible
+            for (int i = 1; i < firstRoundMatches.Count / 2; i+=2)
+            {
+                int otherBracketHalfPosition = (i + firstRoundMatches.Count / 2) % firstRoundMatches.Count;
+
+                //store other match's seeds
+                Seed? tmpSeed1 = firstRoundMatches[otherBracketHalfPosition].Seed1;
+                Seed? tmpSeed2 = firstRoundMatches[otherBracketHalfPosition].Seed2;
+
+                //update other match's seeds
+                firstRoundMatches[otherBracketHalfPosition].Seed1 = firstRoundMatches[i].Seed1;
+                firstRoundMatches[otherBracketHalfPosition].Seed2 = firstRoundMatches[i].Seed2;
+
+                //update match's seeds
+                firstRoundMatches[i].Seed1 = tmpSeed1;
+                firstRoundMatches[i].Seed2 = tmpSeed2;
+            }
+
+
+            //update the seeds of the following rounds to show valid bracket information
+            RoundKoLogic.UpdateKoRoundSeeds(_context, mrp.TargetRound);
+
+            return true;
+#if false
+
+            //Fill with bye's if necessary
+            relevantSeeds = RoundKoLogic.FillWithByeSeeds(relevantSeeds, 2 * numberOfMatches);
+            //Seed byeSeed = new Seed() { SeedName = "Bye" };
+            //for (int i = 0; i < numberOfByePlayers; i++) relevantSeeds.Add(byeSeed);
+
+            ////Check if tournament tree can be filled with the given information
+            //if (2 * numberOfMatches != relevantSeeds.Count)
+            //{
+            //    //This is not the case. Probably because the number of seeds advancing doesn't fit the required ko stages
+            //    ErrorMessage = $"Number of Advancing Seeds ({relevantSeeds.Count}) of the {mrp.BaseRound.Groups?.Count} groups can't be mapped to the required minimum of {firstRoundMatches.Count} matches. Check Progression Settings and Group Count";
+            //    return false;
+            //}
+
+            //fill the matches
             if (fixedPositions)
             {
                 //Pair the seeds top down so that seeds get matched with the lowest rank possible
-                List<Tuple<int, int>>? pairsList = getSeedPairs(firstRoundMatches.Count);
+                List<Tuple<int, int>>? pairsList = RoundKoLogic.GetSeedPairsOfBracket(numberOfMatches);
                 if(pairsList is null) return false;
 
-                //Fill matches based on List and reorder every second match
-                int numberOfMatches = firstRoundMatches.Count;
+                //Fill matches based on List of pairs
                 for (int i = 0; i < numberOfMatches; i++)
                 {
                     //move every second match in the other half of the bracket to ensure players of the same group meet as late as possible
@@ -127,12 +179,12 @@ namespace ChemodartsWebApp.ModelHelper
                     m.Seed2 = relevantSeeds[pairsList[pairListPosition].Item2 - 1];
 
                     //handle byes
-                    if (m.Seed1.Equals(byeSeed))
+                    if (m.Seed1.Equals(RoundKoLogic.BYE_SEED))
                     {
                         m.Seed1 = null;
                         m.SetNewStatus(Match.MatchStatus.Finished);
                     }
-                    else if(m.Seed2.Equals(byeSeed))
+                    else if(m.Seed2.Equals(RoundKoLogic.BYE_SEED))
                     {
                         m.Seed2 = null;
                         m.SetNewStatus(Match.MatchStatus.Finished);
@@ -142,51 +194,15 @@ namespace ChemodartsWebApp.ModelHelper
             else
             {
                 //Randomize Seeds for KO-Round
-                firstRoundMatches = RoundKoLogic.RandomizeSeedsForMatches(firstRoundMatches, relevantSeeds);
+                firstRoundMatches = RoundKoLogic.FillRandomizeSeedsForMatches(firstRoundMatches, relevantSeeds);
             }
 
+            //save in database
             _context.Matches.UpdateRange(firstRoundMatches);
             await _context.SaveChangesAsync();
 
-            RoundKoLogic.UpdateKoRoundSeeds(_context, mrp.TargetRound);
-
-            return true;
+#endif
         }
-
-        private List<Tuple<int, int>>? getSeedPairs(int numberOfMatches) 
-        {
-            if (!(numberOfMatches > 0 && (numberOfMatches & (numberOfMatches - 1)) == 0))
-            {
-                ErrorMessage = $"Number of Matches ({numberOfMatches}) is no power of 2";
-                return null;
-            }
-
-            //Create a List of the seed Ranks for the matches
-            List<Tuple<int, int>> pairsList = new List<Tuple<int, int>>() { new Tuple<int, int>(1, 2) };
-            int rankCntInStage = 0;
-            while (pairsList.Count < numberOfMatches)
-            {
-                //Split the old pairs
-                List<int> ranksInPreviousStage = new List<int>();
-                pairsList.ForEach(pair =>
-                {
-                    ranksInPreviousStage.Add(pair.Item1);
-                    ranksInPreviousStage.Add(pair.Item2);
-                });
-                rankCntInStage = 2 * ranksInPreviousStage.Count;
-
-                //combine with adjecent rank
-                pairsList = new List<Tuple<int, int>>();
-                ranksInPreviousStage.ForEach(rank =>
-                {
-                    pairsList.Add(new Tuple<int, int>(rank, rankCntInStage - (rank - 1)));
-                });
-            }
-
-            return pairsList;
-        }
-
-        //private List<Match>
 
         public async Task<bool> ManagePointsRanking(MapRoundProgression mrp)
         {
@@ -195,44 +211,6 @@ namespace ChemodartsWebApp.ModelHelper
             //TODO
 
             return false;
-        }
-
-        private List<Seed>? getRelevantSeeds(MapRoundProgression mrp)
-        {
-
-            List<Seed> seeds = new List<Seed>();
-            switch (mrp.BaseRound.Modus)
-            {
-                case RoundModus.RoundRobin:
-                    foreach (Group g in mrp.BaseRound.Groups)
-                    {
-                        seeds.AddRange(g.RankedSeeds.ToList().GetRange(0, mrp.AdvanceCount));
-                    }
-                    return seeds;
-                case RoundModus.SingleKo:
-                case RoundModus.DoubleKo:
-                case RoundModus.Ranking:
-                default:
-                    return null;
-            }
-        }
-
-        private List<Match> dummyfySeedNames(List<Match> matches)
-        {
-            foreach (Match match in matches)
-            {
-                match.Seed1 = new Seed()
-                {
-                    Group = match.Group,
-                    SeedName = $"{match.Seed1?.SeedRank}. Gruppe \"{match.Seed1?.Group.GroupName}\""
-                };
-                match.Seed2 = new Seed()
-                {
-                    Group = match.Group,
-                    SeedName = $"{match.Seed2?.SeedRank}. Gruppe \"{match.Seed2?.Group.GroupName}\""
-                };
-            }
-            return matches;
         }
     }
 }

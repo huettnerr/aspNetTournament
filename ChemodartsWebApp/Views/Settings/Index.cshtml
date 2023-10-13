@@ -10,11 +10,6 @@
 
 <br />
 
-<button><a cd-route="Settings" cd-action="Progressions">Progressing Settings</a></button>
-
-<br />
-<br />
-
 @if(Model.R is object)
 {
     @if (!Model.R.IsRoundStarted)
@@ -30,9 +25,6 @@
         <span>Runde beendet</span>
     }
 }
-
-<br />
-<br />
 
 <div>
     <form asp-action="UpdateSeeds">
@@ -50,7 +42,18 @@
     </form>
 </div>
 
-<br /><br />
+
+<br />
+<br />
+
+<h3>Progression Rules of Round "@(Model.R.RoundName)"</h3>
+
+<div>
+    @await Html.PartialAsync("../_Lists/MapRoundProgressionList", Model.R.ProgressionRulesAsBase/*, new ViewDataDictionary(ViewData) { { "ShowGroup", "true" }}*/)
+</div>
+<br />
+
+@*<br /><br />
 
 <div>
     <form asp-action="UpdateKoFirstRound">
@@ -69,4 +72,4 @@
         <button type="submit">Update KO Round</button>
     </form>
     <div style="color:red;">@ViewBag.UpdateKoRoundMessage</div>
-</div>
+</div>*@

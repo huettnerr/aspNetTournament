@@ -8,7 +8,16 @@ namespace ChemodartsWebApp.ModelHelper
 {
     public static class RoundKoLogic
     {
-        public static async Task<bool> CreateSystemSingleKO(ChemodartsContext context, Round r, int numberOfPlayers, bool createSeeds)
+        public enum SeedingType
+        {
+            Random,
+            FixedForAll,
+            FixedForSome
+        }
+
+        public static readonly Seed BYE_SEED = new Seed() { SeedName = "Bye" };
+
+        public static async Task<bool> CreateKoSystem(ChemodartsContext context, Round r, int numberOfPlayers)
         {
             if (r is null || r.Modus != RoundModus.SingleKo || numberOfPlayers < 2) return false;
 
@@ -65,28 +74,6 @@ namespace ChemodartsWebApp.ModelHelper
 
                 //store matches for next round
                 prevStageMatches = matches;
-
-                //Make seeds if neccesary
-                if (createSeeds && stageNr == numberOfStages)
-                {
-                    List<Seed> seeds = new List<Seed>();
-                    for (int seedNr = 0; seedNr < numberOfPlayers; seedNr++)
-                    {
-                        Seed s = new Seed()
-                        {
-                            SeedName = $"KO-Seed #{seedNr}",
-                            GroupId = g.GroupId,
-                        };
-                        seeds.Add(s);
-                    }
-
-                    context.Seeds.AddRange(seeds);
-                    await context.SaveChangesAsync();
-
-                    matches = RandomizeSeedsForMatches(matches, seeds);
-                    context.Matches.UpdateRange(matches);
-                    await context.SaveChangesAsync();
-                }
             }
 
             //After creating this list should contain only the final. Updating it will recursivly update all matches
@@ -96,7 +83,79 @@ namespace ChemodartsWebApp.ModelHelper
             return true;
         }
 
-        public static List<Match> RandomizeSeedsForMatches(List<Match> matches, List<Seed> seeds)
+        public static string ErrorMessage;
+        public static async Task<bool> FillSeeds(ChemodartsContext context, SeedingType type, Round r, List<Seed>? seeds = null, int fixedSeedCount = 0)
+        {
+            //Get the matches of the first round of the tournament bracket
+            List<Match>? firstRoundMatches = RoundKoLogic.GetFirstRoundMatches(r);
+            if (firstRoundMatches is null || firstRoundMatches.Count == 0)
+            {
+                ErrorMessage = $"No first round matches found!";
+                return false;
+            }
+            int numberOfMatches = firstRoundMatches.Count;
+
+            //Check if Seed List is valid, create dummys otherwise
+            if (seeds is null || seeds.Count == 0)
+            {
+                //Use dummy names
+                Group? firstRoundGroup = firstRoundMatches.FirstOrDefault()?.Group;
+                if (firstRoundGroup is null) return false;
+
+                seeds = new List<Seed>();
+                int seedRank = 1;
+                for (int seedNr = 0; seedNr < numberOfMatches * 2; seedNr++)
+                {
+                    Seed s = new Seed()
+                    {
+                        Group = firstRoundGroup,
+                        SeedName = $"Seed {seedRank++}"
+                    };
+                    seeds.Add(s);
+                }
+                context.Seeds.AddRange(seeds);
+                await context.SaveChangesAsync();
+            }
+
+            switch (type)
+            {
+                case SeedingType.Random:
+                    //Randomize Seeds for KO-Round
+                    firstRoundMatches = FillRandomizeSeedsForMatches(firstRoundMatches, seeds);
+                    break;
+                case SeedingType.FixedForAll:
+                    firstRoundMatches = FillFixedSeedsForMatches(firstRoundMatches, seeds);
+                    break;
+                default:
+                    return false;
+            }
+
+            context.Matches.UpdateRange(firstRoundMatches);
+            await context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public static List<Match>? GetFirstRoundMatches(Round r)
+        {
+            if (!(r.Modus == RoundModus.SingleKo || r.Modus == RoundModus.DoubleKo) || r.Groups is null || r.Groups.Count == 0) return null;
+
+            return r.Groups.MinBy(g => g.GroupOrderValue)?.Matches.ToList();
+        }
+
+        public static Group? GetFirstRoundGroup(Round r)
+        {
+            return r.Groups?.MinBy(g => g.GroupOrderValue);
+        }
+
+        public static List<Seed> FillWithByeSeeds(List<Seed> seeds, int desiredSeedCount)
+        {
+            while (seeds.Count < desiredSeedCount) seeds.Add(BYE_SEED);
+
+            return seeds;
+        }
+
+        public static List<Match> FillRandomizeSeedsForMatches(List<Match> matches, List<Seed> seeds)
         {
             Seed randomSeed;
             Random random = new Random();
@@ -106,13 +165,11 @@ namespace ChemodartsWebApp.ModelHelper
             {
                 //Set seed 1
                 randomSeed = seeds.ElementAt(random.Next(seeds.Count));
-                m.Seed1Id = randomSeed.SeedId;
-                seeds.Remove(randomSeed);
+                m.Seed1 = randomSeed;
             }
 
-            //Fill with bye's if necessary
-            Seed byeSeed = new Seed() { SeedName = "Bye" };
-            while (seeds.Count < matches.Count) seeds.Add(byeSeed);
+            //Add bye seeds if necessary
+            seeds = FillWithByeSeeds(seeds, matches.Count);
 
             //Randomize 2nd seed
             foreach (Match m in matches)
@@ -122,12 +179,13 @@ namespace ChemodartsWebApp.ModelHelper
                 seeds.Remove(randomSeed);
 
                 //Handle bye seeds
-                if (!randomSeed.Equals(byeSeed))
+                if (!randomSeed.Equals(BYE_SEED))
                 {
-                    m.Seed2Id = randomSeed.SeedId;
+                    m.Seed2 = randomSeed;
                 }
                 else
                 {
+                    m.Seed2 = null;
                     m.SetNewStatus(Match.MatchStatus.Finished);
                 }
             }
@@ -135,77 +193,41 @@ namespace ChemodartsWebApp.ModelHelper
             return matches;
         }
 
-        //public static async Task<bool> CreateSystem(ChemodartsContext context, OldGroupFactoryKO factory, Round r, ModelStateDictionary? modelState)
-        //{
-        //    if (r is null || r.Modus != RoundModus.SingleKo) return false;
+        public static List<Match> FillFixedSeedsForMatches(List<Match> matches, List<Seed> seeds)
+        {
+            int numberOfMatches = matches.Count;
+            seeds = FillWithByeSeeds(seeds, 2 * numberOfMatches);
 
-        //    context.Groups.RemoveRange(r.Groups);
-        //    await context.SaveChangesAsync();
+            //Pair the seeds top down so that seeds get matched with the lowest rank possible
+            List<Tuple<int, int>>? pairsList = RoundKoLogic.GetSeedPairsOfBracket(numberOfMatches);
+            if (pairsList is null) return matches;
 
-        //    factory.R = r;
-        //    factory.NumberOfRounds--; // Fühlt sich natürlicher an das Finale mitzuzählen
+            //Fill matches based on List of pairs
+            for (int i = 0; i < numberOfMatches; i++)
+            {
+                //move every second match in the other half of the bracket to ensure players of the same group meet as late as possible
+                //int pairListPosition = (i % 2 == 0) ? i : (i + numberOfMatches / 2) % numberOfMatches;
 
-        //    List<Group> groups = new List<Group>();
-        //    for (int roundNr = 0; roundNr <= factory.NumberOfRounds; roundNr++)
-        //    {
-        //        //Make Groups
-        //        int playersInRound = 2 * getPlayersPerStage(factory.NumberOfRounds - roundNr);
-        //        Group g = new Group()
-        //        {
-        //            GroupName = getGroupName(playersInRound),
-        //            RoundId = factory.R.RoundId,
-        //        };
-        //        g.Matches = new List<Match>();
-        //        groups.Add(g);
-        //        context.Groups.Add(g);
-        //        context.SaveChanges();
+                //fill match seeds according to list
+                Match m = matches[i];
+                m.Seed1 = seeds[pairsList[i].Item1 - 1];
+                m.Seed2 = seeds[pairsList[i].Item2 - 1];
 
-        //        //Make Seeds
-        //        List<Seed> seeds = new List<Seed>();
-        //        for (int iPlayer = 0; iPlayer < playersInRound; iPlayer++)
-        //        {
-        //            Seed s = new Seed()
-        //            {
-        //                SeedName = "Please Run Script",
-        //                GroupId = g.GroupId,
-        //            };
+                //handle byes
+                if (m.Seed1.Equals(RoundKoLogic.BYE_SEED))
+                {
+                    m.Seed1 = null;
+                    m.SetNewStatus(Match.MatchStatus.Finished);
+                }
+                else if (m.Seed2.Equals(RoundKoLogic.BYE_SEED))
+                {
+                    m.Seed2 = null;
+                    m.SetNewStatus(Match.MatchStatus.Finished);
+                }
+            }
 
-        //            if (roundNr > 1)
-        //            {
-        //                //Link Ancestors
-        //                s.AncestorMatch = groups.ElementAt(roundNr - 1).Matches.ElementAt(iPlayer);
-        //            }
-        //            else
-        //            {
-        //                //First round
-        //                s.SeedNr = iPlayer;
-        //            }
-
-        //            seeds.Add(s);
-        //        }
-        //        context.Seeds.AddRange(seeds);
-        //        context.SaveChanges();
-
-        //        //Make Matches
-        //        List<Match> matches = new List<Match>();
-        //        for (var iMatch = 0; iMatch < getPlayersPerStage(factory.NumberOfRounds - roundNr); iMatch++)
-        //        {
-        //            Match m = new Match()
-        //            {
-        //                Seed1Id = seeds.ElementAt(2 * iMatch).SeedId,
-        //                Seed2Id = seeds.ElementAt(2 * iMatch + 1).SeedId,
-        //                MatchOrderValue = iMatch,
-        //                GroupId = g.GroupId,
-        //            };
-        //            g.Matches.Add(m);
-        //            matches.Add(m);
-        //        }
-        //        context.Matches.AddRange(matches);
-        //        context.SaveChanges();
-        //    }
-
-        //    return true;
-        //}
+            return matches;
+        }
 
         public static void UpdateFirstRoundSeeds(Data.ChemodartsContext context, Round previousRound, Group firstKoRoundGroup)
         {
@@ -255,6 +277,36 @@ namespace ChemodartsWebApp.ModelHelper
             }
 
             context.SaveChanges();
+        }
+
+        private static List<Tuple<int, int>>? GetSeedPairsOfBracket(int numberOfMatches)
+        {
+            // ensure number of matches is power of 2
+            if (!(numberOfMatches > 0 && (numberOfMatches & (numberOfMatches - 1)) == 0)) return null;
+
+            //Create a List of the seed Ranks for the matches
+            List<Tuple<int, int>> pairsList = new List<Tuple<int, int>>() { new Tuple<int, int>(1, 2) };
+            int rankCntInStage = 0;
+            while (pairsList.Count < numberOfMatches)
+            {
+                //Split the old pairs
+                List<int> ranksInPreviousStage = new List<int>();
+                pairsList.ForEach(pair =>
+                {
+                    ranksInPreviousStage.Add(pair.Item1);
+                    ranksInPreviousStage.Add(pair.Item2);
+                });
+                rankCntInStage = 2 * ranksInPreviousStage.Count;
+
+                //combine with adjecent rank
+                pairsList = new List<Tuple<int, int>>();
+                ranksInPreviousStage.ForEach(rank =>
+                {
+                    pairsList.Add(new Tuple<int, int>(rank, rankCntInStage - (rank - 1)));
+                });
+            }
+
+            return pairsList;
         }
 
         // Gets the number of matches per stage (stage 1 is final, stage 2 is semi and so on)

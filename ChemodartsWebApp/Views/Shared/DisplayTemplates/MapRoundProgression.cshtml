@@ -3,7 +3,7 @@
 <td>
     @if(Model.TargetRound is object)
     {
-        <a cd-route="Round" cd-action="Details" cd-route-roundId="@Model.TargetRound?.RoundId">@Html.DisplayFor(m => m.TargetRound.RoundName)</a>
+        <a cd-route="Round" cd-action="Index" cd-route-roundId="@Model.TargetRound?.RoundId">@Html.DisplayFor(m => m.TargetRound.RoundName)</a>
     }else{
         <span>N/A</span>
     }

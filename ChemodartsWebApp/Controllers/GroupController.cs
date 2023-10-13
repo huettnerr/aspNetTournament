@@ -85,9 +85,15 @@ namespace ChemodartsWebApp.Controllers
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            if (await RoundKoLogic.CreateSystemSingleKO(_context, r, koFactory.NumberOfPlayers, true))
+            List<Seed>? seeds = r.MappedSeedsPlayers?.Select(x => x.Seed).ToList();
+            if(seeds is null || seeds.Count == 0) return NotFound();
+
+            if (await RoundKoLogic.CreateKoSystem(_context, r, koFactory.NumberOfPlayers))
             {
-                return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+                if(await RoundKoLogic.FillSeeds(_context, RoundKoLogic.SeedingType.Random, r, seeds))
+                {
+                    return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+                }
             }
 
             return View("Create", new GroupViewModel() { R = r, GF = koFactory });
