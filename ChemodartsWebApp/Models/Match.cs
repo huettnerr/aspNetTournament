@@ -46,7 +46,11 @@ namespace ChemodartsWebApp.Models
         public virtual Seed? Seed1 { get; set; }
         [Display(Name = "Gast")] 
         public virtual Seed? Seed2 { get; set; }
-        public virtual Seed? WinnerSeed { get; set; }
+        public virtual Seed? WinnerSeed { 
+            get; 
+            private set; 
+        }
+        [NotMapped] public virtual Seed? LoserSeed { get; private set; }    
         public virtual Score? Score { get; set; }
         public virtual Match? WinnerFollowUpMatch { get; set; }
         public virtual Match? LoserFollowUpMatch { get; set; }
@@ -83,7 +87,23 @@ namespace ChemodartsWebApp.Models
                     break;
             }
 
-            Update();
+            UpdateUpwards();
+        }
+
+        public void UpdateUpwards()
+        {
+            // update
+            if (WinnerFollowUpMatch is null && LoserFollowUpMatch is null)
+            {
+                // update when no follow ups
+                Update();
+            }
+            else
+            {
+                // propagate upwards
+                WinnerFollowUpMatch?.UpdateUpwards();
+                LoserFollowUpMatch?.UpdateUpwards();
+            }
         }
 
         public void Update()
@@ -91,38 +111,15 @@ namespace ChemodartsWebApp.Models
             switch (Group.Round.Modus)
             {
                 case RoundModus.RoundRobin:
-                    WinnerSeed = Ranking.GetWinnerSeed(this);
+                    UpdateWinnerSeed(this);
                     Ranking.UpdateGroupRanking(Group);
                     break;
                 case RoundModus.SingleKo:
-                    PropagateToTopTier(nameof(WinnerFollowUpMatch));
-                    goto case RoundModus.DoubleKo;
+                    //goto case RoundModus.DoubleKo;
                 case RoundModus.DoubleKo:
-                    PropagateToTopTier(nameof(LoserFollowUpMatch));
+                    UpdateSeedsFromAcestors(this);
+                    //PropagateToTopTier(nameof(LoserFollowUpMatch));
                     break;
-            }
-        }
-
-        public void PropagateToTopTier(string propertyName)
-        {
-            //Make sure only winner or loser follow up match property is passed
-            if (!(propertyName.Equals(nameof(Match.WinnerFollowUpMatch)) || propertyName.Equals(nameof(Match.LoserFollowUpMatch)))) return;
-            PropertyInfo followUpProperty = typeof(Match).GetProperty(propertyName);
-
-            //get the (winner or loser) follow up match property
-            Match? followUpMatch = followUpProperty?.GetValue(this) as Match;
-            Match? followUpMatchsFollowUpMatch = followUpMatch is object ? followUpProperty?.GetValue(followUpMatch) as Match : null;
-
-            //propagate correctly
-            if(followUpMatchsFollowUpMatch is object)
-            {
-                //Follow Up is not the top tier
-                followUpMatch.PropagateToTopTier(propertyName);
-            }
-            else
-            {
-                //when follow up match is an object, than its the top tier, otherwise we are
-                UpdateSeedsFromAcestors(followUpMatch ?? this);
             }
         }
 
@@ -132,45 +129,103 @@ namespace ChemodartsWebApp.Models
             if (m.AncestorMatches?.Count == 2)
             {
                 Match am1 = m.AncestorMatches.OrderBy(m => m.MatchOrderValue).ElementAt(0);
-                Match.updateSeedFromAncestor(m.GroupId, am1, m.Seed1, out Seed s1New);
+                bool isWinnerAncestor = m.AncestorMatchesAsWinner?.Contains(am1) ?? false;
+                Match.updateSeedFromAncestor(m.GroupId, am1, m.Seed1, out Seed? s1New, isWinnerAncestor);
                 m.Seed1 = s1New;
 
                 Match am2 = m.AncestorMatches.OrderBy(m => m.MatchOrderValue).ElementAt(1);
-                Match.updateSeedFromAncestor(m.GroupId, am2, m.Seed2, out Seed s2New);
+                isWinnerAncestor = m.AncestorMatchesAsWinner?.Contains(am2) ?? false;
+                Match.updateSeedFromAncestor(m.GroupId, am2, m.Seed2, out Seed? s2New, isWinnerAncestor);
                 m.Seed2 = s2New;
-            }
-        }
-
-        private static void updateSeedFromAncestor(int baseGroupId, Match ancestorMatch, Seed? S1orS2, out Seed newSeed)
-        {
-            UpdateSeedsFromAcestors(ancestorMatch);
-
-            ancestorMatch.WinnerSeed = Ranking.GetWinnerSeed(ancestorMatch);
-            if (ancestorMatch.WinnerSeed is object)
-            {
-                //Match has winner
-                newSeed = ancestorMatch.WinnerSeed;
             }
             else
             {
-                //Match has no winner
-                newSeed = S1orS2 is object ? S1orS2 : new Seed() { GroupId = baseGroupId };
-
-                //Update Seedname
-                List<string?> sb = new List<string?>
-                {
-                    ancestorMatch.Seed1?.Player?.ShortName ?? ancestorMatch.Seed1?.SeedName,
-                    ancestorMatch.Seed2?.Player?.ShortName ?? ancestorMatch.Seed2?.SeedName
-                };
-                newSeed.SeedName = String.Join(" | ", sb.Where(s => s is object));
+                //Seed has no ancesters, so add their name/player name to the list
+                if(m.Seed1 is object) m.Seed1.PossibleSeeds = new List<string?>() { m.Seed1?.Player?.ShortName ?? m.Seed1?.SeedName };
+                if(m.Seed2 is object) m.Seed2.PossibleSeeds = new List<string?>() { m.Seed2?.Player?.ShortName ?? m.Seed2?.SeedName };
             }
         }
+
+        private static void updateSeedFromAncestor(int baseGroupId, Match ancestorMatch, Seed? S1orS2, out Seed? newSeed, bool useWinnerSeed)
+        {
+            UpdateSeedsFromAcestors(ancestorMatch);
+
+            UpdateWinnerSeed(ancestorMatch);
+            if (UpdateWinnerSeed(ancestorMatch))
+            {
+                //Match has winner
+                newSeed = useWinnerSeed ? ancestorMatch.WinnerSeed : ancestorMatch.LoserSeed;
+                newSeed?.PossibleSeeds.Clear();
+                newSeed?.PossibleSeeds.Add(newSeed?.Player?.ShortName ?? newSeed?.SeedName);
+            }
+            else //Match has no winner
+            {
+                //check if this match already has a dummy seed and create if not
+                newSeed = S1orS2 is object ? S1orS2 : new Seed() { GroupId = baseGroupId };
+
+                //Update possible seeds
+                newSeed.PossibleSeeds.Clear();
+                newSeed.PossibleSeeds.AddRange(ancestorMatch.Seed1?.PossibleSeeds ?? new List<string?>());
+                newSeed.PossibleSeeds.AddRange(ancestorMatch.Seed2?.PossibleSeeds ?? new List<string?>());
+
+                //update the name
+                if(newSeed.PossibleSeeds.Count <= 12)
+                {
+                    newSeed.SeedName = String.Join(" | ", newSeed.PossibleSeeds.Where(s => s is object));
+                }
+                else
+                {
+                    newSeed.SeedName = $"{newSeed.PossibleSeeds.Count} possible seeds";
+                }
+
+            }
+        }
+
+
+        //public void PropagateToTopTier(string propertyName)
+        //{
+        //    //Make sure only winner or loser follow up match property is passed
+        //    if (!(propertyName.Equals(nameof(Match.WinnerFollowUpMatch)) || propertyName.Equals(nameof(Match.LoserFollowUpMatch)))) return;
+        //    PropertyInfo followUpProperty = typeof(Match).GetProperty(propertyName);
+
+        //    //get the (winner or loser) follow up match property
+        //    Match? followUpMatch = followUpProperty?.GetValue(this) as Match;
+        //    Match? followUpMatchsFollowUpMatch = followUpMatch is object ? followUpProperty?.GetValue(followUpMatch) as Match : null;
+
+        //    //propagate correctly
+        //    if(followUpMatchsFollowUpMatch is object)
+        //    {
+        //        //Follow Up is not the top tier
+        //        followUpMatch.PropagateToTopTier(propertyName);
+        //    }
+        //    else
+        //    {
+        //        //when follow up match is an object, than its the top tier, otherwise we are
+        //        UpdateSeedsFromAcestors(followUpMatch ?? this);
+        //    }
+        //}
 
         public bool IsWinnerSeed(Seed? s)
         {
             if (s is null) return false;
 
             return s.Equals(WinnerSeed);
+        }
+
+        private static bool UpdateWinnerSeed(Match m)
+        {
+            m.WinnerSeed = Ranking.GetWinnerSeed(m);
+
+            if (m.WinnerSeed is null)
+            {
+                m.LoserSeed = null;
+                return false;
+            }
+            else
+            {
+                m.LoserSeed = m.IsWinnerSeed(m.Seed1) ? m.Seed2 : m.Seed1;
+                return true;
+            }
         }
 
         public bool IsMatchOfSeeds(Seed? s1, Seed? s2)

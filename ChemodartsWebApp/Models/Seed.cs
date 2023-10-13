@@ -23,6 +23,7 @@ namespace ChemodartsWebApp.Models
         //[NotMapped][Display(Name = "Turnier")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Tournament Tournament { get => MappedTournamentPlayer.Round.Tournament; }
         [NotMapped][Display(Name = "Runde")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Round Round { get => MappedRoundSeedPlayer?.Round; }
         [NotMapped][Display(Name = "Spieler")][DisplayFormat(NullDisplayText = "n. A.")] public virtual Player? Player { get => MappedRoundSeedPlayer?.Player; }
+        [NotMapped] public virtual List<string?> PossibleSeeds { get; set; } = new List<string?>();
 
         public override string ToString()
         {

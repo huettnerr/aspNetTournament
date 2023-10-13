@@ -1,9 +1,9 @@
 ﻿@model RoundViewModel
 
-@foreach (var group in Model.R.Groups) {
+@foreach (var group in Model.R.OrderedGroups.Reverse()) {
     <h2 class="display-4">
         <a cd-route="Group" cd-action="Index" asp-route-groupId="@group.GroupId">
-        Gruppe <b>@group.GroupName</b>
+        <b>@group.GroupName</b>
         </a>
     </h2>
 

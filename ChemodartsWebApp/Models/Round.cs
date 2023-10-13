@@ -42,6 +42,7 @@ namespace ChemodartsWebApp.Models
         public virtual ICollection<MapRoundProgression> ProgressionRulesAsTarget { get; set; } = new List<MapRoundProgression>();
 
         [NotMapped] public virtual ICollection<Seed>? Seeds { get => MappedSeedsPlayers?.Select(msp => msp.Seed).OrderBy(s => s.SeedNr).ToList(); }
+        [NotMapped] public virtual ICollection<Group>? OrderedGroups { get => Groups?.OrderBy(g => g.GroupOrderValue).ToList(); }
 
     }
 }
