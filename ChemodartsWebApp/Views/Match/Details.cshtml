@@ -28,14 +28,14 @@
         @if (Model.M.Group.Round.Modus != RoundModus.RoundRobin) {
             <tr>
                 <td>
-                    <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
-                        @Html.DisplayFor(model => model.M.Seed1.Group.GroupName) (<span>@Model.M.Seed1.SeedRank</span>. Platz)
+                    <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1?.Group.GroupId">
+                        @Html.DisplayFor(model => model.M.Seed1.Group.GroupName) (<span>@Model.M.Seed1?.SeedRank</span>. Platz)
                     </a>
                 </td>
                 @Html.DisplayFor(m => Model.M, "Match/Columns/MatchGroup", new { RenderType = "Header"})
                 <td>
-                    <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1.Group.GroupId">
-                        @Html.DisplayFor(model => model.M.Seed2.Group.GroupName) (<span>@Model.M.Seed2.SeedRank</span>. Platz)
+                    <a cd-route="Group" cd-action="Index" cd-route-groupId="@Model.M.Seed1?.Group.GroupId">
+                        @Html.DisplayFor(model => model.M.Seed2.Group.GroupName) (<span>@Model.M.Seed2?.SeedRank</span>. Platz)
                     </a>
                 </td>
             </tr>

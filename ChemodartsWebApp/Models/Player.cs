@@ -30,7 +30,7 @@ namespace ChemodartsWebApp.Models
 
         public override string ToString()
         {
-            return $"[{PlayerId}] {PlayerName}";
+            return $"<p>[{PlayerId}] {PlayerName}</p>";
         }
     }
 }

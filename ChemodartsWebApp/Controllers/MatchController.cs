@@ -65,11 +65,13 @@ namespace ChemodartsWebApp.Controllers
             Match? m = await _context.Matches.QueryId(matchId);
             if (m is null) return NotFound();
 
-            m.SetNewStatus(Match.MatchStatus.Active);
-            if (m.Score is null)
+            if (m.SetNewStatus(Match.MatchStatus.Active))
             {
-                Score score = ScoreFactory.CreateScore(m);
-                _context.Scores.Add(score);
+                if (m.Score is null)
+                {
+                    Score score = ScoreFactory.CreateScore(m);
+                    _context.Scores.Add(score);
+                }
             }
 
             await _context.SaveChangesAsync();
@@ -123,6 +125,15 @@ namespace ChemodartsWebApp.Controllers
 
                 _context.Matches.Update(m);
                 await _context.SaveChangesAsync();
+            }
+            else
+            {
+                if (newMatchStatus is object)
+                {
+                    m.SetNewStatus(newMatchStatus.Value);
+                    _context.Matches.Update(m);
+                    await _context.SaveChangesAsync();
+                }
             }
 
             return this.RedirectToPreviousPage(fragment: $"Match_{matchId}", editQueryStringToRemove: editQuery);

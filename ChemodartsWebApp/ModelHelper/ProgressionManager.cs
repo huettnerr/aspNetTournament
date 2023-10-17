@@ -100,7 +100,8 @@ namespace ChemodartsWebApp.ModelHelper
                         relevantSeeds.Add(new Seed()
                         {
                             Group = firstRoundGroup,
-                            SeedName = $"{rank}. Gruppe \"{g.GroupName}\""
+                            SeedName = $"{rank}. Gruppe \"{g.GroupName}\"",
+                            IsDummy = true
                         });
                     }
                 }
@@ -145,63 +146,6 @@ namespace ChemodartsWebApp.ModelHelper
             RoundKoLogic.UpdateKoRoundSeeds(_context, mrp.TargetRound);
 
             return true;
-#if false
-
-            //Fill with bye's if necessary
-            relevantSeeds = RoundKoLogic.FillWithByeSeeds(relevantSeeds, 2 * numberOfMatches);
-            //Seed byeSeed = new Seed() { SeedName = "Bye" };
-            //for (int i = 0; i < numberOfByePlayers; i++) relevantSeeds.Add(byeSeed);
-
-            ////Check if tournament tree can be filled with the given information
-            //if (2 * numberOfMatches != relevantSeeds.Count)
-            //{
-            //    //This is not the case. Probably because the number of seeds advancing doesn't fit the required ko stages
-            //    ErrorMessage = $"Number of Advancing Seeds ({relevantSeeds.Count}) of the {mrp.BaseRound.Groups?.Count} groups can't be mapped to the required minimum of {firstRoundMatches.Count} matches. Check Progression Settings and Group Count";
-            //    return false;
-            //}
-
-            //fill the matches
-            if (fixedPositions)
-            {
-                //Pair the seeds top down so that seeds get matched with the lowest rank possible
-                List<Tuple<int, int>>? pairsList = RoundKoLogic.GetSeedPairsOfBracket(numberOfMatches);
-                if(pairsList is null) return false;
-
-                //Fill matches based on List of pairs
-                for (int i = 0; i < numberOfMatches; i++)
-                {
-                    //move every second match in the other half of the bracket to ensure players of the same group meet as late as possible
-                    int pairListPosition = (i % 2 == 0) ? i : (i + numberOfMatches / 2) % numberOfMatches;
-
-                    //fill match seeds according to list
-                    Match m = firstRoundMatches[i];
-                    m.Seed1 = relevantSeeds[pairsList[pairListPosition].Item1 - 1];
-                    m.Seed2 = relevantSeeds[pairsList[pairListPosition].Item2 - 1];
-
-                    //handle byes
-                    if (m.Seed1.Equals(RoundKoLogic.BYE_SEED))
-                    {
-                        m.Seed1 = null;
-                        m.SetNewStatus(Match.MatchStatus.Finished);
-                    }
-                    else if(m.Seed2.Equals(RoundKoLogic.BYE_SEED))
-                    {
-                        m.Seed2 = null;
-                        m.SetNewStatus(Match.MatchStatus.Finished);
-                    }
-                }
-            }
-            else
-            {
-                //Randomize Seeds for KO-Round
-                firstRoundMatches = RoundKoLogic.FillRandomizeSeedsForMatches(firstRoundMatches, relevantSeeds);
-            }
-
-            //save in database
-            _context.Matches.UpdateRange(firstRoundMatches);
-            await _context.SaveChangesAsync();
-
-#endif
         }
 
         public async Task<bool> ManagePointsRanking(MapRoundProgression mrp)

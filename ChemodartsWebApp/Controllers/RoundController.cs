@@ -10,6 +10,7 @@ using ChemodartsWebApp.Data.Factory;
 using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using ChemodartsWebApp.ViewModel;
+using ChemodartsWebApp.ModelHelper;
 
 namespace ChemodartsWebApp.Controllers
 {
@@ -27,14 +28,14 @@ namespace ChemodartsWebApp.Controllers
         {
             //search for spezific tournament
             Round? r = await _context.Rounds.QueryId(roundId);
-            if (r is null)
+            if (r is null) return NotFound();
+
+            if(r.IsKoRound())
             {
-                return NotFound();
+                RoundKoLogic.CreateDummySeedsForMatches(ref r);
             }
-            else
-            {
-                return View(new RoundViewModel() { R = r });
-            }
+
+            return View(new RoundViewModel() { R = r });
         }
 
         // GET: Rounds/Create

@@ -5,49 +5,6 @@ namespace ChemodartsWebApp.ModelHelper
 {
     public static class Ranking
     {
-        public static Seed? GetWinnerSeed(Match m)
-        {
-            if (m.Status != MatchStatus.Finished) return null;
-
-            if (m.Seed1 is object && m.Seed2 is null) return m.Seed1;
-            if (m.Seed1 is null && m.Seed2 is object) return m.Seed2;
-
-            if (m.Seed1 is null && m.Seed2 is null) return null;
-            if (m.Score == null) return null;
-
-
-            if (m.Group.Round.Scoring == ScoreType.LegsOnly)
-            {
-                //Check for Legs
-                if (m.Score.P1Legs > m.Score.P2Legs)
-                {
-                    //Seed 1 won
-                    return m.Seed1;
-                }
-                else if (m.Score.P1Legs < m.Score.P2Legs)
-                {
-                    //Seed 2 won
-                    return m.Seed2;
-                }
-                return null;
-            }
-            else
-            {
-                //Check for Sets
-                if (m.Score.P1Sets > m.Score.P2Sets)
-                {
-                    //Player 1 won
-                    return m.Seed1;
-                }
-                else if (m.Score.P1Sets < m.Score.P2Sets)
-                {
-                    //Player 2 won
-                    return m.Seed2;
-                }
-                return null;
-            }
-        }
-
         public static void CalculateSeedStatistics(Seed s, Group? g = null)
         {
             //Create Stats if necessary

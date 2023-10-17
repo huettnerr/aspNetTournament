@@ -44,5 +44,9 @@ namespace ChemodartsWebApp.Models
         [NotMapped] public virtual ICollection<Seed>? Seeds { get => MappedSeedsPlayers?.Select(msp => msp.Seed).OrderBy(s => s.SeedNr).ToList(); }
         [NotMapped] public virtual ICollection<Group>? OrderedGroups { get => Groups?.OrderBy(g => g.GroupOrderValue).ToList(); }
 
+        public bool IsKoRound()
+        {
+            return Modus == RoundModus.SingleKo || Modus == RoundModus.DoubleKo;
+        }
     }
 }

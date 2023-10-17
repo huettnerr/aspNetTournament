@@ -4,16 +4,26 @@ using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Bcpg;
+using static ChemodartsWebApp.ModelHelper.KoStage;
 
 namespace ChemodartsWebApp.ModelHelper
 {
     public class KoStage
     {
+        public enum KoLinkingType
+        {
+            None,
+            Winners,
+            Losers,
+            Mixed
+        }
+
         public Round Round { get; set; }
         public int NumberOfStages { get; set; }
         public int StageNr { get; set; }
         public Group StageGroup { get; set; }
         public List<Match> StageMatches { get; set; }
+        public KoLinkingType LinkingType { get; set; }
     }
 
     public static class RoundKoLogic
@@ -25,7 +35,7 @@ namespace ChemodartsWebApp.ModelHelper
             FixedForSome
         }
 
-        public static readonly Seed BYE_SEED = new Seed() { SeedName = "Bye" };
+        public static KoStage? REF_STAGE_NULL = null;
 
         public static async Task<bool> CreateKoSystem(ChemodartsContext context, Round r, int numberOfPlayers)
         {
@@ -39,46 +49,72 @@ namespace ChemodartsWebApp.ModelHelper
             }
 
             //2P -> 1; 4P -> 2, 8P -> 3, ...
-                        //Stage 1 is the final, stage 2 the semi and so on. NumberOfStages equals the first stage
+            //Stage 1 is the final, stage 2 the semi and so on. NumberOfStages equals the first stage
             int numberOfStages = (int)Math.Ceiling(Math.Log2(numberOfPlayers));
+            List<KoStage> stages = new List<KoStage>();    
 
             //now make first stage
-            KoStage? firstStage = await createBracketStage(context, new KoStage() { Round = r, NumberOfStages = numberOfStages}, numberOfStages, null);
+            KoStage prevStage = new KoStage() { Round = r, NumberOfStages = numberOfStages };
+            KoStage? prevLoserStage = null;
+            KoStage? firstStage = createBracketStage(context, ref prevStage, numberOfStages, KoLinkingType.None, ref REF_STAGE_NULL);
+            stages.Add(firstStage);
 
-            KoStage prevStage = firstStage;
+            //Only the first stage of the losers bracket will be entirely connected to the losing seeds
+            prevLoserStage = createBracketStage(context, ref firstStage, numberOfStages - 1, KoLinkingType.Losers, ref REF_STAGE_NULL);
+            prevLoserStage = adjustLoserStage(context, prevLoserStage, "Losers - First Round");
+            stages.Add(prevLoserStage);
+
+            prevStage = firstStage;
             for (int stageNr = numberOfStages - 1; stageNr > 0; stageNr--) 
             {
-                prevStage = await createBracketStage(context, prevStage, stageNr, true);
+                KoStage winnerStage = createBracketStage(context, ref prevStage, stageNr, KoLinkingType.Winners, ref REF_STAGE_NULL);
+
+                if (r.Modus == RoundModus.DoubleKo && numberOfStages >= 2)
+                {
+                    KoStage loserStage;
+
+                    //Check if an intermediate losers round must be played
+                    if(winnerStage.StageMatches.Count < prevLoserStage.StageMatches.Count)
+                    {
+                        //And let them play for a winner
+                        loserStage = createBracketStage(context, ref prevLoserStage, stageNr, KoLinkingType.Winners, ref REF_STAGE_NULL);
+                        loserStage = adjustLoserStage(context, loserStage, $"Losers - Pre {loserStage.StageGroup.GroupName}");
+                        stages.Add(loserStage);
+
+                        prevLoserStage = loserStage;
+                    }
+
+                    stages.Add(winnerStage);
+
+                    //Flip matches of every second stage
+                    if (stageNr - (numberOfStages - 1) % 2 != 0) winnerStage.StageMatches.Reverse();
+
+                    //link a winner bracket loser with a loser bracket winner
+                    loserStage = createBracketStage(context, ref winnerStage, stageNr, KoLinkingType.Mixed, ref prevLoserStage);
+                    loserStage = adjustLoserStage(context, loserStage);
+                    stages.Add(loserStage);
+
+                    //Reverse back for winners bracket
+                    if (stageNr - (numberOfStages - 1) % 2 != 0) winnerStage.StageMatches.Reverse();
+
+                    prevLoserStage = loserStage;
+                }
+                else
+                {
+                    stages.Add(winnerStage);
+                }
+
+                prevStage = winnerStage;
             }
             KoStage winnersFinalStage = prevStage; //The last created Stage is the final
-            //winnersFinalStage.StageMatches?.FirstOrDefault()?.Update();
+            KoStage? losersFinalStage = prevLoserStage; //The last created Stage is the final
 
             //when creating a double ko (with more than one stage) create the losing bracket
             if (r.Modus == RoundModus.DoubleKo && numberOfStages >= 2)
             {
-                //add following stages
-                prevStage = firstStage;
-                for (int stageNr = numberOfStages - 1; stageNr > 0; stageNr--)
-                {
-                    bool isFirstLosersStage = stageNr == numberOfStages - 1;
-
-                    //Only the first stage of the losers bracket will be connected to the losing seeds
-                    KoStage newStage = await createBracketStage(context, prevStage, stageNr, !isFirstLosersStage);
-
-                    //Change name of the group and adjust group stage
-                    newStage.StageGroup.GroupName = $"Losers - {newStage.StageGroup.GroupName}";
-                    newStage.StageGroup.GroupOrderValue++;
-                    context.Groups.Update(newStage.StageGroup);
-
-                    //Adjust match stages
-                    newStage.StageMatches.ForEach(m => m.MatchStage++);
-                    context.UpdateRange(newStage.StageMatches);
-
-                    prevStage = newStage;
-                }
-
                 //Add final final of both brackets by creating a final stage
-                KoStage finalFinalStage = await createBracketStage(context, new KoStage() { Round = r, NumberOfStages = 1 }, 1, null);
+                KoStage finalFinalStage = new KoStage() { Round = r, NumberOfStages = 1 };
+                finalFinalStage = createBracketStage(context, ref finalFinalStage, 1, KoLinkingType.None, ref prevLoserStage);
 
                 //update all values of this final final
                 finalFinalStage.StageGroup.GroupOrderValue = 1;
@@ -88,9 +124,33 @@ namespace ChemodartsWebApp.ModelHelper
 
                 //Link the matches
                 winnersFinalStage.StageMatches.First().WinnerFollowUpMatch = finalFinal;
-                prevStage.StageMatches.First().WinnerFollowUpMatch = finalFinal;
+                winnersFinalStage.StageMatches.First().WinnerFollowUpSeedNr = 1;
+                losersFinalStage.StageMatches.First().WinnerFollowUpMatch = finalFinal;
+                losersFinalStage.StageMatches.First().WinnerFollowUpSeedNr = 2;
 
-                //finalFinal.Update();
+                //Update the linked previous stages in the database
+                context.Groups.Update(finalFinalStage.StageGroup);
+                if (winnersFinalStage.StageMatches is object) context.Matches.UpdateRange(winnersFinalStage.StageMatches);
+                if (losersFinalStage?.StageMatches is object) context.Matches.UpdateRange(losersFinalStage.StageMatches);
+                context.SaveChangesAsync().Wait();
+
+                stages.Add(finalFinalStage);
+            }
+
+            //adjust the stageOrder values
+            stages.Reverse();
+            int stageOrder = 1;
+            foreach (var stage in stages) 
+            {
+                //adjust the group
+                stage.StageGroup.GroupOrderValue = stageOrder;
+                context.Groups.Update(stage.StageGroup);
+
+                //Adjust match stages
+                stage.StageMatches.ForEach(m => m.MatchStage = stageOrder);
+                context.UpdateRange(stage.StageMatches);
+
+                stageOrder++;
             }
             
             //save changes to database
@@ -99,7 +159,7 @@ namespace ChemodartsWebApp.ModelHelper
             return true;
         }
 
-        private static async Task<KoStage> createBracketStage(ChemodartsContext context, KoStage previousStage, int stageNr, bool? connectMatchWinners)
+        private static KoStage createBracketStage(ChemodartsContext context, ref KoStage previousStage, int stageNr, KoLinkingType linkingType, ref KoStage? previousLosersStage)
         {
             KoStage newStage = new KoStage() { 
                 Round = previousStage.Round, 
@@ -114,62 +174,101 @@ namespace ChemodartsWebApp.ModelHelper
             newStage.StageGroup = new Group()
             {
                 RoundId = newStage.Round.RoundId,
-                GroupOrderValue = getStageOrderFromStage(newStage),
+                //GroupOrderValue = getStageOrderFromStage(newStage),
                 GroupName = $"{getGroupName(numberOfPlayersInStage)}",
             };
             context.Groups.Add(newStage.StageGroup);
-            await context.SaveChangesAsync();
+            context.SaveChangesAsync().Wait();
 
             //Make Matches
-            int numberOfMatchesInStage = numberOfPlayersInStage / 2;
+            int numberOfMatchesInStage = (linkingType != KoLinkingType.Mixed) ? numberOfPlayersInStage / 2 : previousStage.StageMatches.Count;
             int matchNr = 0;
             for (int matchStageNr = 0; matchStageNr < numberOfMatchesInStage; matchStageNr++)
             {
                 Match m = new Match()
                 {
                     GroupId = newStage.StageGroup.GroupId,
-                    MatchStage = getStageOrderFromStage(newStage), 
+                    //MatchStage = getStageOrderFromStage(newStage), 
                     MatchOrderValue = ++matchNr,
                 };
                 newStage.StageMatches.Add(m);
             }
             context.Matches.AddRange(newStage.StageMatches);
-            await context.SaveChangesAsync(); //save to get matchIds
+            context.SaveChangesAsync().Wait(); //save to get matchIds
 
             //register as follow up if not base stage
-            if (connectMatchWinners.HasValue && previousStage.StageMatches is object && previousStage.StageMatches.Count == 2 * newStage.StageMatches.Count)
+            if (linkingType != KoLinkingType.None && previousStage.StageMatches is object)
             {
                 for (int i = 0; i < newStage.StageMatches.Count; i++)
                 {
-                    if (connectMatchWinners.Value)
+                    if (linkingType == KoLinkingType.Winners && previousStage.StageMatches?.Count == 2 * newStage.StageMatches.Count)
                     {
                         previousStage.StageMatches[2 * i].WinnerFollowUpMatch = newStage.StageMatches[i];
+                        previousStage.StageMatches[2 * i].WinnerFollowUpSeedNr = 1;
+
                         previousStage.StageMatches[2 * i + 1].WinnerFollowUpMatch = newStage.StageMatches[i];
+                        previousStage.StageMatches[2 * i + 1].WinnerFollowUpSeedNr = 2;
                     }
-                    else
+                    else if (linkingType == KoLinkingType.Losers && previousStage.StageMatches?.Count == 2 * newStage.StageMatches.Count)
                     {
                         previousStage.StageMatches[2 * i].LoserFollowUpMatch = newStage.StageMatches[i];
+                        previousStage.StageMatches[2 * i].LoserFollowUpSeedNr = 1;
+
                         previousStage.StageMatches[2 * i + 1].LoserFollowUpMatch = newStage.StageMatches[i];
+                        previousStage.StageMatches[2 * i + 1].LoserFollowUpSeedNr = 2;
+                    }
+                    else if (linkingType == KoLinkingType.Mixed && previousLosersStage?.StageMatches is object 
+                        && previousStage.StageMatches?.Count == newStage.StageMatches.Count
+                        && previousLosersStage.StageMatches.Count == newStage.StageMatches.Count) 
+                    {
+                        previousLosersStage.StageMatches[i].WinnerFollowUpMatch = newStage.StageMatches[i];
+                        previousLosersStage.StageMatches[i].WinnerFollowUpSeedNr = 1;
+
+                        previousStage.StageMatches[i].LoserFollowUpMatch = newStage.StageMatches[i];
+                        previousStage.StageMatches[i].LoserFollowUpSeedNr = 2;
                     }
                 }
-                await context.SaveChangesAsync();
+
+                //Update the linked previous stages in the database
+                if(previousStage.StageMatches is object) context.Matches.UpdateRange(previousStage.StageMatches);
+                if(previousLosersStage?.StageMatches is object) context.Matches.UpdateRange(previousLosersStage.StageMatches);
+                context.SaveChangesAsync().Wait();
             }
 
             return newStage;
         } 
 
-        private static int getStageOrderFromStage(KoStage s)
+        private static KoStage adjustLoserStage(ChemodartsContext context, KoStage loserStage, string? groupName = null)
         {
-            switch(s.Round.Modus)
-            {
-                case RoundModus.SingleKo:
-                    return s.StageNr;
-                case RoundModus.DoubleKo:
-                    return 2 * s.StageNr;
-                default:
-                    return -1;
-            }
+            //Change name of the group
+            if (groupName is object) loserStage.StageGroup.GroupName = groupName;
+            else loserStage.StageGroup.GroupName = $"Losers - {loserStage.StageGroup.GroupName}";
+
+            //Adjust the group stage
+            //loserStage.StageGroup.GroupOrderValue++;
+            //context.Groups.Update(loserStage.StageGroup);
+
+            ////Adjust match stages
+            //loserStage.StageMatches.ForEach(m => m.MatchStage++);
+            //context.UpdateRange(loserStage.StageMatches);
+
+            //context.SaveChangesAsync().Wait();
+
+            return loserStage;
         }
+
+        //private static int getStageOrderFromStage(KoStage s)
+        //{
+        //    switch(s.Round.Modus)
+        //    {
+        //        case RoundModus.SingleKo:
+        //            return s.StageNr;
+        //        case RoundModus.DoubleKo:
+        //            return 2 * s.StageNr;
+        //        default:
+        //            return -1;
+        //    }
+        //}
 
         public static string ErrorMessage;
         public static async Task<bool> FillSeeds(ChemodartsContext context, SeedingType type, Round r, List<Seed>? seeds = null, int fixedSeedCount = 0)
@@ -236,9 +335,16 @@ namespace ChemodartsWebApp.ModelHelper
             return r.Groups?.MaxBy(g => g.GroupOrderValue);
         }
 
-        public static List<Seed> FillWithByeSeeds(List<Seed> seeds, int desiredSeedCount)
+        public static Match? GetFinal(Round r)
         {
-            while (seeds.Count < desiredSeedCount) seeds.Add(BYE_SEED);
+            return r.Groups?.MinBy(g => g.GroupOrderValue).OrderedMatches.LastOrDefault();
+        }
+
+        public static List<Seed> FillWithByeSeeds(List<Seed> seeds, int desiredSeedCount, int? groupId)
+        {
+            if (groupId is null) return seeds;
+
+            while (seeds.Count < desiredSeedCount) seeds.Add(Seed.CreateByeSeed(groupId.Value));
 
             return seeds;
         }
@@ -257,7 +363,7 @@ namespace ChemodartsWebApp.ModelHelper
             }
 
             //Add bye seeds if necessary
-            seeds = FillWithByeSeeds(seeds, matches.Count);
+            seeds = FillWithByeSeeds(seeds, matches.Count, matches.FirstOrDefault()?.GroupId);
 
             //Randomize 2nd seed
             foreach (Match m in matches)
@@ -265,17 +371,6 @@ namespace ChemodartsWebApp.ModelHelper
                 //set seed 2
                 randomSeed = seeds.ElementAt(random.Next(seeds.Count));
                 seeds.Remove(randomSeed);
-
-                //Handle bye seeds
-                if (!randomSeed.Equals(BYE_SEED))
-                {
-                    m.Seed2 = randomSeed;
-                }
-                else
-                {
-                    m.Seed2 = null;
-                    m.SetNewStatus(Match.MatchStatus.Finished);
-                }
             }
 
             return matches;
@@ -284,7 +379,7 @@ namespace ChemodartsWebApp.ModelHelper
         public static List<Match> FillFixedSeedsForMatches(List<Match> matches, List<Seed> seeds)
         {
             int numberOfMatches = matches.Count;
-            seeds = FillWithByeSeeds(seeds, 2 * numberOfMatches);
+            seeds = FillWithByeSeeds(seeds, 2 * numberOfMatches, matches.FirstOrDefault()?.GroupId);
 
             //Pair the seeds top down so that seeds get matched with the lowest rank possible
             List<Tuple<int, int>>? pairsList = RoundKoLogic.GetSeedPairsOfBracket(numberOfMatches);
@@ -300,58 +395,9 @@ namespace ChemodartsWebApp.ModelHelper
                 Match m = matches[i];
                 m.Seed1 = seeds[pairsList[i].Item1 - 1];
                 m.Seed2 = seeds[pairsList[i].Item2 - 1];
-
-                //handle byes
-                if (m.Seed1.Equals(RoundKoLogic.BYE_SEED))
-                {
-                    m.Seed1 = null;
-                    m.SetNewStatus(Match.MatchStatus.Finished);
-                }
-                else if (m.Seed2.Equals(RoundKoLogic.BYE_SEED))
-                {
-                    m.Seed2 = null;
-                    m.SetNewStatus(Match.MatchStatus.Finished);
-                }
             }
 
             return matches;
-        }
-
-        public static void UpdateFirstRoundSeeds(Data.ChemodartsContext context, Round previousRound, Group firstKoRoundGroup)
-        {
-            int numberOfMatches = firstKoRoundGroup.Matches.Count;
-            int matchNr = 0;
-            foreach (Match m in firstKoRoundGroup.Matches)
-            {
-                if ((2 * numberOfMatches) == previousRound.Groups.Count)
-                {
-                    Seed sforS1 = previousRound.Groups.ElementAt(2 * matchNr).RankedSeeds.ElementAt(0);
-                    m.Seed1Id = sforS1.SeedId;
-                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname ?? sforS1.SeedName;
-
-                    Seed sforS2 = previousRound.Groups.ElementAt(2 * matchNr + 1).RankedSeeds.ElementAt(0);
-                    m.Seed2Id = sforS2.SeedId;
-                    m.Seed2.SeedName = sforS2.Player?.PlayerDartname ?? sforS2.SeedName;
-                }
-                else if (numberOfMatches == previousRound.Groups.Count)
-                {
-                    Seed sforS1 = previousRound.Groups.ElementAt(matchNr).RankedSeeds.ElementAt(0);
-                    m.Seed1Id = sforS1.SeedId;
-                    m.Seed1.SeedName = sforS1.Player?.PlayerDartname ?? sforS1.SeedName;
-
-                    Seed sforS2 = previousRound.Groups.ElementAt(numberOfMatches - 1 - matchNr).RankedSeeds.ElementAt(1);
-                    m.Seed2Id = sforS2.SeedId;
-                    m.Seed2.SeedName = sforS2.Player?.PlayerDartname ?? sforS2.SeedName;
-                }
-                else
-                {
-                    //Group count does not match
-                    return;
-                }
-                matchNr++;
-            }
-
-            context.SaveChanges();
         }
 
         public static void UpdateKoRoundSeeds(Data.ChemodartsContext context, Round r)
@@ -361,11 +407,152 @@ namespace ChemodartsWebApp.ModelHelper
 
             foreach(Match m in frm)
             {
-                m.UpdateUpwards();
+                m.CheckWinnerAndHandleFollowUpMatches(true);
             }
 
             context.SaveChanges();
         }
+
+        #region Frontend Seed Dummys
+
+        public static void CreateDummySeedsForMatches(ref Round r)
+        {
+            List<Match> topTiers = new List<Match>();
+
+            List<Match>? frm = GetFirstRoundMatches(r);
+            if (frm is null) return;
+
+            //Get all the Top level matches (without follow ups)
+            foreach (Match m in frm)
+            {
+                getTopLevelMatches(m, ref topTiers);
+            }
+
+            topTiers.ForEach(tt => updateSeedNamesFromAncestors(tt));
+        }
+
+        private static void getTopLevelMatches(Match? m, ref List<Match> topTiers)
+        {
+            if(m is null || topTiers is null) return;
+
+            if (m.WinnerFollowUpMatch is null && m.LoserFollowUpMatch is null)
+            {
+                if(!topTiers.Contains(m)) topTiers.Add(m);
+            }
+            else
+            {
+                // propagate upwards
+                getTopLevelMatches(m.WinnerFollowUpMatch, ref topTiers);
+                getTopLevelMatches(m.LoserFollowUpMatch, ref topTiers);
+            }
+        }
+
+        private static void updateSeedNamesFromAncestors(Match m)
+        {
+            if (m.AncestorMatches?.Count == 2)
+            {
+                Match? am1 = m.AncestorMatches.Where(am => IsAncesterMatchForMatchsSeedNr(am, m, 1)).FirstOrDefault();
+                if (am1 is object)
+                {
+                    updateSeedNamesFromAncestors(am1);
+
+                    bool isWinnerAncestor = m.AncestorMatchesAsWinner?.Contains(am1) ?? false;
+                    updateSeedNameFromAncestor(m.GroupId, am1, m.Seed1, out Seed? s1New, isWinnerAncestor);
+                    m.Seed1 = s1New;
+                }
+
+                Match? am2 = m.AncestorMatches.Where(am => IsAncesterMatchForMatchsSeedNr(am, m, 2)).FirstOrDefault();
+                if (am2 is object)
+                {
+                    updateSeedNamesFromAncestors(am2);
+
+                    bool isWinnerAncestor = m.AncestorMatchesAsWinner?.Contains(am2) ?? false;
+                    updateSeedNameFromAncestor(m.GroupId, am2, m.Seed2, out Seed? s2New, isWinnerAncestor);
+                    m.Seed2 = s2New;
+                }
+            }
+            else
+            {
+                //Seed has no ancesters, so add their name/player name to the list
+                updateSeedName(m.Seed1);
+                updateSeedName(m.Seed2);
+            }
+        }
+
+        private static bool IsAncesterMatchForMatchsSeedNr(Match ancesterMatch, Match match, int seedNr)
+        {
+            if ((ancesterMatch.WinnerFollowUpMatch?.Equals(match) ?? false) && ancesterMatch.WinnerFollowUpSeedNr == seedNr)
+            {
+                return true;
+            }
+            else if ((ancesterMatch.LoserFollowUpMatch?.Equals(match) ?? false) && ancesterMatch.LoserFollowUpSeedNr == seedNr)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        private static void updateSeedNameFromAncestor(int groupId, Match ancestorMatch, Seed? S1orS2, out Seed? winnerOrLoserSeed, bool useWinnerSeed)
+        {
+            ancestorMatch.HandleWinnerLoserSeedOfMatch();
+
+            if (ancestorMatch.WinnerSeed is object)
+            {
+                //Match has winner. There is only one possible seed for the next level.
+                winnerOrLoserSeed = useWinnerSeed ? ancestorMatch.WinnerSeed : ancestorMatch.LoserSeed;
+                updateSeedName(winnerOrLoserSeed);
+            }
+            else //Match has no winner
+            {
+                //check if this match already has a dummy seed and create if not
+                winnerOrLoserSeed = S1orS2 is object ? S1orS2 : new Seed() { IsDummy = true, GroupId = groupId };
+
+                //Update possible seeds
+                List<Seed?> ps = new List<Seed?>();
+                ps.AddRange(ancestorMatch.Seed1?.PossibleSeeds ?? new List<Seed?>());
+                ps.AddRange(ancestorMatch.Seed2?.PossibleSeeds ?? new List<Seed?>());
+
+                //update the name
+                updateSeedName(winnerOrLoserSeed, ps);
+            }
+        }
+
+        private static void updateSeedName(Seed? s, List<Seed?>? ps = null)
+        {
+            if (s is null) return;
+
+            if (ps is object)
+            {
+                //remove duplicates and null's
+                s.PossibleSeeds = ps.Distinct().Where(s => s is object).ToList();
+            }
+            else
+            {
+                //only possible seed is seed itself
+                s.PossibleSeeds = new List<Seed?>() { s };
+            }
+
+            //update the name
+            if (s.Player is object)
+            {
+                s.SeedName = s.Player?.ShortName;
+            }
+            else if(s.IsByeSeed())
+            {
+                return;
+                //s.SeedName = Seed.BYE_SEED.SeedName;
+            }
+            else if (s.PossibleSeeds.Count <= 12)
+            {
+                s.SeedName = String.Join(" | ", s.PossibleSeeds.Select(s => s.Player?.ShortName ?? s.SeedName));
+            }
+            else
+            {
+                s.SeedName = $"{s.PossibleSeeds.Count} possible seeds";
+            }
+        }
+
+        #endregion
 
         private static List<Tuple<int, int>>? GetSeedPairsOfBracket(int numberOfMatches)
         {

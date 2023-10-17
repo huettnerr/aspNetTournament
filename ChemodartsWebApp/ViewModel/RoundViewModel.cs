@@ -11,7 +11,10 @@ namespace ChemodartsWebApp.ViewModel
             set
             {
                 _r = value;
-                if (_r is object) base.T = _r.Tournament;
+                if (_r is object)
+                {
+                    base.T = _r.Tournament;
+                }
             } 
         }
 
