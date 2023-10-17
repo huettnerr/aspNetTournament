@@ -10,18 +10,22 @@ using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 using ChemodartsWebApp.ViewModel;
+using ChemodartsWebApp.ModelHelper;
 
 namespace ChemodartsWebApp.Controllers
 {
     public class MatchController : Controller
     {
-        private readonly ChemodartsContext _context;
-
         private const string editQuery = "editMatchId";
+        private readonly ChemodartsContext _context;
+        private readonly MatchLogic _matchLogic;
+        private readonly RoundKoLogic _koLogic;
 
-        public MatchController(ChemodartsContext context)
+        public MatchController(ChemodartsContext context, MatchLogic matchLogic, RoundKoLogic koLogic)
         {
             _context = context;
+            _matchLogic = matchLogic;
+            _koLogic = koLogic;
         }
 
         // GET Vollständige Matchliste
@@ -65,7 +69,7 @@ namespace ChemodartsWebApp.Controllers
             Match? m = await _context.Matches.QueryId(matchId);
             if (m is null) return NotFound();
 
-            if (m.SetNewStatus(Match.MatchStatus.Active))
+            if (_matchLogic.SetNewStatus(m, Match.MatchStatus.Active))
             {
                 if (m.Score is null)
                 {
@@ -110,30 +114,32 @@ namespace ChemodartsWebApp.Controllers
             //Match m = _context.DebugTournament.Rounds.ElementAt(0).Groups.ElementAt(0).Matches.ElementAt(0);
             if (m is null) return NotFound();
 
+            //Handle Score
             if (m.Score is object && seed1Legs is object && seed2Legs is object)
             {
                 m.Score.P1Legs = seed1Legs ?? 0;
                 m.Score.P2Legs = seed2Legs ?? 0;
 
-                if (newMatchStatus is object) 
-                {
-                    m.SetNewStatus(newMatchStatus.Value);
-                }
-
-                if (newVenueId?.Equals(0) ?? true) { m.VenueId = null; }
-                m.Venue = await _context.Venues.QueryId(newVenueId);
-
-                _context.Matches.Update(m);
+                _context.Scores.Update(m.Score);
                 await _context.SaveChangesAsync();
+            }
+
+            //Handle Venue
+            if (newVenueId?.Equals(0) ?? true) { 
+                m.VenueId = null;
             }
             else
             {
-                if (newMatchStatus is object)
-                {
-                    m.SetNewStatus(newMatchStatus.Value);
-                    _context.Matches.Update(m);
-                    await _context.SaveChangesAsync();
-                }
+                m.Venue = await _context.Venues.QueryId(newVenueId);
+            }
+            _context.Matches.Update(m);
+            await _context.SaveChangesAsync();
+
+            //Handle Match Status
+            if (newMatchStatus is object)
+            {
+                _matchLogic.SetNewStatus(m, newMatchStatus.Value);
+                _koLogic.CreateDummySeedsForMatches(m.Group.Round);
             }
 
             return this.RedirectToPreviousPage(fragment: $"Match_{matchId}", editQueryStringToRemove: editQuery);

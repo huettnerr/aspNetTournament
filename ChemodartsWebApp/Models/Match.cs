@@ -28,7 +28,7 @@ namespace ChemodartsWebApp.Models
         [Column("seed1Id")] public int? Seed1Id { get; set; }
         [Column("seed2Id")] public int? Seed2Id { get; set; }
         [Column("winnerSeedId")] public int? WinnerSeedId { get; set; }
-        [Display(Name = "Status")][Column("status")] public MatchStatus Status { get; private set; } = Match.MatchStatus.Created;
+        [Display(Name = "Status")][Column("status")] public MatchStatus Status { get; set; }
         [Column("venueId")] public int? VenueId {get; set; }
 
         [Display(Name = "Startzeit")][Column("time_started")][DataType(DataType.DateTime)]
@@ -48,11 +48,8 @@ namespace ChemodartsWebApp.Models
         public virtual Seed? Seed1 { get; set; }
         [Display(Name = "Gast")] 
         public virtual Seed? Seed2 { get; set; }
-        public virtual Seed? WinnerSeed { 
-            get; 
-            private set; 
-        }
-        [NotMapped] public virtual Seed? LoserSeed { get; private set; }    
+        public virtual Seed? WinnerSeed { get; set; }
+        [NotMapped] public virtual Seed? LoserSeed { get; set; }    
         public virtual Score? Score { get; set; }
         public virtual Match? WinnerFollowUpMatch { get; set; }
         public virtual Match? LoserFollowUpMatch { get; set; }
@@ -74,75 +71,35 @@ namespace ChemodartsWebApp.Models
             }
         }
 
-        //Functions
-
-        public bool SetNewStatus(MatchStatus newStatus)
+        public bool IsWinnerSeed(Seed? s)
         {
-            bool statusChanged = !Status.Equals(newStatus);             
-            switch(newStatus)
-            {
-                case MatchStatus.Active:
-                    //both seeds are null, dummy or bye. Dont start match
-                    if ((Seed1 is null || Seed1.IsDummy || Seed1.IsByeSeed()) && (Seed2 is null || Seed2.IsDummy || Seed2.IsByeSeed())) return false; 
-                    break;
-                case MatchStatus.Created:
-                    Score = null;
-                    break;
-                case MatchStatus.Finished: 
-                    Venue = null;
-                    break;
-            }
+            if (s is null) return false;
 
-            Status = newStatus;
-
-            Update(statusChanged);
-            return true;
+            return s.Equals(WinnerSeed);
         }
 
-        public void Update(bool statusChanged)
+        public bool IsMatchOfSeeds(Seed? s1, Seed? s2)
         {
-            switch (Group.Round.Modus)
+            if (Seed1 is null || Seed2 is null || s1 is null || s2 is null) return false;
+
+            if (Seed1.Equals(s1) && Seed2.Equals(s2) || Seed1.Equals(s2) && Seed2.Equals(s1))
             {
-                case RoundModus.RoundRobin:
-                    if (HandleWinnerLoserSeedOfMatch() || statusChanged)
-                    {
-                        Ranking.UpdateGroupRanking(Group);
-                    }
-                    break;
-                case RoundModus.SingleKo:
-                case RoundModus.DoubleKo:
-                    CheckWinnerAndHandleFollowUpMatches(statusChanged);
-                    break;
+                return true;
             }
+
+            return false;
         }
 
-        /// <summary>
-        /// Checks if the Match has a winner and if so, it propagates the update to the following matches
-        /// </summary>
-        /// <param name="statusChanged">If the statusChanged is true the updated seeds will be propagated either way</param>
-        public void CheckWinnerAndHandleFollowUpMatches(bool statusChanged)
+        public bool IsMatchOfPlayers(Player p1, Player p2)
         {
-            bool hasMatchWínner = HandleWinnerLoserSeedOfMatch();
+            if (Seed1?.Player is null || Seed2?.Player is null) return false;
 
-            if (hasMatchWínner || statusChanged)
+            if (Seed1.Player.Equals(p1) && Seed2.Player.Equals(p2) || Seed1.Player.Equals(p2) && Seed2.Player.Equals(p1))
             {
-                //Match has winner. Handle Follow-Ups
-                if (WinnerFollowUpMatch is object)
-                {
-                    if (WinnerFollowUpSeedNr == 1) WinnerFollowUpMatch.Seed1 = hasMatchWínner ? WinnerSeed : null;
-                    else if (WinnerFollowUpSeedNr == 2) WinnerFollowUpMatch.Seed2 = hasMatchWínner ? WinnerSeed : null;
-
-                    WinnerFollowUpMatch.CheckWinnerAndHandleFollowUpMatches(statusChanged);
-                }
-
-                if (LoserFollowUpMatch is object)
-                {
-                    if (LoserFollowUpSeedNr == 1) LoserFollowUpMatch.Seed1 = hasMatchWínner ? LoserSeed : null;
-                    else if (LoserFollowUpSeedNr == 2) LoserFollowUpMatch.Seed2 = hasMatchWínner ? LoserSeed : null;
-
-                    LoserFollowUpMatch.CheckWinnerAndHandleFollowUpMatches(statusChanged);
-                }
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
@@ -212,40 +169,9 @@ namespace ChemodartsWebApp.Models
                 }
             }
 
-            CLEAR:
+        CLEAR:
             WinnerSeed = null;
             LoserSeed = null;
-            return false;
-        }
-
-        public bool IsWinnerSeed(Seed? s)
-        {
-            if (s is null) return false;
-
-            return s.Equals(WinnerSeed);
-        }
-
-        public bool IsMatchOfSeeds(Seed? s1, Seed? s2)
-        {
-            if(Seed1 is null || Seed2 is null || s1 is null || s2 is null) return false;
-
-            if (Seed1.Equals(s1) && Seed2.Equals(s2) || Seed1.Equals(s2) && Seed2.Equals(s1))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        public bool IsMatchOfPlayers(Player p1, Player p2)
-        {
-            if (Seed1?.Player is null || Seed2?.Player is null) return false;
-
-            if (Seed1.Player.Equals(p1) && Seed2.Player.Equals(p2) || Seed1.Player.Equals(p2) && Seed2.Player.Equals(p1))
-            {
-                return true;
-            }
-
             return false;
         }
 

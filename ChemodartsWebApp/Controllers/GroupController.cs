@@ -62,7 +62,7 @@ namespace ChemodartsWebApp.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateRR(int? tournamentId, int? roundId, int? groupId, GroupFactoryRR rrFactory)
+        public async Task<IActionResult> CreateRR(int? tournamentId, int? roundId, GroupFactoryRR rrFactory)
         {
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
@@ -72,31 +72,6 @@ namespace ChemodartsWebApp.Controllers
                 return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
             }
             return View("Create", new GroupViewModel() { R = r, GF = rrFactory });
-        }
-
-        // POST: Players/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Administrator")]
-        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, int? groupId, GroupFactoryKO koFactory)
-        {
-            Round? r = await _context.Rounds.QueryId(roundId);
-            if (r is null) return NotFound();
-
-            List<Seed>? seeds = r.MappedSeedsPlayers?.Select(x => x.Seed).ToList();
-            if(seeds is null || seeds.Count == 0) return NotFound();
-
-            if (await RoundKoLogic.CreateKoSystem(_context, r, koFactory.NumberOfPlayers))
-            {
-                if(await RoundKoLogic.FillSeeds(_context, RoundKoLogic.SeedingType.Random, r, seeds))
-                {
-                    return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
-                }
-            }
-
-            return View("Create", new GroupViewModel() { R = r, GF = koFactory });
         }
 
         // GET: Players/Edit/5

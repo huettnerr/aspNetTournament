@@ -17,12 +17,14 @@ namespace ChemodartsWebApp.Controllers
     public class SettingsController : Controller
     {
         private readonly ChemodartsContext _context;
+        private readonly ProgressionManager _progressionManager;
 
         private const string editQuery = "editMrpId";
 
-        public SettingsController(ChemodartsContext context)
+        public SettingsController(ChemodartsContext context, ProgressionManager progressionManager)
         {
             _context = context;
+            _progressionManager = progressionManager;
         }
 
         [Authorize(Roles = "Administrator")]
@@ -69,8 +71,8 @@ namespace ChemodartsWebApp.Controllers
                 _context.Entry(mrp).Reference(m => m.TargetRound).Load();
 
                 //try handle progression as a dummy 
-                ProgressionManager pm = new ProgressionManager(_context, true);
-                if (await pm.Manage(mrp))
+                _progressionManager.UseDummySeeds = true;
+                if (await _progressionManager.Manage(mrp))
                 {
                     //everything all right, save in database
                     await _context.SaveChangesAsync();
@@ -153,8 +155,8 @@ namespace ChemodartsWebApp.Controllers
             Round? r =await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
 
-            ProgressionManager pm = new ProgressionManager(_context);
-            if(await pm.ManageAll(r))
+            _progressionManager.UseDummySeeds = false;
+            if(await _progressionManager.ManageAll(r))
             {
 
                 r.IsRoundStarted = true;
@@ -167,7 +169,7 @@ namespace ChemodartsWebApp.Controllers
             }
             else
             {
-                ViewBag.UpdateMessage = pm.ErrorMessage;
+                ViewBag.UpdateMessage = _progressionManager.ErrorMessage;
                 return this.RedirectToPreviousPage();
             }
         }

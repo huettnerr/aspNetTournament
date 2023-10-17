@@ -5,15 +5,17 @@ namespace ChemodartsWebApp.ModelHelper
 {
     public class ProgressionManager
     {
-        public string ErrorMessage { get; private set; }
-
         private ChemodartsContext _context;
-        private bool _useDummySeeds;
+        private RoundKoLogic _koLogic;
 
-        public ProgressionManager(ChemodartsContext context, bool useDummySeeds = false) 
+        public string ErrorMessage { get; private set; }
+        public bool UseDummySeeds { get; set; }
+
+        public ProgressionManager(ChemodartsContext context, RoundKoLogic koLogic, bool useDummySeeds = false) 
         { 
             _context= context;
-            _useDummySeeds = useDummySeeds;
+            _koLogic= koLogic;
+            UseDummySeeds = useDummySeeds;
         }
 
         public async Task<bool> ManageAll(Round? r)
@@ -64,7 +66,7 @@ namespace ChemodartsWebApp.ModelHelper
             int numberOfPlayers = mrp.AdvanceCount * numberOfGroups;
             int numberOfByePlayers = mrp.ByeCount * numberOfGroups;
 
-            if (!await RoundKoLogic.CreateKoSystem(_context, mrp.TargetRound, numberOfPlayers))
+            if (!await _koLogic.CreateKoSystem(mrp.TargetRound, numberOfPlayers))
             {
                 ErrorMessage = $"Failed to create Ko-System!";
                 return false;
@@ -72,7 +74,7 @@ namespace ChemodartsWebApp.ModelHelper
 
             //Get all the seeds that advance
             List<Seed>? relevantSeeds;
-            if (!_useDummySeeds)
+            if (!UseDummySeeds)
             {
                 //Get the advancing seeds from base round
                 relevantSeeds = Ranking.GetProgressingSeeds(mrp.BaseRound, mrp.AdvanceCount);
@@ -88,7 +90,7 @@ namespace ChemodartsWebApp.ModelHelper
             else
             {
                 //Use dummy names
-                Group? firstRoundGroup = RoundKoLogic.GetFirstRoundGroup(mrp.TargetRound);
+                Group? firstRoundGroup = _koLogic.GetFirstRoundGroup(mrp.TargetRound);
                 if(firstRoundGroup is null) return false;
 
                 relevantSeeds = new List<Seed>();
@@ -108,15 +110,14 @@ namespace ChemodartsWebApp.ModelHelper
             }
 
             // fill the seeds
-            await RoundKoLogic.FillSeeds(
-                _context, 
+            await _koLogic.FillSeeds(
                 fixedPositions ? RoundKoLogic.SeedingType.FixedForAll : RoundKoLogic.SeedingType.Random, 
                 mrp.TargetRound,
-                (_useDummySeeds && !fixedPositions) ? null : relevantSeeds //when random dummys, the group names shall not be used
+                (UseDummySeeds && !fixedPositions) ? null : relevantSeeds //when random dummys, the group names shall not be used
             );
 
             //Get the matches of the first round of the tournament bracket
-            List<Match>? firstRoundMatches = RoundKoLogic.GetFirstRoundMatches(mrp.TargetRound);
+            List<Match>? firstRoundMatches = _koLogic.GetFirstRoundMatches(mrp.TargetRound);
             if (firstRoundMatches is null || firstRoundMatches.Count == 0)
             {
                 ErrorMessage = $"No first round matches found!";
@@ -143,7 +144,8 @@ namespace ChemodartsWebApp.ModelHelper
 
 
             //update the seeds of the following rounds to show valid bracket information
-            RoundKoLogic.UpdateKoRoundSeeds(_context, mrp.TargetRound);
+            _koLogic.UpdateKoRoundSeeds(mrp.TargetRound);
+            _koLogic.CreateDummySeedsForMatches(mrp.TargetRound);
 
             return true;
         }

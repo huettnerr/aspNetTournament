@@ -7,6 +7,7 @@ using ChemodartsWebApp.Models;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Data.SqlClient;
 using System.Web.Mvc;
+using ChemodartsWebApp.ModelHelper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +19,10 @@ builder.Services.AddDbContext<ChemodartsContext>(
     options => options.UseLazyLoadingProxies().UseMySQL(connectionString), 
     ServiceLifetime.Scoped
 );
+
+builder.Services.AddScoped<RoundKoLogic>();
+builder.Services.AddScoped<MatchLogic>();
+builder.Services.AddScoped<ProgressionManager>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

@@ -17,10 +17,12 @@ namespace ChemodartsWebApp.Controllers
     public class RoundController : Controller
     {
         private readonly ChemodartsContext _context;
+        private readonly RoundKoLogic _koLogic;
 
-        public RoundController(ChemodartsContext context)
+        public RoundController(ChemodartsContext context, RoundKoLogic koLogic)
         {
             _context = context;
+            _koLogic = koLogic;
         }
 
         //GET Rundenansicht
@@ -29,11 +31,6 @@ namespace ChemodartsWebApp.Controllers
             //search for spezific tournament
             Round? r = await _context.Rounds.QueryId(roundId);
             if (r is null) return NotFound();
-
-            if(r.IsKoRound())
-            {
-                RoundKoLogic.CreateDummySeedsForMatches(ref r);
-            }
 
             return View(new RoundViewModel() { R = r });
         }
@@ -69,6 +66,31 @@ namespace ChemodartsWebApp.Controllers
             }
 
             return View(new RoundViewModel() { T = t, RF = roundFactory });
+        }
+
+        // POST: Players/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> CreateKO(int? tournamentId, int? roundId, GroupFactoryKO koFactory)
+        {
+            Round? r = await _context.Rounds.QueryId(roundId);
+            if (r is null) return NotFound();
+
+            List<Seed>? seeds = r.MappedSeedsPlayers?.Select(x => x.Seed).ToList();
+            if (seeds is null || seeds.Count == 0) return NotFound();
+
+            if (await _koLogic.CreateKoSystem(r, koFactory.NumberOfPlayers))
+            {
+                if (await _koLogic.FillSeeds(RoundKoLogic.SeedingType.Random, r, seeds))
+                {
+                    return RedirectToRoute("Round", new { controller = "Round", tournamentId = tournamentId, action = "Index", roundId = r.RoundId });
+                }
+            }
+
+            return View("Create", new GroupViewModel() { R = r, GF = koFactory });
         }
 
         [Authorize(Roles = "Administrator")]

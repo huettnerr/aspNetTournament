@@ -2,7 +2,7 @@
 
 @foreach (var group in Model.R.OrderedGroups.Reverse()) {
     <h2 class="display-4">
-        <a cd-route="Group" cd-action="Index" asp-route-groupId="@group.GroupId">
+        <a cd-route="Group" cd-action="Index" cd-route-groupId="@group.GroupId">
         <b>@group.GroupName</b>
         </a>
     </h2>
